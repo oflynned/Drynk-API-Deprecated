@@ -7,8 +7,8 @@ import { User } from '../models/user.model';
 export class Session {
   private static widmark(drink: Drink, user: User): number {
     // BAC = (ethanol of drink in grams / (widmark factor * weight in g)) - (metabolism rate * time in hours since drink)
-    const bacEffect = ((drink.ethanolGrams() / (user.widmarkConstant * user.weight)) * 100) - (user.metabolismRate * drink.timeSinceDrink('HOURS').elapsedTime);
-    return bacEffect < 0 ? 0 : bacEffect;
+    const bloodAlcoholEffect = ((drink.ethanolGrams() / (user.widmarkConstant * user.weight)) * 100) - (user.metabolismRate * drink.timeSinceDrink('HOURS').elapsedTime);
+    return Math.max(0, bloodAlcoholEffect);
   }
 
   async calculateDrinkSeries(): Promise<object[]> {
@@ -20,6 +20,8 @@ export class Session {
       const ethanolGrams = drink.ethanolGrams();
       const ethanolMls = drink.ethanolVolume();
 
+      // TODO refactor this as it is not needed aside from calculating the widmark hit for the series since the user was last sober
+      //      or over the drinks that are only affecting the user in the current session
       return {
         intake: {
           volume: `${drink.toJson().volume} ml`,
