@@ -1,0 +1,7 @@
+node_modules
+dist/
+.idea/
+.yalc/
+yalc.lock
+.env
+yarn-error.log
