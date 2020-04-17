@@ -6,37 +6,38 @@ import { Session } from '../../services/session.service';
 
 export const graphql = (app: Application) => {
   const typeDefs = gql`
-      type Drink {
-          _id: ID!
-          createdAt: Float!
-          updatedAt: Float
-          deletedAt: Float
-          deleted: Boolean!
-          drinkWasDowned: Boolean!
-          volume: Int!
-          abv: Int!
-          drinkName: String!
-      }
+    type Drink {
+      _id: ID!
+      createdAt: Float!
+      updatedAt: Float
+      deletedAt: Float
+      deleted: Boolean!
+      drinkWasDowned: Boolean!
+      volume: Int!
+      abv: Int!
+      drinkName: String!
+    }
 
-      type Session {
-          bloodAlcoholContent: Float
-      }
+    type Session {
+      bloodAlcoholContent: Float
+      timeToSober: Float
+    }
 
-      type Query {
-          getDrinks: [Drink]
-          getDrink(drinkId: String!): Drink
-          getSession(userId: String): Session
-      }
+    type Query {
+      getDrinks: [Drink]
+      getDrink(drinkId: String!): Drink
+      getSession(userId: String): Session
+    }
 
-      type Mutation {
-          addDrink(
-              drinkWasDowned: Boolean!
-              volume: Int!
-              abv: Int!
-              drinkName: String!
-          ): Drink!
-          removeDrink(drinkId: ID!): Drink
-      }
+    type Mutation {
+      addDrink(
+        drinkWasDowned: Boolean!
+        volume: Int!
+        abv: Int!
+        drinkName: String!
+      ): Drink!
+      removeDrink(drinkId: ID!): Drink
+    }
   `;
 
   const resolvers = {
@@ -48,13 +49,15 @@ export const graphql = (app: Application) => {
         context: object,
         args: { drinkId: string }
       ): Promise<Drink> => {
-        return Repository.with(Drink).findById(args.drinkId, { populate: true });
+        return Repository.with(Drink).findById(args.drinkId, {
+          populate: true
+        });
       },
       getSession: async (
         context: object,
         args: { userId?: string }
       ): Promise<Session> => {
-        return new Session();
+        return Session.getInstance();
       }
     },
     Mutation: {

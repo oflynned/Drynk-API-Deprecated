@@ -7,15 +7,17 @@ const routes = (): Router => {
   router.get(
     '/series',
     async (req: Request, res: Response): Promise<void> => {
-      const series = await new Session().calculateDrinkSeries();
-      res.status(200).json(series);
+      const session = await Session.getInstance();
+      res.status(200).json(session.drinkSeries);
     }
   );
   router.get(
     '/bac',
     async (req: Request, res: Response): Promise<void> => {
-      const bac = await new Session().bloodAlcoholContent();
-      res.status(200).json({ bac });
+      const session: Session = await Session.getInstance();
+      const currentBac = session.bloodAlcoholContent();
+      const hoursToSober = await session.timeToSober();
+      res.status(200).json({ currentBac, hoursToSober });
     }
   );
 
