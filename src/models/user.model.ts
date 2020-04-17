@@ -1,8 +1,17 @@
 type Sex = 'MALE' | 'FEMALE';
 
+type Mass = 'KG' | 'G';
+
+type Length = 'M' | 'CM'
+
+interface MeasureType<Unit> {
+  value: number,
+  unit: Unit
+}
+
 export class User {
-  private readonly MALE_WIDMARK_CONSTANT = 0.68;
-  private readonly FEMALE_WIDMARK_CONSTANT = 0.55;
+  // static readonly MALE_WIDMARK_CONSTANT = 0.68;
+  // static readonly FEMALE_WIDMARK_CONSTANT = 0.55;
 
   private readonly MALE_METABOLISM_RATE = 0.015;
   private readonly FEMALE_METABOLISM_RATE = 0.017;
@@ -17,32 +26,51 @@ export class User {
     this.heightInCm = 189;
   }
 
-  get height(): number {
-    return this.heightInCm;
-  }
-
-  get weight(): number {
-    return this.weightInKg * 1000;
-  }
-
   get isMale(): boolean {
     return this.sex === 'MALE';
   }
 
   get widmarkConstant(): number {
-    // average values
-    return this.isMale ? this.MALE_WIDMARK_CONSTANT : this.FEMALE_WIDMARK_CONSTANT;
+    const weight = this.weight('KG').value;
+    const height = this.height('CM').value;
 
-    // this doesn't work from the paper, I might be converting float <-> int weird at some point with .toFixed(...)
-    // if (this.isMale) {
-    //   return (0.3161 - 0.004821 * this.weight) + (0.004632 * this.height);
-    // }
-    //
-    // return (0.3122 - 0.006446 * this.weight) + (0.004466 * this.height);
+    if (this.isMale) {
+      return (0.3161 - 0.004821 * weight + 0.004632 * height);
+    }
+
+    return (0.3122 - 0.006446 * weight + 0.004466 * height);
   }
 
   get metabolismRate(): number {
     return this.isMale ? this.MALE_METABOLISM_RATE : this.FEMALE_METABOLISM_RATE;
+  }
+
+  height(unit: Length): MeasureType<Length> {
+    if (unit === 'CM') {
+      return {
+        value: this.heightInCm,
+        unit
+      };
+    }
+
+    return {
+      value: this.heightInCm / 100,
+      unit
+    }
+  }
+
+  weight(unit: Mass): MeasureType<Mass> {
+    if (unit === 'G') {
+      return {
+        value: this.weightInKg * 1000,
+        unit
+      };
+    }
+
+    return {
+      value: this.weightInKg,
+      unit
+    };
   }
 
 }
