@@ -16,7 +16,8 @@ interface DrinkSeries {
 export class Session {
   private readonly user: User = new User();
 
-  private constructor() {}
+  private constructor() {
+  }
 
   private _drinkSeries: DrinkSeries[] = [];
 
@@ -28,7 +29,6 @@ export class Session {
     return new Session().buildSession();
   }
 
-  // BAC = (D / (r * W) * 100) - (β * t)
   private static widmark(
     drink: Drink,
     user: User,
@@ -41,10 +41,14 @@ export class Session {
       ? drink.timeSinceDrink('HOURS').value
       : waitTimeToPeakDrinkBac;
 
+    // BAC = (D / (r * W) * 100) - (β * t)
     // BAC = (ethanol of drink in grams / (widmark factor * weight in g) * 100) - (metabolism rate * time in hours since drink)
     const maxBacEffect =
       (drink.ethanolGrams() / (user.widmarkConstant * user.weight('G').value)) *
       100;
+
+    // if the time since the drink was added is less than the time it takes to enter the system
+    // then the bac will increase over a time period until it reaches its peak
     if (elapsedTime < waitTimeToPeakDrinkBac) {
       return maxBacEffect * elapsedTime;
     }
@@ -53,6 +57,8 @@ export class Session {
     const bloodAlcoholBacEffectFromDrink =
       maxBacEffect -
       user.metabolismRate * (elapsedTime - waitTimeToPeakDrinkBac);
+
+    // negative bac values should be clamped at 0
     return Math.max(0, bloodAlcoholBacEffectFromDrink);
   }
 
@@ -86,10 +92,10 @@ export class Session {
     }
 
     const drinksBeingAbsorbed = this.drinkSeries.filter(
-      (item: any) => !item.peakBacEffectWasPassed
+      (item: DrinkSeries) => !item.peakBacEffectWasPassed
     );
     const drinksBeingExcreted = this.drinkSeries.filter(
-      (item: any) => item.peakBacEffectWasPassed
+      (item: DrinkSeries) => item.peakBacEffectWasPassed
     );
 
     const timeToFullAbsorption = sum(
@@ -97,7 +103,7 @@ export class Session {
         (drinkSeries: DrinkSeries) => drinkSeries.timeToPeakBacEffect.value
       )
     );
-    const decayingBacUndigestedDrinks = sum(
+    const futureDecayingBacUndigestedDrinks = sum(
       drinksBeingAbsorbed.map(
         (drinkSeries: DrinkSeries) => drinkSeries.maxPredictedBac
       )
@@ -109,7 +115,7 @@ export class Session {
     );
 
     const maxPredictedBac =
-      decayingBacDigestedDrinks + decayingBacUndigestedDrinks;
+      decayingBacDigestedDrinks + futureDecayingBacUndigestedDrinks;
     return (
       Session.widmarkTimeToSober(maxPredictedBac, this.user) +
       timeToFullAbsorption
