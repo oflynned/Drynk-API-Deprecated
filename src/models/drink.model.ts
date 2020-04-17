@@ -1,5 +1,12 @@
 import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
-import { elapsedTimeFromMsToHours, toDecimalPlaces } from '../common/helpers';
+import {
+  elapsedTimeFromMsToHours,
+  MeasureType,
+  ONE_HOUR_IN_MS,
+  Time,
+  toDecimalPlaces
+} from '../common/helpers';
+import { User } from './user.model';
 
 export interface DrinkType extends BaseModelType {
   drinkWasDowned: boolean;
@@ -26,13 +33,6 @@ export class DrinkSchema extends Schema<DrinkType> {
   }
 }
 
-export type Granularity = 'HOURS' | 'MS';
-
-export interface TimeGranularity {
-  elapsedTime: number,
-  granularity: Granularity
-}
-
 export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   private readonly ETHANOL_DENSITY_GRAMS = 0.789; // 0.789 g/ml
   private readonly STANDARD_DRINK_ETHANOL_GRAMS = 10; // 10 g
@@ -57,22 +57,41 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   standardDrinks(): number {
-    return toDecimalPlaces(this.ethanolGrams() / this.STANDARD_DRINK_ETHANOL_GRAMS);
+    return toDecimalPlaces(
+      this.ethanolGrams() / this.STANDARD_DRINK_ETHANOL_GRAMS
+    );
   }
 
-  timeSinceDrink(granularity: Granularity): TimeGranularity {
-    const timeSinceDrink = Date.now() - this.toJson().createdAt.getTime();
-
-    if (granularity === 'HOURS') {
+  timeToPeakEffect(user: User, time: Time): MeasureType<Time> {
+    const createdMsAgo = Date.now() - this.toJson().createdAt.getTime();
+    const peakEffectInMs =
+      user.timeToPeakDrinkEffect('MS').value - createdMsAgo;
+    if (time === 'HOURS') {
       return {
-        elapsedTime: elapsedTimeFromMsToHours(timeSinceDrink),
-        granularity: 'HOURS'
+        value: elapsedTimeFromMsToHours(peakEffectInMs),
+        unit: 'HOURS'
       };
     }
 
     return {
-      elapsedTime: timeSinceDrink,
-      granularity: 'MS'
+      value: peakEffectInMs,
+      unit: 'MS'
+    };
+  }
+
+  timeSinceDrink(time: Time): MeasureType<Time> {
+    const timeSinceDrink = Date.now() - this.toJson().createdAt.getTime();
+
+    if (time === 'HOURS') {
+      return {
+        value: elapsedTimeFromMsToHours(timeSinceDrink),
+        unit: 'HOURS'
+      };
+    }
+
+    return {
+      value: timeSinceDrink,
+      unit: 'MS'
     };
   }
 }
