@@ -13,6 +13,7 @@ interface DrinkSeries {
 // based on these papers
 // https://staff.fnwi.uva.nl/a.j.p.heck/Research/art/ICTMT8_2.pdf
 // http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
+// https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
 export class Session {
   private readonly user: User = new User();
 
@@ -34,7 +35,7 @@ export class Session {
     user: User,
     decay: boolean = true
   ): number {
-    // the max bac a drink has on someone is 0.75-1.25 hours
+    // the max bac a drink has on someone is after 0.5-1 hours
     // this peak value is always accessible by getting the user's food state at the time
     const waitTimeToPeakDrinkBac = user.timeToPeakDrinkEffect('HOURS').value;
     const elapsedTime = decay
@@ -50,7 +51,8 @@ export class Session {
     // if the time since the drink was added is less than the time it takes to enter the system
     // then the bac will increase over a time period until it reaches its peak
     if (elapsedTime < waitTimeToPeakDrinkBac) {
-      return maxBacEffect * elapsedTime;
+      // so then until the full ramp-up period has passed, then the current bac is just a percentage of this
+      return maxBacEffect * (elapsedTime / waitTimeToPeakDrinkBac);
     }
 
     // after the wait to peak, excretion starts and the max bac observed from the drink starts to decay

@@ -9,15 +9,15 @@ import {
 } from '../common/helpers';
 
 export class User {
-  private readonly MALE_WIDMARK_CONSTANT = 0.68; // avg male constant
-  private readonly FEMALE_WIDMARK_CONSTANT = 0.55; // avg female constant
+  private readonly MALE_WIDMARK_CONSTANT = 0.68;    // avg male constant
+  private readonly FEMALE_WIDMARK_CONSTANT = 0.55;  // avg female constant
 
-  private readonly MALE_METABOLISM_RATE = 0.017; // avg male liver metabolism
-  private readonly FEMALE_METABOLISM_RATE = 0.015; // avg female liver metabolism
+  private readonly MALE_METABOLISM_RATE = 0.017;    // avg male liver metabolism
+  private readonly FEMALE_METABOLISM_RATE = 0.015;  // avg female liver metabolism
 
-  private readonly PEAK_BAC_EMPTY_STOMACH = 0.75; // 45 mins
-  private readonly PEAK_BAC_NORMAL_STOMACH = 1; // 1 hour
-  private readonly PEAK_BAC_FULL_STOMACH = 1.25; // 1 hour 15 mins
+  private readonly PEAK_BAC_EMPTY_STOMACH = 0.5;    // 30 mins
+  private readonly PEAK_BAC_NORMAL_STOMACH = 0.75;  // 45 mins
+  private readonly PEAK_BAC_FULL_STOMACH = 1;       // 1 hour
 
   private readonly mealSize: MealSize;
   private readonly sex: Sex;
