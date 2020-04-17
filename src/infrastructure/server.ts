@@ -6,21 +6,15 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
 import sitemap from './sitemap';
-import {
-  bindGlobalDatabaseClient,
-  ConnectionOptions,
-  MongoClient
-} from 'mongoize-orm';
+import { dbConfig } from '../config/database.config';
+
+import { bindGlobalDatabaseClient, MongoClient } from 'mongoize-orm';
 import { graphql } from './graphql';
 
 export class Server {
   async buildServer(): Promise<Application> {
     const client: MongoClient = new MongoClient();
-    const options: ConnectionOptions = {
-      uri: 'mongodb://localhost:27017/drynk',
-      appendDatabaseEnvironment: true
-    };
-    await bindGlobalDatabaseClient(client, options);
+    await bindGlobalDatabaseClient(client, dbConfig());
 
     const app = express();
     app.use(morgan('combined'));

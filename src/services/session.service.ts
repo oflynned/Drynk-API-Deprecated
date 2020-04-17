@@ -10,8 +10,9 @@ interface DrinkSeries {
   currentBac: number;
 }
 
-// based on this research paper
+// based on these papers
 // https://staff.fnwi.uva.nl/a.j.p.heck/Research/art/ICTMT8_2.pdf
+// http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
 export class Session {
   private readonly user: User = new User();
 
@@ -48,7 +49,7 @@ export class Session {
       return maxBacEffect * elapsedTime;
     }
 
-    // after 1 hour, excretion starts and the max bac observed from the drink starts to decay
+    // after the wait to peak, excretion starts and the max bac observed from the drink starts to decay
     const bloodAlcoholBacEffectFromDrink =
       maxBacEffect -
       user.metabolismRate * (elapsedTime - waitTimeToPeakDrinkBac);
