@@ -8,16 +8,35 @@ const routes = (): Router => {
     '/series',
     async (req: Request, res: Response): Promise<void> => {
       const session = await Session.getInstance();
-      res.status(200).json(session.drinkSeries);
+      res.status(200).json(await session.buildTimeSeries());
     }
   );
+
+  router.get('/graph/downed', async (req: Request, res: Response): Promise<void> => {
+    const session = await Session.getInstance();
+    const bacChartOverTime = await session.buildTimeSeries({ drinkName: 'Gin' });
+    res.status(200).json(bacChartOverTime);
+  });
+
+  router.get('/graph/spaced', async (req: Request, res: Response): Promise<void> => {
+    const session = await Session.getInstance();
+    const bacChartOverTime = await session.buildTimeSeries({ drinkName: 'Vodka' });
+    res.status(200).json(bacChartOverTime);
+  });
+
+  router.get('/events', async (req: Request, res: Response): Promise<void> => {
+    const session = await Session.getInstance();
+    const eventEstimates = await session.estimateEventTimes();
+    res.status(200).json(eventEstimates);
+  });
+
   router.get(
     '/bac',
     async (req: Request, res: Response): Promise<void> => {
       const session: Session = await Session.getInstance();
       const currentBac = session.bloodAlcoholContent();
-      const hoursToSober = await session.timeToSober();
-      res.status(200).json({ currentBac, hoursToSober });
+      // const hoursToSober = await session.timeToSober();
+      res.status(200).json({ currentBac });
     }
   );
 

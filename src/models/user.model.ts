@@ -1,23 +1,13 @@
-import {
-  Length,
-  Mass,
-  MealSize,
-  MeasureType,
-  ONE_HOUR_IN_MS,
-  Sex,
-  Time
-} from '../common/helpers';
+import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
 
 export class User {
-  private readonly MALE_WIDMARK_CONSTANT = 0.68;    // avg male constant
-  private readonly FEMALE_WIDMARK_CONSTANT = 0.55;  // avg female constant
+  private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 0;  // mins
+  private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 45;  // mins
+  private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 60;  // mins
 
-  private readonly MALE_METABOLISM_RATE = 0.017;    // avg male liver metabolism
-  private readonly FEMALE_METABOLISM_RATE = 0.015;  // avg female liver metabolism
-
-  private readonly PEAK_BAC_EMPTY_STOMACH = 0.5;    // 30 mins
-  private readonly PEAK_BAC_NORMAL_STOMACH = 0.75;  // 45 mins
-  private readonly PEAK_BAC_FULL_STOMACH = 1;       // 1 hour
+  // private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 6;  // mins
+  // private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 12;   // mins
+  // private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 18;    // mins
 
   private readonly mealSize: MealSize;
   private readonly sex: Sex;
@@ -26,7 +16,7 @@ export class User {
 
   constructor() {
     this.sex = 'MALE';
-    this.mealSize = 'SMALL';
+    this.mealSize = 'NONE';
     this.weightInKg = 92;
     this.heightInCm = 189;
   }
@@ -36,22 +26,20 @@ export class User {
   }
 
   get widmarkConstant(): number {
-    // const weight = this.weight('KG').value;
-    // const height = this.height('CM').value;
+    const weight = this.weight('KG').value;
+    const height = this.height('CM').value;
 
     if (this.isMale) {
-      return this.MALE_WIDMARK_CONSTANT;
-      // return (0.3161 - 0.004821 * weight + 0.004632 * height);
+      const r = 0.3161 - 0.004821 * weight + 0.004632 * height;
+      return clamp(r, 0.6, 0.87);
     }
 
-    return this.FEMALE_WIDMARK_CONSTANT;
-    // return (0.3122 - 0.006446 * weight + 0.004466 * height);
+    const r = 0.3122 - 0.006446 * weight + 0.004466 * height;
+    return clamp(r, 0.44, 0.8);
   }
 
   get metabolismRate(): number {
-    return this.isMale
-      ? this.MALE_METABOLISM_RATE
-      : this.FEMALE_METABOLISM_RATE;
+    return 0.018;
   }
 
   height(unit: Length): MeasureType<Length> {
@@ -82,28 +70,42 @@ export class User {
     };
   }
 
-  timeToPeakDrinkEffect(time: Time): MeasureType<Time> {
-    const peakTime = () => {
+  absorptionHalflife(time: Time): MeasureType<Time> {
+    const halflife = () => {
       if (this.mealSize === 'LARGE') {
-        return this.PEAK_BAC_FULL_STOMACH;
+        return this.ABSORPTION_HALFLIFE_LARGE_MEAL;
       }
 
       if (this.mealSize === 'SMALL') {
-        return this.PEAK_BAC_NORMAL_STOMACH;
+        return this.ABSORPTION_HALFLIFE_NORMAL_MEAL;
       }
 
-      return this.PEAK_BAC_EMPTY_STOMACH;
+      return this.ABSORPTION_HALFLIFE_EMPTY_STOMACH;
     };
 
     if (time === 'HOURS') {
       return {
-        value: peakTime(),
+        value: halflife() / 60,
         unit: 'HOURS'
       };
     }
 
+    if (time === 'MINS') {
+      return {
+        value: halflife(),
+        unit: 'MINS'
+      };
+    }
+
+    if (time === 'SECS') {
+      return {
+        value: halflife() * 60,
+        unit: 'SECS'
+      };
+    }
+
     return {
-      value: peakTime() * ONE_HOUR_IN_MS,
+      value: halflife() / 60 * ONE_HOUR_IN_MS,
       unit: 'MS'
     };
   }
