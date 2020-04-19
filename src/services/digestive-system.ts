@@ -1,13 +1,34 @@
 import { Drink } from '../models/drink.model';
+import { expectedBacFromEthanolMass } from './widmark.service';
+import { User } from '../models/user.model';
 
 export class DigestiveSystem {
-  intaken = 0;
-  absorbed = 0;
-  excreted = 0;
+  private readonly _user: User;
+  private readonly ABSORBANCE_RATE = 0.8 * (100 / 60);
 
-  process(drink?: Drink): void {
-    if (drink) {
-      this.addToStomach(drink);
+  private _intaken = 0;
+  private _absorbed = 0;
+  private _excreted = 0;
+
+  constructor(user: User) {
+    this._user = user;
+  }
+
+  get bloodAlcoholContent(): number {
+    if (this._absorbed === 0) {
+      return 0;
+    }
+
+    return expectedBacFromEthanolMass(this._absorbed, this._user);
+  }
+
+  puke(): void {
+    this._intaken *= 0.1; // lol
+  }
+
+  digest(drinks?: Drink[]): void {
+    if (drinks?.length > 0) {
+      drinks.map((drink: Drink) => this.addToStomach(drink));
     }
 
     this.absorbToBlood();
@@ -15,27 +36,32 @@ export class DigestiveSystem {
   }
 
   activeEthanolInSystem(): number {
-    return this.absorbed;
+    return this._absorbed;
   }
 
   private addToStomach(drink: Drink): void {
-    this.intaken += drink.ethanolMass('G').value;
+    this._intaken += drink.ethanolMass('G').value;
   }
 
   private absorbToBlood(): void {
-    if (this.intaken === 0) {
-      return;
+    if (this._intaken > 0) {
+      const transient =
+        this._intaken < this.ABSORBANCE_RATE
+          ? this._intaken
+          : this.ABSORBANCE_RATE;
+      this._intaken -= transient;
+      this._absorbed += transient;
     }
-
-    this.absorbed += 0.1;
   }
 
   private excreteFromBlood(): void {
-    if (this.absorbed === 0) {
-      return;
+    if (this._absorbed > 0) {
+      const transient =
+        this._absorbed < this._user.metabolismRate
+          ? this._absorbed
+          : this._user.metabolismRate;
+      this._absorbed -= transient;
+      this._excreted += transient;
     }
-
-    this.absorbed -= 0.05;
-    this.excreted += 0.05;
   }
 }

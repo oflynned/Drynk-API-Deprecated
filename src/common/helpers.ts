@@ -2,8 +2,8 @@ export const ONE_HOUR_IN_MS = 3.6e6;
 export const ONE_MINUTE_IN_MS = ONE_HOUR_IN_MS / 60;
 
 export interface Point<X, Y> {
-  x: X,
-  y: Y
+  x: X;
+  y: Y;
 }
 
 export interface MeasureType<Unit> {

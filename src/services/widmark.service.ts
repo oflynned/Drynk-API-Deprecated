@@ -3,9 +3,9 @@ import { User } from '../models/user.model';
 import { elapsedTimeFromMsToHours } from '../common/helpers';
 
 type WidmarkOption = {
-  reportBac: 'MAX' | 'FORCED' | 'ACTUAL',
-  reportedTime?: number
-}
+  reportBac: 'MAX' | 'FORCED' | 'ACTUAL';
+  reportedTime?: number;
+};
 
 export const expectedBacFromEthanolMass = (
   ethanolGramsInBlood: number,
@@ -13,7 +13,10 @@ export const expectedBacFromEthanolMass = (
 ): number => {
   // BAC = (D / (r * W) * 100) - (β * t)
   // BAC = (ethanol of drink in grams / (widmark factor * weight in g) * 100) - (metabolism rate * time in hours since drink)
-  return (ethanolGramsInBlood / (user.widmarkConstant * user.weight('G').value)) * 100;
+  return (
+    (ethanolGramsInBlood / (user.widmarkConstant * user.weight('G').value)) *
+    100
+  );
 };
 
 export const expectedBacFromSingularDrink = (
@@ -36,7 +39,9 @@ export const expectedBacFromSingularDrink = (
     }
 
     // otherwise it's at some point afterwards
-    hoursElapsedSinceDrink = elapsedTimeFromMsToHours(reportedTime - drink.toJson().createdAt.getTime());
+    hoursElapsedSinceDrink = elapsedTimeFromMsToHours(
+      reportedTime - drink.toJson().createdAt.getTime()
+    );
   } else {
     hoursElapsedSinceDrink = drink.timeSinceDrink('HOURS').value;
   }
@@ -44,20 +49,24 @@ export const expectedBacFromSingularDrink = (
   // BAC = (D / (r * W) * 100) - (β * t)
   // BAC = (ethanol of drink in grams / (widmark factor * weight in g) * 100) - (metabolism rate * time in hours since drink)
   const maxBacEffect =
-    (drink.ethanolMass('G').value / (user.widmarkConstant * user.weight('G').value)) *
+    (drink.ethanolMass('G').value /
+      (user.widmarkConstant * user.weight('G').value)) *
     100;
 
   // if the time since the drink was added is less than the time it takes to enter the system
   // then the bac will increase over a time period until it reaches its peak
   if (hoursElapsedSinceDrink < hoursWaitTimeToPeakDrinkBac) {
     // so then until the full ramp-up period has passed, then the current bac is just a percentage of this
-    return maxBacEffect * (hoursElapsedSinceDrink / hoursWaitTimeToPeakDrinkBac);
+    return (
+      maxBacEffect * (hoursElapsedSinceDrink / hoursWaitTimeToPeakDrinkBac)
+    );
   }
 
   // after the wait to peak, excretion starts and the max bac observed from the drink starts to decay
   const bloodAlcoholBacEffectFromDrink =
     maxBacEffect -
-    user.metabolismRate * (hoursElapsedSinceDrink - hoursWaitTimeToPeakDrinkBac);
+    user.metabolismRate *
+      (hoursElapsedSinceDrink - hoursWaitTimeToPeakDrinkBac);
 
   // negative bac values should be clamped at 0
   return Math.max(0, bloodAlcoholBacEffectFromDrink);

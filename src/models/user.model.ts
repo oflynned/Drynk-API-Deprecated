@@ -1,13 +1,18 @@
-import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
+import {
+  clamp,
+  Length,
+  Mass,
+  MealSize,
+  MeasureType,
+  ONE_HOUR_IN_MS,
+  Sex,
+  Time
+} from '../common/helpers';
 
 export class User {
-  private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 0;  // mins
-  private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 45;  // mins
-  private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 60;  // mins
-
-  // private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 6;  // mins
-  // private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 12;   // mins
-  // private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 18;    // mins
+  private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
+  private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 45; // mins
+  private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 60; // mins
 
   private readonly mealSize: MealSize;
   private readonly sex: Sex;
@@ -39,7 +44,7 @@ export class User {
   }
 
   get metabolismRate(): number {
-    return 0.018;
+    return 0.018 * (1000 / 60);
   }
 
   height(unit: Length): MeasureType<Length> {
@@ -105,7 +110,7 @@ export class User {
     }
 
     return {
-      value: halflife() / 60 * ONE_HOUR_IN_MS,
+      value: (halflife() / 60) * ONE_HOUR_IN_MS,
       unit: 'MS'
     };
   }

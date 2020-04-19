@@ -1,5 +1,11 @@
 import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
-import { elapsedTimeFromMsToHours, Mass, MeasureType, Time, Volume } from '../common/helpers';
+import {
+  elapsedTimeFromMsToHours,
+  Mass,
+  MeasureType,
+  Time,
+  Volume
+} from '../common/helpers';
 import { User } from './user.model';
 
 export interface DrinkType extends BaseModelType {
@@ -58,7 +64,8 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   ethanolMass(unit: Mass): MeasureType<Mass> {
-    const grams = this.ethanolVolume('ML').value * this.ETHANOL_DENSITY_GRAMS_PER_ML;
+    const grams =
+      this.ethanolVolume('ML').value * this.ETHANOL_DENSITY_GRAMS_PER_ML;
 
     if (unit === 'KG') {
       return {
@@ -79,8 +86,7 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
 
   timeToPeakEffect(user: User, time: Time): MeasureType<Time> {
     const createdMsAgo = Date.now() - this.toJson().createdAt.getTime();
-    const peakEffectInMs =
-      user.absorptionHalflife('MS').value - createdMsAgo;
+    const peakEffectInMs = user.absorptionHalflife('MS').value - createdMsAgo;
     if (time === 'HOURS') {
       return {
         value: elapsedTimeFromMsToHours(peakEffectInMs),
