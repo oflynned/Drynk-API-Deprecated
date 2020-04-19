@@ -17,7 +17,7 @@ const routes = (): Router => {
     async (req: Request, res: Response): Promise<void> => {
       const session = await Session.getInstance();
       const bacChartOverTime = await session.buildTimeSeries({
-        drinkName: 'Gin'
+        drinkName: 'Wine'
       });
       res.status(200).json(bacChartOverTime);
     }

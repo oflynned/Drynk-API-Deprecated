@@ -84,22 +84,6 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
     return this.ethanolMass('G').value / this.STANDARD_DRINK_ETHANOL_GRAMS;
   }
 
-  timeToPeakEffect(user: User, time: Time): MeasureType<Time> {
-    const createdMsAgo = Date.now() - this.toJson().createdAt.getTime();
-    const peakEffectInMs = user.absorptionHalflife('MS').value - createdMsAgo;
-    if (time === 'HOURS') {
-      return {
-        value: elapsedTimeFromMsToHours(peakEffectInMs),
-        unit: 'HOURS'
-      };
-    }
-
-    return {
-      value: peakEffectInMs,
-      unit: 'MS'
-    };
-  }
-
   timeSinceDrink(time: Time): MeasureType<Time> {
     const timeSinceDrink = Date.now() - this.toJson().createdAt.getTime();
 

@@ -25,7 +25,8 @@ export class Session {
   private user: User;
   private digestiveSystem: DigestiveSystem;
 
-  private constructor() {}
+  private constructor() {
+  }
 
   static async getInstance() {
     return new Session().buildSession();
@@ -66,7 +67,10 @@ export class Session {
 
           this.digestiveSystem.digest(drinksInTimeframe);
 
-          return { x: time, y: this.digestiveSystem.bloodAlcoholContent };
+          return {
+            x: time,
+            y: this.digestiveSystem.bloodAlcoholContent
+          };
         }
       )
     );
@@ -92,16 +96,9 @@ export class Session {
         return prev.y > current.y ? prev : current;
       }
     );
-    const soberPoint: Point<number, number> = timeSeries
-      .filter((point, index) => index !== 0)
-      .reduce(
-        (
-          prev: Point<number, number>,
-          current: Point<number, number>
-        ): Point<number, number> => {
-          return prev.y > 0 && current.y === 0 ? current : prev;
-        }
-      );
+    const soberPoint: Point<number, number> = timeSeries.filter((point, index) => {
+      return index !== 0 && point.y === 0;
+    })[0];
 
     return {
       startedDrinkingAt: {

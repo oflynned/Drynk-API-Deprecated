@@ -65,7 +65,7 @@ export const expectedBacFromSingularDrink = (
   // after the wait to peak, excretion starts and the max bac observed from the drink starts to decay
   const bloodAlcoholBacEffectFromDrink =
     maxBacEffect -
-    user.metabolismRate *
+    user.excretionRate *
       (hoursElapsedSinceDrink - hoursWaitTimeToPeakDrinkBac);
 
   // negative bac values should be clamped at 0

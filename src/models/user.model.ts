@@ -1,13 +1,4 @@
-import {
-  clamp,
-  Length,
-  Mass,
-  MealSize,
-  MeasureType,
-  ONE_HOUR_IN_MS,
-  Sex,
-  Time
-} from '../common/helpers';
+import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
 
 export class User {
   private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
@@ -43,36 +34,12 @@ export class User {
     return clamp(r, 0.44, 0.8);
   }
 
-  get metabolismRate(): number {
-    return 0.018 * (1000 / 60);
+  get absorptionRate(): number {
+    return this.ABSORPTION_HALFLIFE_EMPTY_STOMACH / this.absorptionHalflife('MINS').value;
   }
 
-  height(unit: Length): MeasureType<Length> {
-    if (unit === 'CM') {
-      return {
-        value: this.heightInCm,
-        unit
-      };
-    }
-
-    return {
-      value: this.heightInCm / 100,
-      unit
-    };
-  }
-
-  weight(unit: Mass): MeasureType<Mass> {
-    if (unit === 'G') {
-      return {
-        value: this.weightInKg * 1000,
-        unit
-      };
-    }
-
-    return {
-      value: this.weightInKg,
-      unit
-    };
+  get excretionRate(): number {
+    return 0.19;
   }
 
   absorptionHalflife(time: Time): MeasureType<Time> {
@@ -112,6 +79,34 @@ export class User {
     return {
       value: (halflife() / 60) * ONE_HOUR_IN_MS,
       unit: 'MS'
+    };
+  }
+
+  height(unit: Length): MeasureType<Length> {
+    if (unit === 'CM') {
+      return {
+        value: this.heightInCm,
+        unit
+      };
+    }
+
+    return {
+      value: this.heightInCm / 100,
+      unit
+    };
+  }
+
+  weight(unit: Mass): MeasureType<Mass> {
+    if (unit === 'G') {
+      return {
+        value: this.weightInKg * 1000,
+        unit
+      };
+    }
+
+    return {
+      value: this.weightInKg,
+      unit
     };
   }
 }
