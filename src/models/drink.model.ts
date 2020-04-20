@@ -9,6 +9,7 @@ import {
 
 export interface DrinkType extends BaseModelType {
   sessionId: string;
+  userId: string;
   volume: number;
   abv: number;
   drinkName: string;
@@ -18,6 +19,7 @@ export class DrinkSchema extends Schema<DrinkType> {
   joiBaseSchema(): object {
     return {
       sessionId: Joi.string().required(),
+      userId: Joi.string().required(),
       volume: Joi.number().required(),
       abv: Joi.number()
         .required()
