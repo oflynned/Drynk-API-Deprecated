@@ -10,7 +10,7 @@ const routes = (): Router => {
     '/series',
     async (req: Request, res: Response): Promise<void> => {
       const session = await Session.getInstance(user);
-      res.status(200).json(await session.buildTimeSeries());
+      res.status(200).json(await session.buildTimeSeries({}));
     }
   );
 
@@ -40,7 +40,7 @@ const routes = (): Router => {
     '/events',
     async (req: Request, res: Response): Promise<void> => {
       const session = await Session.getInstance(user);
-      const eventEstimates = await session.estimateEventTimes();
+      const eventEstimates = await session.estimateEventTimes({});
       res.status(200).json(eventEstimates);
     }
   );

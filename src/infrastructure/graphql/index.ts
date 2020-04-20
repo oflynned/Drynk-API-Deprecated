@@ -37,14 +37,17 @@ export const graphql = (app: Application) => {
     }
 
     type Projection {
-      startedDrinkingAt: ProjectionValue
+      startedSessionAt: ProjectionValue
       currentState: ProjectionValue
       mostDrunkAt: ProjectionValue
       soberAt: ProjectionValue
     }
 
+    union Event = Drink | Puke
+
     type Session {
       estimateEventTimes: Projection
+      events: [Event]
     }
 
     type Query {

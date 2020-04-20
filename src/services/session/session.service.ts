@@ -31,7 +31,7 @@ export class Session {
     return this;
   }
 
-  async buildTimeSeries(query: Query = {}): Promise<Point<number, number>[]> {
+  async buildTimeSeries(query: Query): Promise<Point<number, number>[]> {
     const drinks: Drink[] = await Repository.with(Drink).findMany(query);
     const pukes: Puke[] = await Repository.with(Puke).findMany(query);
     const events: Event[] = []
@@ -92,8 +92,8 @@ export class Session {
     );
   }
 
-  async estimateEventTimes(): Promise<object> {
-    const timeSeries = await this.buildTimeSeries();
+  async estimateEventTimes(query: Query): Promise<object> {
+    const timeSeries = await this.buildTimeSeries(query);
     const soberPoint = timeSeries[timeSeries.length - 1];
     const mostDrunkPoint: Point<number, number> = timeSeries.reduce(
       (
