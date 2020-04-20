@@ -1,4 +1,13 @@
-import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
+import {
+  clamp,
+  Length,
+  Mass,
+  MealSize,
+  MeasureType,
+  ONE_HOUR_IN_MS,
+  Sex,
+  Time
+} from '../common/helpers';
 import { Drink } from './drink.model';
 
 export class User {
@@ -36,7 +45,10 @@ export class User {
   }
 
   get absorptionDelayCoefficient(): number {
-    return this.ABSORPTION_HALFLIFE_EMPTY_STOMACH / this.absorptionHalflife('MINS').value;
+    return (
+      this.ABSORPTION_HALFLIFE_EMPTY_STOMACH /
+      this.absorptionHalflife('MINS').value
+    );
   }
 
   get excretionRate(): number {

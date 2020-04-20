@@ -1,25 +1,21 @@
-import { Drink } from '../models/drink.model';
-import { expectedBacFromEthanolMass } from './widmark.service';
-import { User } from '../models/user.model';
+import { expectedBacFromEthanolMass } from './widmark';
+import { Drink } from '../../models/drink.model';
+import { User } from '../../models/user.model';
+import { Event } from '../../models/event.facade';
 
 type StomachContents = {
-  volumeLitres: number,
-  ethanolGrams: number
-}
+  volumeLitres: number;
+  ethanolGrams: number;
+};
 
 export class DigestiveSystem {
   private readonly _user: User;
-
-  private readonly STOMACH_VOLUME = 44; // litres
-  private readonly ABSORPTION_RATE = 6; // elimination rate per hour
-
   private _intaken: StomachContents = {
     volumeLitres: 0,
     ethanolGrams: 0
   };
-
-  private _absorbed = 0;  // g of ethanol in blood
-  private _excreted = 0;  // g of ethanol pissed out
+  private _absorbed = 0; // g of ethanol in blood
+  private _excreted = 0; // g of ethanol pissed out
 
   constructor(user: User) {
     this._user = user;
@@ -41,25 +37,31 @@ export class DigestiveSystem {
     };
   }
 
-  digest(drinks?: Drink[]): void {
-    if (drinks?.length > 0) {
-      drinks.map((drink: Drink) => this.addToStomach(drink));
-    }
+  process(events?: Event[]): void {
+    events.map((event: Event) => {
+      switch (event.constructor.name) {
+        case 'Drink':
+          this.addToStomach(event as Drink);
+          break;
+        case 'Puke':
+          this.puke();
+          break;
+        default:
+          break;
+      }
+    });
 
     this.absorbToBlood();
     this.excreteFromBlood();
   }
 
-  // this is correct as it's zero-order eq
-  // I drink a beer and it can be instantaneous or in additions of x mls every y mins
   private addToStomach(drink: Drink): void {
     this._intaken.volumeLitres += drink.toJson().volume / 1000;
     this._intaken.ethanolGrams += drink.ethanolMass('G').value;
   }
 
-  // TODO incorrect, absorption is a first-order eq
-  // a rate of n grams per litre is cleared per hour
-  // having a drink adds more volume and can change the potency of the ethanol quantity in the stomach
+  // TODO incorrect, absorption is a first-order eq, a rate of n grams per litre is cleared per hour
+  //      having a drink adds more volume and can change the potency of the ethanol quantity in the stomach
   private absorbToBlood(): void {
     if (this._intaken.ethanolGrams > 0) {
       // const stomachContentsDistribution = this._intaken.ethanolGrams / this._intaken.volumeLitres;
@@ -72,17 +74,15 @@ export class DigestiveSystem {
       // this._intaken.volumeLitres -= stomachVolumeProcessed;
 
       // TODO wrong? this is the coefficient and not 1g per minute absorption
-      const rate = this._intaken.ethanolGrams < this._user.absorptionDelayCoefficient
-        ? this._intaken.ethanolGrams
-        : this._user.absorptionDelayCoefficient;
+      const rate =
+        this._intaken.ethanolGrams < this._user.absorptionDelayCoefficient
+          ? this._intaken.ethanolGrams
+          : this._user.absorptionDelayCoefficient;
       this._intaken.ethanolGrams -= rate;
       this._absorbed += rate;
     }
   }
 
-  // this is correct as a static zero-order eq
-  // could be a delay before the excretion process begins?
-  // right now it's instantaneous which is incorrect?
   private excreteFromBlood(): void {
     if (this._absorbed > 0) {
       const rate =

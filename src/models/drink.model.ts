@@ -8,7 +8,7 @@ import {
 } from '../common/helpers';
 
 export interface DrinkType extends BaseModelType {
-  drinkWasDowned: boolean;
+  sessionId: string;
   volume: number;
   abv: number;
   drinkName: string;
@@ -17,7 +17,7 @@ export interface DrinkType extends BaseModelType {
 export class DrinkSchema extends Schema<DrinkType> {
   joiBaseSchema(): object {
     return {
-      drinkWasDowned: Joi.bool().required(),
+      sessionId: Joi.string().required(),
       volume: Joi.number().required(),
       abv: Joi.number()
         .required()
@@ -33,14 +33,9 @@ export class DrinkSchema extends Schema<DrinkType> {
 }
 
 export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
-  private readonly ETHANOL_DENSITY_GRAMS_PER_ML = 0.789; // 0.789 g/ml
-  static readonly STANDARD_DRINK_ETHANOL_GRAMS = 10; // 10 g
+  public static readonly STANDARD_DRINK_ETHANOL_GRAMS = 10; // 10 g
 
-  // assume a drink was drunk over 15-30 mins in equal amounts consistently
-  // otherwise the drink was downed and will be accumulated as one hit when it is digested
-  // if necessary an end time can be added later on a migration
-  // its start time corresponds to .createdAt
-  // if a drink is added to the session after this, then the first drink must be finished at that point
+  private readonly ETHANOL_DENSITY_GRAMS_PER_ML = 0.789; // 0.789 g/ml
 
   joiSchema(): DrinkSchema {
     return new DrinkSchema();

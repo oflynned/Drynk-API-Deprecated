@@ -1,13 +1,15 @@
 import { Request, Response, Router } from 'express';
-import { Session } from '../../services/session.service';
+import { Session } from '../../services/session/session.service';
+import { User } from '../../models/user.model';
 
 const routes = (): Router => {
   const router = Router();
+  const user = new User();
 
   router.get(
     '/series',
     async (req: Request, res: Response): Promise<void> => {
-      const session = await Session.getInstance();
+      const session = await Session.getInstance(user);
       res.status(200).json(await session.buildTimeSeries());
     }
   );
@@ -15,9 +17,9 @@ const routes = (): Router => {
   router.get(
     '/graph/downed',
     async (req: Request, res: Response): Promise<void> => {
-      const session = await Session.getInstance();
+      const session = await Session.getInstance(user);
       const bacChartOverTime = await session.buildTimeSeries({
-        drinkName: 'Shame'
+        drinkName: 'Gin'
       });
       res.status(200).json(bacChartOverTime);
     }
@@ -26,7 +28,7 @@ const routes = (): Router => {
   router.get(
     '/graph/spaced',
     async (req: Request, res: Response): Promise<void> => {
-      const session = await Session.getInstance();
+      const session = await Session.getInstance(user);
       const bacChartOverTime = await session.buildTimeSeries({
         drinkName: 'Vodka'
       });
@@ -37,7 +39,7 @@ const routes = (): Router => {
   router.get(
     '/events',
     async (req: Request, res: Response): Promise<void> => {
-      const session = await Session.getInstance();
+      const session = await Session.getInstance(user);
       const eventEstimates = await session.estimateEventTimes();
       res.status(200).json(eventEstimates);
     }
