@@ -8,17 +8,19 @@ type WidmarkOption = {
 };
 
 export const expectedBacFromEthanolMass = (
-  ethanolGramsInBlood: number,
+  activeEthanolGrams: number,
   user: User
 ): number => {
   // BAC = (D / (r * W) * 100) - (β * t)
   // BAC = (ethanol of drink in grams / (widmark factor * weight in g) * 100) - (metabolism rate * time in hours since drink)
   return (
-    (ethanolGramsInBlood / (user.widmarkConstant * user.weight('G').value)) *
+    (activeEthanolGrams / (user.widmarkConstant * user.weight('G').value)) *
     100
   );
 };
 
+
+// TODO remove me
 export const expectedBacFromSingularDrink = (
   drink: Drink,
   user: User,

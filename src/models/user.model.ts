@@ -1,4 +1,5 @@
 import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
+import { Drink } from './drink.model';
 
 export class User {
   private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
@@ -39,7 +40,8 @@ export class User {
   }
 
   get excretionRate(): number {
-    return 0.2;
+    // approx one standard drink every hour
+    return Drink.STANDARD_DRINK_ETHANOL_GRAMS / 60;
   }
 
   absorptionHalflife(time: Time): MeasureType<Time> {

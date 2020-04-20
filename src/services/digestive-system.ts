@@ -18,7 +18,6 @@ export class DigestiveSystem {
     ethanolGrams: 0
   };
 
-  // private _intaken = 0;   // concentration of g of ethanol relative to the volume of the liquid in stomach
   private _absorbed = 0;  // g of ethanol in blood
   private _excreted = 0;  // g of ethanol pissed out
 
@@ -31,7 +30,8 @@ export class DigestiveSystem {
       return 0;
     }
 
-    return expectedBacFromEthanolMass(this._absorbed, this._user);
+    // TODO ~10% difference due to absorption, this should be changed via the first order absorption method
+    return expectedBacFromEthanolMass(this._absorbed * 1.1, this._user);
   }
 
   puke(): void {
@@ -50,10 +50,6 @@ export class DigestiveSystem {
     this.excreteFromBlood();
   }
 
-  activeEthanolInSystem(): number {
-    return this._absorbed;
-  }
-
   // this is correct as it's zero-order eq
   // I drink a beer and it can be instantaneous or in additions of x mls every y mins
   private addToStomach(drink: Drink): void {
@@ -63,7 +59,7 @@ export class DigestiveSystem {
 
   // TODO incorrect, absorption is a first-order eq
   // a rate of n grams per litre is cleared per hour
-  // having a drink adds more volume and can change the potency of the ethanol
+  // having a drink adds more volume and can change the potency of the ethanol quantity in the stomach
   private absorbToBlood(): void {
     if (this._intaken.ethanolGrams > 0) {
       // const stomachContentsDistribution = this._intaken.ethanolGrams / this._intaken.volumeLitres;
@@ -75,6 +71,7 @@ export class DigestiveSystem {
       // this._intaken.ethanolGrams -= ethanolWeightProcessed;
       // this._intaken.volumeLitres -= stomachVolumeProcessed;
 
+      // TODO wrong? this is the coefficient and not 1g per minute absorption
       const rate = this._intaken.ethanolGrams < this._user.absorptionDelayCoefficient
         ? this._intaken.ethanolGrams
         : this._user.absorptionDelayCoefficient;

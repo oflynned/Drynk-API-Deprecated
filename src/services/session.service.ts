@@ -1,21 +1,8 @@
 import { Drink } from '../models/drink.model';
 import { Repository } from 'mongoize-orm';
 import { User } from '../models/user.model';
-import { MeasureType, ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point, Time } from '../common/helpers';
-import { expectedBacFromEthanolMass } from './widmark.service';
+import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../common/helpers';
 import { DigestiveSystem } from './digestive-system';
-
-interface DrinkEffect {
-  timeToPeakBacEffect: MeasureType<Time>;
-  peakBacEffectWasPassed: boolean;
-  maxPredictedBacFromDrink: number;
-  currentBacFromDrink: number;
-}
-
-interface BodySystem {
-  intake: number;
-  clearance: number;
-}
 
 // based on these papers
 // https://staff.fnwi.uva.nl/a.j.p.heck/Research/art/ICTMT8_2.pdf
@@ -32,13 +19,17 @@ export class Session {
     return new Session().buildSession();
   }
 
-  bloodAlcoholContent(): number {
-    console.log();
+  bloodAlcoholContent(timeSeries: Point<number, number>[], soberPoint: Point<number, number>): number {
+    let closestPointInSeries: Point<number, number>;
+    if (soberPoint.x < Date.now()) {
+      closestPointInSeries = { x: Date.now(), y: 0 };
+    } else {
+      closestPointInSeries = timeSeries.filter((point: Point<number, number>) => {
+        return point.x < Date.now() + (ONE_MINUTE_IN_MS / 2) && point.x > Date.now() - (ONE_MINUTE_IN_MS / 2);
+      })[0];
+    }
 
-    return expectedBacFromEthanolMass(
-      this.digestiveSystem.activeEthanolInSystem(),
-      this.user
-    );
+    return closestPointInSeries.y || 0;
   }
 
   async buildSession(): Promise<Session> {
@@ -48,7 +39,7 @@ export class Session {
   }
 
   async buildTimeSeries(query: object = {}): Promise<Point<number, number>[]> {
-    const drinks: Drink[] = await Repository.with(Drink).findMany(query);
+    const drinks: Drink[] = await Repository.with(Drink).findMany({ drinkName: 'Shame' });
     const timeOfLastDrink = drinks[drinks.length - 1].toJson().createdAt.getTime();
     let timestamps = [];
     let timePeriod = drinks[0].toJson().createdAt.getTime();
@@ -101,15 +92,6 @@ export class Session {
       }
     );
 
-    let closestPointInSeries: Point<number, number>;
-    if (soberPoint.x < Date.now()) {
-      closestPointInSeries = { x: Date.now(), y: 0 };
-    } else {
-      closestPointInSeries = timeSeries.filter((point: Point<number, number>) => {
-        return point.x < Date.now() + (ONE_MINUTE_IN_MS / 2) && point.x > Date.now() - (ONE_MINUTE_IN_MS / 2);
-      })[0];
-    }
-
     return {
       startedDrinkingAt: {
         time: timeSeries[0].x,
@@ -117,7 +99,7 @@ export class Session {
       },
       currentState: {
         time: new Date().getTime(),
-        bac: closestPointInSeries.y || 0
+        bac: this.bloodAlcoholContent(timeSeries, soberPoint)
       },
       mostDrunkAt: {
         time: mostDrunkPoint.x,

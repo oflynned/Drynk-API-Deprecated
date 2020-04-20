@@ -6,7 +6,6 @@ import {
   Time,
   Volume
 } from '../common/helpers';
-import { User } from './user.model';
 
 export interface DrinkType extends BaseModelType {
   drinkWasDowned: boolean;
@@ -35,7 +34,7 @@ export class DrinkSchema extends Schema<DrinkType> {
 
 export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   private readonly ETHANOL_DENSITY_GRAMS_PER_ML = 0.789; // 0.789 g/ml
-  private readonly STANDARD_DRINK_ETHANOL_GRAMS = 10; // 10 g
+  static readonly STANDARD_DRINK_ETHANOL_GRAMS = 10; // 10 g
 
   // assume a drink was drunk over 15-30 mins in equal amounts consistently
   // otherwise the drink was downed and will be accumulated as one hit when it is digested
@@ -81,7 +80,7 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   standardDrinks(): number {
-    return this.ethanolMass('G').value / this.STANDARD_DRINK_ETHANOL_GRAMS;
+    return this.ethanolMass('G').value / Drink.STANDARD_DRINK_ETHANOL_GRAMS;
   }
 
   timeSinceDrink(time: Time): MeasureType<Time> {
