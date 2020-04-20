@@ -34,12 +34,12 @@ export class User {
     return clamp(r, 0.44, 0.8);
   }
 
-  get absorptionRate(): number {
+  get absorptionDelayCoefficient(): number {
     return this.ABSORPTION_HALFLIFE_EMPTY_STOMACH / this.absorptionHalflife('MINS').value;
   }
 
   get excretionRate(): number {
-    return 0.19;
+    return 0.2;
   }
 
   absorptionHalflife(time: Time): MeasureType<Time> {

@@ -1,7 +1,7 @@
 import { Drink } from '../models/drink.model';
 import { Repository } from 'mongoize-orm';
 import { User } from '../models/user.model';
-import { MeasureType, ONE_MINUTE_IN_MS, Point, Time } from '../common/helpers';
+import { MeasureType, ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point, Time } from '../common/helpers';
 import { expectedBacFromEthanolMass } from './widmark.service';
 import { DigestiveSystem } from './digestive-system';
 
@@ -33,6 +33,8 @@ export class Session {
   }
 
   bloodAlcoholContent(): number {
+    console.log();
+
     return expectedBacFromEthanolMass(
       this.digestiveSystem.activeEthanolInSystem(),
       this.user
@@ -47,10 +49,11 @@ export class Session {
 
   async buildTimeSeries(query: object = {}): Promise<Point<number, number>[]> {
     const drinks: Drink[] = await Repository.with(Drink).findMany(query);
+    const timeOfLastDrink = drinks[drinks.length - 1].toJson().createdAt.getTime();
     let timestamps = [];
     let timePeriod = drinks[0].toJson().createdAt.getTime();
 
-    while (timePeriod < Date.now()) {
+    while (timePeriod < timeOfLastDrink + 24 * ONE_HOUR_IN_MS) {
       timestamps.push(timePeriod);
       timePeriod += ONE_MINUTE_IN_MS;
     }
@@ -88,6 +91,7 @@ export class Session {
 
   async estimateEventTimes(): Promise<object> {
     const timeSeries = await this.buildTimeSeries();
+    const soberPoint = timeSeries[timeSeries.length - 1];
     const mostDrunkPoint: Point<number, number> = timeSeries.reduce(
       (
         prev: Point<number, number>,
@@ -96,27 +100,32 @@ export class Session {
         return prev.y > current.y ? prev : current;
       }
     );
-    const soberPoint: Point<number, number> = timeSeries.filter((point, index) => {
-      return index !== 0 && point.y === 0;
-    })[0];
+
+    let closestPointInSeries: Point<number, number>;
+    if (soberPoint.x < Date.now()) {
+      closestPointInSeries = { x: Date.now(), y: 0 };
+    } else {
+      closestPointInSeries = timeSeries.filter((point: Point<number, number>) => {
+        return point.x < Date.now() + (ONE_MINUTE_IN_MS / 2) && point.x > Date.now() - (ONE_MINUTE_IN_MS / 2);
+      })[0];
+    }
 
     return {
       startedDrinkingAt: {
-        time: new Date(timeSeries[0].x).getTime(),
+        time: timeSeries[0].x,
         bac: 0
       },
       currentState: {
         time: new Date().getTime(),
-        bac: await this.bloodAlcoholContent(),
-        hoursToSober: Math.max(0, new Date(soberPoint.x - Date.now()).getTime())
+        bac: closestPointInSeries.y || 0
       },
       mostDrunkAt: {
-        time: new Date(mostDrunkPoint.x).getTime(),
+        time: mostDrunkPoint.x,
         bac: mostDrunkPoint.y,
         alreadyPassed: mostDrunkPoint.x < Date.now()
       },
       soberAt: {
-        time: new Date(soberPoint.x).getTime(),
+        time: soberPoint.x,
         bac: 0
       }
     };
