@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { Session } from '../../services/session/session.service';
 import { User } from '../../models/user.model';
+import { ONE_DAY_IN_MS } from '../../common/helpers';
 
 const routes = (): Router => {
   const router = Router();
@@ -10,7 +11,8 @@ const routes = (): Router => {
     '/series',
     async (req: Request, res: Response): Promise<void> => {
       const session = await Session.getInstance(user);
-      res.status(200).json(await session.buildTimeSeries({}));
+      const series = await session.buildTimeSeries({ createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) } } as object);
+      res.status(200).json(series);
     }
   );
 

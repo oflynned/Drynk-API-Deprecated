@@ -1,5 +1,6 @@
 export const ONE_HOUR_IN_MS = 3.6e6;
 export const ONE_MINUTE_IN_MS = ONE_HOUR_IN_MS / 60;
+export const ONE_DAY_IN_MS = 24 * ONE_HOUR_IN_MS;
 
 export interface Point<X, Y> {
   x: X;
