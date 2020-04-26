@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { User } from '../../models/user.model';
 
-export type UserHeader = { user: User }
+export type UserHeader = { user: User };
 
 export type Provider = 'google' | 'facebook' | 'twitter';
 
@@ -9,9 +9,9 @@ export type SocialProviderHeader = {
   provider: {
     providerId: string;
     providerToken: string;
-    providerOrigin: Provider
-  }
-}
+    providerOrigin: Provider;
+  };
+};
 
 export type SocialRequest = Request & SocialProviderHeader;
 

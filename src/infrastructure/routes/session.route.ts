@@ -15,7 +15,9 @@ const routes = (): Router => {
       const user = new SessionUser('NONE', users[0]);
       const session = await Session.getInstance(user);
 
-      const series = await session.buildTimeSeries({ createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) } } as object);
+      const series = await session.buildTimeSeries({
+        createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) }
+      } as object);
       res.status(200).json(series);
     }
   );

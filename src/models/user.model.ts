@@ -8,9 +8,9 @@ export interface UserType extends BaseModelType {
   providerId: string;
 
   weight?: number;
-  height?:number;
+  height?: number;
   sex?: Sex;
-  unitPreference?: UnitPreference
+  unitPreference?: UnitPreference;
 }
 
 class UserSchema extends Schema<UserType> {
@@ -18,15 +18,27 @@ class UserSchema extends Schema<UserType> {
     return {
       // required when accessing the app with an account
       name: Joi.string().required(),
-      email: Joi.string().email().required(),
-      providerOrigin: Joi.string().valid('google', 'facebook', 'twitter').required(),
+      email: Joi.string()
+        .email()
+        .required(),
+      providerOrigin: Joi.string()
+        .valid('google', 'facebook', 'twitter')
+        .required(),
       providerId: Joi.string().required(),
 
       // required later during onboarding
-      weight: Joi.number().min(1).allow(null),
-      height: Joi.number().min(1).allow(null),
-      sex: Joi.string().valid('male', 'female').allow(null),
-      unitPreference: Joi.string().valid('metric', 'us_imperial', 'gb_imperial').allow(null)
+      weight: Joi.number()
+        .min(1)
+        .allow(null),
+      height: Joi.number()
+        .min(1)
+        .allow(null),
+      sex: Joi.string()
+        .valid('male', 'female')
+        .allow(null),
+      unitPreference: Joi.string()
+        .valid('metric', 'us_imperial', 'gb_imperial')
+        .allow(null)
     };
   }
 

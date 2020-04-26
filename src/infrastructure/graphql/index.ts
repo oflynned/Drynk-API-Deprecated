@@ -10,64 +10,64 @@ import { SessionUser } from '../../models/session-user.model';
 export const graphql = (app: Application) => {
   const user = new User();
   const typeDefs = gql`
-      type Drink {
-          _id: ID!
-          sessionId: ID!
-          createdAt: Float!
-          updatedAt: Float
-          deletedAt: Float
-          deleted: Boolean!
-          volume: Int!
-          abv: Float!
-          drinkName: String!
-      }
+    type Drink {
+      _id: ID!
+      sessionId: ID!
+      createdAt: Float!
+      updatedAt: Float
+      deletedAt: Float
+      deleted: Boolean!
+      volume: Int!
+      abv: Float!
+      drinkName: String!
+    }
 
-      type Puke {
-          _id: ID!
-          sessionId: ID!
-          createdAt: Float!
-          updatedAt: Float
-          deletedAt: Float
-          deleted: Boolean!
-      }
+    type Puke {
+      _id: ID!
+      sessionId: ID!
+      createdAt: Float!
+      updatedAt: Float
+      deletedAt: Float
+      deleted: Boolean!
+    }
 
-      type ProjectionValue {
-          time: Float!
-          bac: Float!
-          alreadyPassed: Boolean
-      }
+    type ProjectionValue {
+      time: Float!
+      bac: Float!
+      alreadyPassed: Boolean
+    }
 
-      type Projection {
-          startedSessionAt: ProjectionValue
-          currentState: ProjectionValue
-          mostDrunkAt: ProjectionValue
-          soberAt: ProjectionValue
-      }
+    type Projection {
+      startedSessionAt: ProjectionValue
+      currentState: ProjectionValue
+      mostDrunkAt: ProjectionValue
+      soberAt: ProjectionValue
+    }
 
-      union Event = Drink | Puke
+    union Event = Drink | Puke
 
-      type Session {
-          estimateEventTimes: Projection
-          events: [Event]
-      }
+    type Session {
+      estimateEventTimes: Projection
+      events: [Event]
+    }
 
-      type Query {
-          getDrinks(sessionId: ID!): [Drink]
-          getPukes(sessionId: ID!): [Puke]
-          getSession(userId: String): Session
-      }
+    type Query {
+      getDrinks(sessionId: ID!): [Drink]
+      getPukes(sessionId: ID!): [Puke]
+      getSession(userId: String): Session
+    }
 
-      type Mutation {
-          addDrink(
-              sessionId: String!
-              volume: Int!
-              abv: Float!
-              drinkName: String!
-          ): Drink!
-          removeDrink(drinkId: ID!): Drink
-          addPuke(sessionId: String!): Puke!
-          removePuke(pukeId: ID!): Puke
-      }
+    type Mutation {
+      addDrink(
+        sessionId: String!
+        volume: Int!
+        abv: Float!
+        drinkName: String!
+      ): Drink!
+      removeDrink(drinkId: ID!): Drink
+      addPuke(sessionId: String!): Puke!
+      removePuke(pukeId: ID!): Puke
+    }
   `;
 
   const resolvers = {

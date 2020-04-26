@@ -1,4 +1,13 @@
-import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
+import {
+  clamp,
+  Length,
+  Mass,
+  MealSize,
+  MeasureType,
+  ONE_HOUR_IN_MS,
+  Sex,
+  Time
+} from '../common/helpers';
 import { Drink } from './drink.model';
 import { User } from './user.model';
 
