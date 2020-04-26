@@ -1,16 +1,8 @@
-import {
-  clamp,
-  Length,
-  Mass,
-  MealSize,
-  MeasureType,
-  ONE_HOUR_IN_MS,
-  Sex,
-  Time
-} from '../common/helpers';
+import { clamp, Length, Mass, MealSize, MeasureType, ONE_HOUR_IN_MS, Sex, Time } from '../common/helpers';
 import { Drink } from './drink.model';
+import { User } from './user.model';
 
-export class User {
+export class SessionUser {
   private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
   private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 45; // mins
   private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 60; // mins
@@ -20,11 +12,11 @@ export class User {
   private readonly weightInKg: number;
   private readonly heightInCm: number;
 
-  constructor(user:User) {
-    this.sex = 'MALE';
-    this.mealSize = 'NONE';
-    this.weightInKg = 92;
-    this.heightInCm = 189;
+  constructor(mealSize: MealSize, user: User) {
+    this.mealSize = mealSize;
+    this.sex = user.toJson().sex;
+    this.weightInKg = user.toJson().weight;
+    this.heightInCm = user.toJson().height;
   }
 
   get isMale(): boolean {
