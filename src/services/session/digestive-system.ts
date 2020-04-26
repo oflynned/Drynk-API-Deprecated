@@ -1,7 +1,7 @@
 import { expectedBacFromEthanolMass } from './widmark';
 import { Drink } from '../../models/drink.model';
-import { User } from '../../models/user.model';
 import { Event } from '../../models/event.facade';
+import { SessionUser } from '../../models/session-user.model';
 
 type StomachContents = {
   volumeLitres: number;
@@ -9,7 +9,7 @@ type StomachContents = {
 };
 
 export class DigestiveSystem {
-  private readonly _user: User;
+  private readonly _user: SessionUser;
   private _intaken: StomachContents = {
     volumeLitres: 0,
     ethanolGrams: 0
@@ -17,7 +17,7 @@ export class DigestiveSystem {
   private _absorbed = 0; // g of ethanol in blood
   private _excreted = 0; // g of ethanol pissed out
 
-  constructor(user: User) {
+  constructor(user: SessionUser) {
     this._user = user;
   }
 

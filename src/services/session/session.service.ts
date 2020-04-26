@@ -1,10 +1,10 @@
 import { Drink } from '../../models/drink.model';
 import { Repository } from 'mongoize-orm';
-import { User } from '../../models/user.model';
 import { Event } from '../../models/event.facade';
 import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
 import { DigestiveSystem } from './digestive-system';
 import { Puke } from '../../models/puke.model';
+import { SessionUser } from '../../models/session-user.model';
 
 type Query = {
   sessionId?: string;
@@ -16,16 +16,16 @@ type Query = {
 // http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
 // https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
 export class Session {
-  private _user: User;
+  private _user: SessionUser;
   private _digestiveSystem: DigestiveSystem;
 
   private constructor() {}
 
-  static async getInstance(user: User) {
+  static async getInstance(user: SessionUser) {
     return new Session().buildSession(user);
   }
 
-  async buildSession(user: User): Promise<Session> {
+  async buildSession(user: SessionUser): Promise<Session> {
     this._user = user;
     this._digestiveSystem = new DigestiveSystem(this._user);
     return this;
