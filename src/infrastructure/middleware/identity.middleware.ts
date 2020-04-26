@@ -4,10 +4,10 @@ import { User } from '../../models/user.model';
 
 import { auth } from 'firebase-admin';
 import DecodedIdToken = auth.DecodedIdToken;
-import { Provider, SocialProviderHeader } from './authenticated.request';
+import { Provider, SocialProviderHeader, SocialRequest } from './authenticated.request';
 
 export const withUser = async (
-  req: Request & SocialProviderHeader,
+  req: SocialRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -30,7 +30,7 @@ export const withFirebaseUser = async (
 ): Promise<void> => {
   const firebaseId = req.headers['x-firebase-id'];
   const firebaseToken = req.headers['x-firebase-token'];
-  const firebaseProvider = req.headers['x-firebase-provider'] as Provider;
+  const firebaseProvider = req.headers['x-firebase-provider'] as Provider | undefined;
 
   if (!firebaseId || !firebaseToken || !firebaseProvider) {
     res
