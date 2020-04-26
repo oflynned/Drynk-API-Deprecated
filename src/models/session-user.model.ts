@@ -20,7 +20,7 @@ export class User {
   private readonly weightInKg: number;
   private readonly heightInCm: number;
 
-  constructor() {
+  constructor(user:User) {
     this.sex = 'MALE';
     this.mealSize = 'NONE';
     this.weightInKg = 92;
