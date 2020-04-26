@@ -4,7 +4,7 @@ import { Sex, UnitPreference } from '../common/helpers';
 export interface UserType extends BaseModelType {
   name: string;
   email: string;
-  provider: string;
+  providerOrigin: string;
   providerId: string;
 
   weight?: number;
@@ -37,7 +37,7 @@ class UserSchema extends Schema<UserType> {
         .valid('male', 'female')
         .allow(null),
       unitPreference: Joi.string()
-        .valid('metric', 'us_imperial', 'gb_imperial')
+        .valid('metric', 'imperial')
         .allow(null)
     };
   }
@@ -47,7 +47,7 @@ class UserSchema extends Schema<UserType> {
       weight: Joi.number().min(1),
       height: Joi.number().min(1),
       sex: Joi.string().valid('male', 'female'),
-      unitPreference: Joi.string().valid('metric', 'us_imperial', 'gb_imperial')
+      unitPreference: Joi.string().valid('metric', 'imperial')
     };
   }
 }

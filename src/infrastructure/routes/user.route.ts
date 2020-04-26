@@ -2,6 +2,8 @@ import { Response, Router } from 'express';
 import { createUser, findUser } from '../../controllers/user.controller';
 import { withFirebaseUser, withUser } from '../middleware/identity.middleware';
 import { AuthenticatedRequest } from '../middleware/authenticated.request';
+import { Repository } from 'mongoize-orm';
+import { User } from '../../models/user.model';
 
 const routes = (): Router => {
   const router = Router();
@@ -27,20 +29,25 @@ const routes = (): Router => {
   );
 
   router.get(
-    '/:id',
+    '/',
     withFirebaseUser,
     async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-      if (req.user.toJson()._id !== req.params.id) {
-        res.status(403).json({ message: 'can only request own user account' });
-        return;
-      }
-
       const user = await findUser(req.params.id);
       if (user) {
         res.status(200).json(user);
       } else {
         res.status(404).send();
       }
+    }
+  );
+
+  router.patch(
+    '/',
+    withFirebaseUser,
+    withUser,
+    async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+      const user = await req.user.update(req.body);
+      res.status(200).json(user.toJson());
     }
   );
 
