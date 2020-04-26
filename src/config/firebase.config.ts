@@ -3,7 +3,7 @@ import admin, { AppOptions } from 'firebase-admin';
 const serviceAccountConfig = () => {
   return process.env.NODE_ENV === 'production'
     ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-    : require('../config/firebase-service-account.json');
+    : require('./secrets/firebase-service-account.json');
 };
 
 export const firebaseConfig = (): AppOptions => {
