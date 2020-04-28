@@ -14,7 +14,7 @@ const routes = (): Router => {
     withUser,
     async (req: AuthenticatedRequest, res: Response): Promise<void> => {
       if (req.user) {
-        res.status(200).json(req.user);
+        res.status(200).json(req.user.toJson());
         return;
       }
 
