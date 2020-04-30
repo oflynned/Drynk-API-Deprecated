@@ -13,14 +13,24 @@ export class UserFactory {
     return providers[Math.floor(Math.random() * providers.length)];
   }
 
+  private static sex(): string {
+    const providers = ['male', 'female'];
+    return providers[Math.floor(Math.random() * providers.length)];
+  }
+
   private static buildProperties(overrides?: Partial<UserType>): UserType {
     const firstName = name.firstName();
     const lastName = name.lastName();
     return {
-      name: `${firstName} ${lastName}`,
-      email: internet.email(firstName, lastName),
-      providerOrigin: UserFactory.provider(),
-      providerId: random.uuid(),
+      ...({
+        name: `${firstName} ${lastName}`,
+        email: internet.email(firstName, lastName),
+        providerOrigin: UserFactory.provider(),
+        providerId: random.uuid(),
+        height: random.number({ min: 120, max: 200 }),
+        weight: random.number({ min: 40, max: 150 }),
+        sex: this.sex()
+      } as UserType),
       ...overrides
     };
   }

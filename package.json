@@ -12,7 +12,7 @@
     "lint:staged": "pretty-quick --staged",
     "start:dev": "NODE_ENV=development nodemon ./src/infrastructure/app.ts",
     "start:prod": "NODE_ENV=production node ./dist/infrastructure/app.js",
-    "test": "jest -c jest.base.config.js",
+    "test": "jest -c jest.config.js",
     "test:integration": "jest -c jest.integration.config.js",
     "test:spec": "jest -c jest.spec.config.js",
     "test:watch": "jest -c jest.config.js --watch"
