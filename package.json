@@ -44,7 +44,7 @@
     "@types/faker": "^4.1.11",
     "@types/graphql": "^14.5.0",
     "@types/graphql-iso-date": "^3.3.3",
-    "@types/helmet": "0.0.45",
+    "@types/helmet": "0.0.46",
     "@types/jest": "^24.0.25",
     "@types/morgan": "^1.7.37",
     "@types/node": "^13.1.2",
