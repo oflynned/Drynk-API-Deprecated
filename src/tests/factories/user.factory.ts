@@ -39,4 +39,8 @@ export class UserFactory {
     const properties = UserFactory.buildProperties(overrides);
     return new User().build(properties) as User;
   }
+
+  seed(overrides?: Partial<UserType>): Promise<User> {
+    return this.build(overrides).save();
+  }
 }
