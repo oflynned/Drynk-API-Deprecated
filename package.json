@@ -7,6 +7,8 @@
     "clean": "rimraf ./dist",
     "lint:code": "prettier --write '**/*.ts' --config ./.prettierrc",
     "lint:package": "sort-package-json",
+    "lint:dependencies": "node_modules/.bin/ncu -u --semverLevel major && yarn && git add yarn.lock package.json && git commit -m 'auto-update dependencies'",
+    "lint:dependencies:check": "node_modules/.bin/ncu -e 2 --semverLevel major",
     "start:dev": "NODE_ENV=development nodemon ./src/infrastructure/app.ts",
     "start:prod": "NODE_ENV=production node ./dist/infrastructure/app.js",
     "test": "jest -c jest.base.config.js",
@@ -29,6 +31,7 @@
     "hbs": "~4.0.4",
     "helmet": "latest",
     "http-errors": "~1.6.3",
+    "husky": "^4.2.5",
     "mongoize-orm": "^1.0.1",
     "morgan": "~1.9.1"
   },
