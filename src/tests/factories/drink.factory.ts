@@ -18,7 +18,8 @@ export class DrinkFactory {
       ...({
         drinkName: this.drinkName(),
         abv: random.number({ min: 1, max: 99 }),
-        volume: random.number({ min: 35, max: 568 })
+        volume: random.number({ min: 35, max: 568 }),
+        sessionId: random.uuid()
       } as DrinkType),
       ...overrides
     };

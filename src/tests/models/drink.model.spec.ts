@@ -42,4 +42,12 @@ describe('drink model', () => {
       ).rejects.toThrowError(/must be larger than or equal to 1/);
     });
   });
+
+  describe('.sessionId', () => {
+    it('should be uuid v4 format', async () => {
+      await expect(
+        factory.build({ sessionId: 'asdf' }).validate()
+      ).rejects.toThrowError(/must be a valid GUID/);
+    });
+  });
 });

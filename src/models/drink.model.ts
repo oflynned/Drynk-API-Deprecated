@@ -11,6 +11,7 @@ export interface DrinkType extends BaseModelType {
   volume: number;
   abv: number;
   drinkName: string;
+  sessionId: string;
 }
 
 export class DrinkSchema extends Schema<DrinkType> {
@@ -23,7 +24,10 @@ export class DrinkSchema extends Schema<DrinkType> {
         .min(1)
         .max(100)
         .required(),
-      drinkName: Joi.string().required()
+      drinkName: Joi.string().required(),
+      sessionId: Joi.string()
+        .uuid()
+        .required()
     };
   }
 

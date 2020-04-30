@@ -4,23 +4,19 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import http from 'http';
 
 import sitemap from './sitemap';
-import { firebaseConfig } from '../config/firebase.config';
-
-import { bindGlobalDatabaseClient, MongoClient } from 'mongoize-orm';
 import { graphql } from './graphql';
-import firebase from 'firebase-admin';
 
 export class Server {
-  async buildServer(): Promise<Application> {
-    const client: MongoClient = new MongoClient();
+  private _app: Application;
 
-    const { dbConfig } = require('../config/database.config');
-    await bindGlobalDatabaseClient(client, dbConfig());
+  get app(): Application {
+    return this._app;
+  }
 
-    firebase.initializeApp(firebaseConfig());
-
+  build(): Server {
     const app = express();
     app.use(morgan('combined'));
     app.use(bodyParser.json());
@@ -31,6 +27,18 @@ export class Server {
     graphql(app);
     sitemap(app);
 
-    return app;
+    this._app = app;
+
+    return this;
+  }
+
+  async listen(port = this._app.get('port')): Promise<http.Server> {
+    return this._app.listen(port, () => {
+      console.log(
+        `The server is running and listening on http://localhost:${port}`
+      );
+    });
   }
 }
+
+export default Server;
