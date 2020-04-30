@@ -74,7 +74,7 @@ describe('user', () => {
       }
     );
 
-    it('should require at least 1', async () => {
+    it('should require valid sex', async () => {
       await expect(
         factory.build({ sex: 'not a sex' } as object).validate()
       ).rejects.toThrowError(/must be one of/);
