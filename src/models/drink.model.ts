@@ -20,11 +20,13 @@ export class DrinkSchema extends Schema<DrinkType> {
     return {
       // sessionId: Joi.string().required(),
       // userId: Joi.string().required(),
-      volume: Joi.number().required(),
+      volume: Joi.number()
+        .min(1)
+        .required(),
       abv: Joi.number()
-        .required()
-        .min(0)
-        .max(100),
+        .min(1)
+        .max(100)
+        .required(),
       drinkName: Joi.string().required()
     };
   }

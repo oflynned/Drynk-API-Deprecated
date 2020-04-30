@@ -37,6 +37,6 @@ export class UserFactory {
 
   build(overrides?: Partial<UserType>): User {
     const properties = UserFactory.buildProperties(overrides);
-    return new User().build(properties);
+    return new User().build(properties) as User;
   }
 }
