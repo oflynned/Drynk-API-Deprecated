@@ -8,8 +8,6 @@ import {
 } from '../common/helpers';
 
 export interface DrinkType extends BaseModelType {
-  // sessionId: string;
-  // userId: string;
   volume: number;
   abv: number;
   drinkName: string;
@@ -18,8 +16,6 @@ export interface DrinkType extends BaseModelType {
 export class DrinkSchema extends Schema<DrinkType> {
   joiBaseSchema(): object {
     return {
-      // sessionId: Joi.string().required(),
-      // userId: Joi.string().required(),
       volume: Joi.number()
         .min(1)
         .required(),
@@ -32,7 +28,13 @@ export class DrinkSchema extends Schema<DrinkType> {
   }
 
   joiUpdateSchema(): object {
-    return undefined;
+    return {
+      volume: Joi.number().min(1),
+      abv: Joi.number()
+        .min(1)
+        .max(100),
+      drinkName: Joi.string()
+    };
   }
 }
 
