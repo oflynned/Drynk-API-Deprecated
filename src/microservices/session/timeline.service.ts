@@ -15,17 +15,17 @@ type Query = {
 // https://staff.fnwi.uva.nl/a.j.p.heck/Research/art/ICTMT8_2.pdf
 // http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
 // https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
-export class Session {
+export class Timeline {
   private _user: SessionUser;
   private _digestiveSystem: DigestiveSystem;
 
   private constructor() {}
 
   static async getInstance(user: SessionUser) {
-    return new Session().buildSession(user);
+    return new Timeline().buildSession(user);
   }
 
-  async buildSession(user: SessionUser): Promise<Session> {
+  async buildSession(user: SessionUser): Promise<Timeline> {
     this._user = user;
     this._digestiveSystem = new DigestiveSystem(this._user);
     return this;
@@ -54,11 +54,11 @@ export class Session {
       .toJson()
       .createdAt.getTime();
     let timestamps = [];
-    let timePeriod = events[0].toJson().createdAt.getTime();
+    let timeOfFirstEvent = events[0].toJson().createdAt.getTime();
 
-    while (timePeriod < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
-      timestamps.push(timePeriod);
-      timePeriod += ONE_MINUTE_IN_MS;
+    while (timeOfFirstEvent < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
+      timestamps.push(timeOfFirstEvent);
+      timeOfFirstEvent += ONE_MINUTE_IN_MS;
     }
 
     const series: Point<number, number>[] = await Promise.all(
