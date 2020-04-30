@@ -11,7 +11,7 @@
     "start:prod": "NODE_ENV=production node ./dist/infrastructure/app.js",
     "test": "jest -c jest.base.config.js",
     "test:integration": "jest -c jest.integration.config.js",
-    "test:unit": "jest -c jest.unit.config.js",
+    "test:spec": "jest -c jest.spec.config.js",
     "test:watch": "jest -c jest.base.config.js --watch"
   },
   "dependencies": {
