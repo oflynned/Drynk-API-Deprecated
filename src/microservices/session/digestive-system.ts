@@ -64,6 +64,7 @@ export class DigestiveSystem {
   //      having a drink adds more volume and can change the potency of the ethanol quantity in the stomach
   private absorbToBlood(): void {
     if (this._intaken.ethanolGrams > 0) {
+      // TODO volume needs to be taken into account so that puking & drinking water have more context
       // const stomachContentsDistribution = this._intaken.ethanolGrams / this._intaken.volumeLitres;
       // const processableEthanol = stomachContentsDistribution * 0.1; // 1L per minute?
       //
