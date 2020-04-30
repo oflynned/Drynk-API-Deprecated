@@ -2,8 +2,6 @@ import { Response, Router } from 'express';
 import { createUser, findUser } from '../../controllers/user.controller';
 import { withFirebaseUser, withUser } from '../middleware/identity.middleware';
 import { AuthenticatedRequest } from '../middleware/authenticated.request';
-import { Repository } from 'mongoize-orm';
-import { User } from '../../models/user.model';
 
 const routes = (): Router => {
   const router = Router();

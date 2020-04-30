@@ -54,11 +54,11 @@ export class Timeline {
       .toJson()
       .createdAt.getTime();
     let timestamps = [];
-    let timePeriod = events[0].toJson().createdAt.getTime();
+    let timeOfFirstEvent = events[0].toJson().createdAt.getTime();
 
-    while (timePeriod < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
-      timestamps.push(timePeriod);
-      timePeriod += ONE_MINUTE_IN_MS;
+    while (timeOfFirstEvent < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
+      timestamps.push(timeOfFirstEvent);
+      timeOfFirstEvent += ONE_MINUTE_IN_MS;
     }
 
     const series: Point<number, number>[] = await Promise.all(
