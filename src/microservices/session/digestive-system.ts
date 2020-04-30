@@ -1,6 +1,6 @@
 import { expectedBacFromEthanolMass } from './widmark';
 import { Drink } from '../../models/drink.model';
-import { Event } from '../../models/event.facade';
+import { Event } from '../../models/event.type';
 import { SessionUser } from '../../models/session-user.model';
 
 type StomachContents = {

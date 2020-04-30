@@ -1,6 +1,6 @@
 import { Drink } from '../../models/drink.model';
 import { Repository } from 'mongoize-orm';
-import { Event } from '../../models/event.facade';
+import { Event } from '../../models/event.type';
 import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
 import { DigestiveSystem } from './digestive-system';
 import { Puke } from '../../models/puke.model';
