@@ -4,16 +4,14 @@ describe('user', () => {
   const factory: UserFactory = UserFactory.getInstance();
 
   it('should be validated', async () => {
-    await expect(
-      factory.build().validate()
-    ).resolves.toBeDefined();
+    await expect(factory.build().validate()).resolves.toBeDefined();
   });
 
   describe('.name', () => {
     it('should require at least one character', async () => {
-      await expect(
-        factory.build({ name: '' }).validate()
-      ).rejects.toThrowError(/is not allowed to be empty/);
+      await expect(factory.build({ name: '' }).validate()).rejects.toThrowError(
+        /is not allowed to be empty/
+      );
     });
   });
 
@@ -40,11 +38,13 @@ describe('user', () => {
       ).rejects.toThrowError(/must be one of/);
     });
 
-    test.each(['google', 'facebook', 'twitter'])
-    ('should accept %s as a provider', async (provider: string) => {
-      await expect(
-        factory.build({ providerOrigin: provider }).validate()
-      ).resolves.toBeDefined();
-    });
+    test.each(['google', 'facebook', 'twitter'])(
+      'should accept %s as a provider',
+      async (provider: string) => {
+        await expect(
+          factory.build({ providerOrigin: provider }).validate()
+        ).resolves.toBeDefined();
+      }
+    );
   });
 });
