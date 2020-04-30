@@ -1,5 +1,5 @@
 import { Response, Router } from 'express';
-import { Timeline } from '../../services/session/timeline.service';
+import { Timeline } from '../../microservices/session/timeline.service';
 import { ONE_DAY_IN_MS } from '../../common/helpers';
 import { SessionUser } from '../../models/session-user.model';
 import { withFirebaseUser, withUser } from '../middleware/identity.middleware';

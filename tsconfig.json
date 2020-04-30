@@ -13,5 +13,5 @@
     "baseUrl": "."
   },
   "include": ["./src/**/*.ts"],
-  "exclude": ["./__tests__", "./node_modules", "./assets"]
+  "exclude": ["./src/tests", "./node_modules", "./assets"]
 }

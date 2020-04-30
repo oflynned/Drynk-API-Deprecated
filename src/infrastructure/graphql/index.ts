@@ -2,7 +2,7 @@ import { ApolloServer, gql } from 'apollo-server-express';
 import { Repository } from 'mongoize-orm';
 import { Application } from 'express';
 import { Drink, DrinkType } from '../../models/drink.model';
-import { SessionTimeline } from '../../services/session/session-timeline.service';
+import { Timeline } from '../../microservices/session/timeline.service';
 import { User } from '../../models/user.model';
 import { Puke } from '../../models/puke.model';
 import { SessionUser } from '../../models/session-user.model';
@@ -80,14 +80,14 @@ export const graphql = (app: Application) => {
       getSession: async (
         context: object,
         args: { userId?: string }
-      ): Promise<SessionTimeline | {}> => {
+      ): Promise<Timeline | {}> => {
         const userProfile = await Repository.with(User).findById(args.userId);
         if (!userProfile) {
           return {};
         }
 
         const user = new SessionUser('NONE', userProfile);
-        return SessionTimeline.getInstance(user);
+        return Timeline.getInstance(user);
       }
     },
     Mutation: {
