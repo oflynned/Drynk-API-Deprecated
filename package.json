@@ -12,7 +12,7 @@
     "test": "jest -c jest.base.config.js",
     "test:integration": "jest -c jest.integration.config.js",
     "test:spec": "jest -c jest.spec.config.js",
-    "test:watch": "jest -c jest.base.config.js --watch"
+    "test:watch": "jest -c jest.config.js --watch"
   },
   "dependencies": {
     "apollo-server-express": "^2.12.0",

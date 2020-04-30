@@ -3,7 +3,7 @@ const { resolve } = require('path');
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['./__tests__'],
+  roots: ['./src'],
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
