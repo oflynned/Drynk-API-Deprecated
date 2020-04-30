@@ -3,10 +3,17 @@ import { UserFactory } from '../factories/user.factory';
 describe('user', () => {
   const factory: UserFactory = UserFactory.getInstance();
 
+  it('should be validated', async () => {
+    await expect(
+      factory.build().validate()
+    ).resolves.toBeDefined();
+  });
+
   describe('.name', () => {
     it('should require at least one character', async () => {
-      const user = factory.build({ name: '' });
-      await expect(user.validate()).rejects.toThrowError(/is not allowed to be empty/);
+      await expect(
+        factory.build({ name: '' }).validate()
+      ).rejects.toThrowError(/is not allowed to be empty/);
     });
   });
 
