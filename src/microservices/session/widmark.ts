@@ -1,4 +1,3 @@
-import { User } from '../../models/user.model';
 import { SessionUser } from '../../models/session-user.model';
 
 export const expectedBacFromEthanolMass = (

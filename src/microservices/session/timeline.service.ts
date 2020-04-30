@@ -15,17 +15,17 @@ type Query = {
 // https://staff.fnwi.uva.nl/a.j.p.heck/Research/art/ICTMT8_2.pdf
 // http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
 // https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
-export class Session {
+export class Timeline {
   private _user: SessionUser;
   private _digestiveSystem: DigestiveSystem;
 
   private constructor() {}
 
   static async getInstance(user: SessionUser) {
-    return new Session().buildSession(user);
+    return new Timeline().buildSession(user);
   }
 
-  async buildSession(user: SessionUser): Promise<Session> {
+  async buildSession(user: SessionUser): Promise<Timeline> {
     this._user = user;
     this._digestiveSystem = new DigestiveSystem(this._user);
     return this;
