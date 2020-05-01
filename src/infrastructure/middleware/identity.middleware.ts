@@ -9,6 +9,8 @@ import {
   SocialProviderHeader,
   SocialRequest
 } from './authenticated.request';
+import { BadRequestError } from '../errors/bad-request.error';
+import { UnauthorisedError } from '../errors/unauthorised.error';
 
 export const withUser = async (
   req: SocialRequest,
@@ -33,45 +35,53 @@ export const withFirebaseUser = async (
   next: NextFunction
 ): Promise<void> => {
   const firebaseId = req.headers['x-firebase-id'];
-  const firebaseToken = req.headers['x-firebase-token'];
-  const firebaseProvider = req.headers['x-firebase-provider'] as
-    | Provider
-    | undefined;
+  const jwtToken = req.headers['authorization'];
+  const firebaseProvider = req.headers['x-firebase-provider'] as Provider;
 
-  if (!firebaseId || !firebaseToken || !firebaseProvider) {
-    res
-      .status(400)
-      .json({ error: 'id and token headers are required headers' });
-    return;
+  if (!jwtToken || !firebaseId || !firebaseProvider) {
+    throw new BadRequestError('Id and token headers are required headers');
   }
 
   if (
     Array.isArray(firebaseId) ||
-    Array.isArray(firebaseToken) ||
+    Array.isArray(jwtToken) ||
     Array.isArray(firebaseProvider)
   ) {
-    res.status(400).json({ error: 'id and token headers are not arrays' });
-    return;
+    throw new BadRequestError('Id and token headers are not arrays');
   }
 
+  const [authorisation, token] = jwtToken.split(' ');
+  if (authorisation !== 'Bearer') {
+    throw new BadRequestError('Bearer authorization required');
+  }
+
+  // TODO check for revocation
   const decodedIdToken: DecodedIdToken = await auth().verifyIdToken(
-    firebaseToken,
-    false
+    decode(token),
+    true
   );
+
   if (decodedIdToken.uid !== firebaseId) {
-    res.status(403).json({ error: '' });
-    return;
+    throw new UnauthorisedError(
+      "The associated Firebase id doesn't match the one on record"
+    );
   }
 
   const headers: SocialProviderHeader = {
     provider: {
-      providerId: firebaseId,
-      providerToken: firebaseToken,
-      providerOrigin: firebaseProvider
+      providerId: firebaseId
     }
   };
 
   Object.assign(req, { ...headers });
 
   next();
+};
+
+const encode = (data: string): string => {
+  return Buffer.from(data).toString('base64');
+};
+
+const decode = (data: string): string => {
+  return Buffer.from(data, 'base64').toString('ascii');
 };

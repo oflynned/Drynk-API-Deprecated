@@ -1,12 +1,36 @@
-import { User, UserType } from '../models/user.model';
-import { Repository } from 'mongoize-orm';
+import { User } from '../models/user.model';
+import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
+import { Response } from 'express';
+import { BadRequestError } from '../infrastructure/errors/bad-request.error';
+import { UnauthenticatedError } from '../infrastructure/errors/unauthenticated.error';
+import asyncHandler from 'express-async-handler';
 
-export const createUser = async (params: UserType): Promise<object> => {
-  const user: User = await new User().build(params).save();
-  return user.toJson();
-};
+export class UserController {
+  static async createUser(req: AuthenticatedRequest, res: Response) {
+    return asyncHandler(async () => {
+      if (req.user) {
+        return res.status(200).json(req.user.toJson());
+      }
 
-export const findUser = async (id: string): Promise<object> => {
-  const user = await Repository.with(User).findById(id);
-  return user.toJson();
-};
+      try {
+        const user: User = await new User()
+          .build({ ...req.body, ...req.provider })
+          .save();
+
+        return res.status(201).json(user.toJson());
+      } catch (e) {
+        throw new BadRequestError('User payload is malformed');
+      }
+    });
+  }
+
+  static async findUser(req: AuthenticatedRequest, res: Response) {
+    return asyncHandler(async () => {
+      if (!req.user) {
+        throw new UnauthenticatedError('User is not authenticated');
+      }
+
+      return res.status(200).json(req.user.toJson());
+    });
+  }
+}

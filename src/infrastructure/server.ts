@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import http from 'http';
 
-import sitemap from './sitemap';
+import sitemap from './sitemap/sitemap';
 import { graphql } from './graphql';
 
 export class Server {
