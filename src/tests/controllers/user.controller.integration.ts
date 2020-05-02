@@ -1,44 +1,72 @@
 import { UserController } from '../../controllers/user.controller';
-import { UserFactory } from '../factories/user.factory';
-import { bindGlobalDatabaseClient, InMemoryClient } from 'mongoize-orm';
 import { User } from '../../models/user.model';
-import { mockRequest, mockResponse } from 'mock-req-res';
+import { UserFactory } from '../factories/user.factory';
+import {
+  bindGlobalDatabaseClient,
+  InMemoryClient,
+  Repository
+} from 'mongoize-orm';
+import { BadRequestError } from '../../infrastructure/errors';
+
+const mockRequest = (user: User, request: object): object => {
+  return { provider: { providerId: user.toJson().providerId }, ...request };
+};
+
+const mockResponse = (): any => {
+  const res: any = {};
+  res.status = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
+  return res;
+};
 
 describe('user controller', () => {
-  const res = mockResponse();
-  let client: InMemoryClient = new InMemoryClient();
+  const client: InMemoryClient = new InMemoryClient();
+  const factory: UserFactory = UserFactory.getInstance();
+
+  let req: any;
+  let res: any;
 
   beforeAll(async () => {
     await client.connect();
     await bindGlobalDatabaseClient(client);
+    await client.dropDatabase();
   });
 
   afterAll(async () => {
+    await client.dropDatabase();
     await client.close();
   });
 
   describe('#createUser', () => {
-    describe('when user already exists', () => {
-      let user: User;
-
+    describe('when payload is valid', () => {
       beforeAll(async () => {
-        await client.dropDatabase();
-        user = await UserFactory.getInstance().seed();
+        const user: User = await factory.build();
+        req = mockRequest(user, { body: { ...user.toJson() } });
+        res = mockResponse();
+        await UserController.createUser(req, res);
       });
 
-      afterAll(async () => {
-        await client.dropDatabase();
+      it('should return 201', () => {
+        expect(res.status).toHaveBeenCalledWith(201);
       });
 
-      it('should return http 200 status', async () => {
-        const req = mockRequest({ user: user.toJson() });
-        // console.log(req)
-        const response = await UserController.createUser(req as any, res);
-        console.log(response);
-        // expect(response).toEqual(200)
+      it('should create user', async () => {
+        await expect(Repository.with(User).count()).resolves.toEqual(1);
       });
     });
 
-    describe('when user does not exist', () => {});
+    describe('when payload is invalid', () => {
+      beforeAll(async () => {
+        const user: User = await factory.build();
+        req = mockRequest(user, { body: {} });
+        res = mockResponse();
+      });
+
+      it('should throw BadRequestError', async () => {
+        await expect(UserController.createUser(req, res)).rejects.toThrow(
+          BadRequestError.name
+        );
+      });
+    });
   });
 });
