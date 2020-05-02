@@ -12,10 +12,9 @@ const request = agent(new Server().build().app);
 const endpoint = '/users';
 
 describe(endpoint, () => {
-  let client: InMemoryClient;
+  let client: InMemoryClient = new InMemoryClient();
 
   beforeAll(async () => {
-    client = await new InMemoryClient().connect();
     await bindGlobalDatabaseClient(client);
 
     // TODO initialise mock firebase auth

@@ -33,7 +33,6 @@ describe('user controller', () => {
   let res: any;
 
   beforeAll(async () => {
-    await client.connect();
     await bindGlobalDatabaseClient(client);
     await client.dropDatabase();
   });
@@ -45,8 +44,10 @@ describe('user controller', () => {
 
   describe('#createUser', () => {
     describe('when payload is valid', () => {
+      let user: User;
+
       beforeAll(async () => {
-        const user: User = await factory.build();
+        user = await factory.build();
         req = mockRequest(user, user.toJson());
         res = mockResponse();
         await UserController.createUser(req, res);
@@ -62,8 +63,10 @@ describe('user controller', () => {
     });
 
     describe('when payload is invalid', () => {
+      let user: User;
+
       beforeAll(async () => {
-        const user: User = await factory.build();
+        user = await factory.build();
         req = mockRequest(user);
         res = mockResponse();
       });
@@ -92,6 +95,44 @@ describe('user controller', () => {
 
     it('should return req user as json', async () => {
       expect(res.json).toHaveBeenCalledWith(user.toJson());
+    });
+  });
+
+  describe('#updateUser', () => {
+    describe('when payload is valid', () => {
+      let user: User;
+
+      beforeAll(async () => {
+        user = await factory.seed();
+        req = mockRequest(user, { weight: 90 });
+        res = mockResponse();
+
+        await UserController.updateUser(req, res);
+      });
+
+      it('should return 200', async () => {
+        expect(res.status).toHaveBeenCalledWith(200);
+      });
+
+      it('should return updated user', async () => {
+        expect(res.json).toHaveBeenCalledWith({ ...user.toJson(), weight: 90 });
+      });
+    });
+
+    describe('when payload is invalid', () => {
+      let user: User;
+
+      beforeAll(async () => {
+        user = await factory.seed();
+        req = mockRequest(user, { weight: -1 });
+        res = mockResponse();
+      });
+
+      it('should throw bad request error', async () => {
+        await expect(UserController.updateUser(req, res)).rejects.toThrow(
+          BadRequestError.name
+        );
+      });
     });
   });
 });
