@@ -39,6 +39,10 @@ const routes = (): Router => {
       async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
         withUser(req, res, next)
     ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
     asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
       UserController.findUser(req, res)
     )
