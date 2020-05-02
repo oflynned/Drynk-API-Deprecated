@@ -40,7 +40,7 @@ export class UserFactory {
     return new User().build(properties) as User;
   }
 
-  seed(overrides?: Partial<UserType>): Promise<User> {
+  async seed(overrides?: Partial<UserType>): Promise<User> {
     return this.build(overrides).save();
   }
 }
