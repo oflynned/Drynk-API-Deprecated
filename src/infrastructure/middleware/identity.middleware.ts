@@ -88,11 +88,3 @@ export const withFirebaseUser = async (
 
   next();
 };
-
-const encode = (data: string): string => {
-  return Buffer.from(data).toString('base64');
-};
-
-const decode = (data: string): string => {
-  return Buffer.from(data, 'base64').toString('ascii');
-};
