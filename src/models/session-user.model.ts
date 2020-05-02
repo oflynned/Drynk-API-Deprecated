@@ -10,6 +10,7 @@ import {
 } from '../common/helpers';
 import { Drink } from './drink.model';
 import { User } from './user.model';
+import { Session } from './session.model';
 
 export class SessionUser {
   private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
@@ -21,8 +22,8 @@ export class SessionUser {
   private readonly weightInKg: number;
   private readonly heightInCm: number;
 
-  constructor(mealSize: MealSize, user: User) {
-    this.mealSize = mealSize;
+  constructor(session: Session, user: User) {
+    this.mealSize = session.toJson().mealSize;
     this.sex = user.toJson().sex;
     this.weightInKg = user.toJson().weight;
     this.heightInCm = user.toJson().height;

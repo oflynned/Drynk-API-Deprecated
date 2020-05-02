@@ -8,6 +8,7 @@ import {
   Schema
 } from 'mongoize-orm';
 import { Drink } from './drink.model';
+import { MealSize } from '../common/helpers';
 
 type Projection = {
   bloodAlcoholContent: number;
@@ -17,6 +18,7 @@ type Projection = {
 
 export interface SessionType extends BaseModelType {
   userId: string;
+  mealSize: MealSize;
 }
 
 export class SessionSchema extends Schema<SessionType> {
@@ -24,6 +26,9 @@ export class SessionSchema extends Schema<SessionType> {
     return {
       userId: Joi.string()
         .uuid()
+        .required(),
+      mealSize: Joi.string()
+        .valid('none', 'small', 'large')
         .required()
     };
   }

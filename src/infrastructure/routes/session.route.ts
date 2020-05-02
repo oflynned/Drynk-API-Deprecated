@@ -58,7 +58,14 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const sessionUser = new SessionUser('NONE', req.user);
+        // TODO can also be abstracted out to a middleware to fetch session ...
+        const session = await Repository.with(Session).findById(req.params.id);
+        // TODO can be abstracted out to middleware as a user owns sessions, drinks, events ...
+        if (session.toJson().userId !== req.user.toJson()._id) {
+          throw new ResourceNotFoundError();
+        }
+        // TODO meal size  and any other info should be fetched from the session instead
+        const sessionUser = new SessionUser(session, req.user);
         const timeline = await Timeline.getInstance(sessionUser);
 
         // TODO events should be passed to the microservice
@@ -113,7 +120,9 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const sessionUser = new SessionUser('NONE', req.user);
+        // TODO get most recent session for the user if something is active from the cached timeline from the service
+        //      otherwise return no session active, therefore sober
+        const sessionUser = new SessionUser(new Session(), req.user);
         const timeline = await Timeline.getInstance(sessionUser);
         const eventEstimates = await timeline.estimateEventTimes({});
         return res.status(200).json(eventEstimates);
