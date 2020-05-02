@@ -6,7 +6,11 @@ import {
   InMemoryClient,
   Repository
 } from 'mongoize-orm';
-import { BadRequestError } from '../../infrastructure/errors';
+import {
+  BadRequestError,
+  ResourceNotFoundError,
+  UnauthorisedError
+} from '../../infrastructure/errors';
 
 const mockRequest = (user: User, body: object = {}): object => {
   return {
@@ -131,6 +135,49 @@ describe('user controller', () => {
       it('should throw bad request error', async () => {
         await expect(UserController.updateUser(req, res)).rejects.toThrow(
           BadRequestError.name
+        );
+      });
+    });
+  });
+
+  describe('#deleteUser', () => {
+    describe('when user is not deleted', () => {
+      let user: User;
+
+      beforeAll(async () => {
+        user = await factory.seed();
+        req = mockRequest(user);
+        res = mockResponse();
+
+        await UserController.deleteUser(req, res);
+      });
+
+      it('should return 204', async () => {
+        expect(res.status).toHaveBeenCalledWith(204);
+      });
+
+      it('should be soft deleted', async () => {
+        const ref = await Repository.with(User).findById(user.toJson()._id);
+        expect(ref.toJson().deleted).toBeTruthy();
+        expect(ref.toJson().deletedAt).not.toBeNull();
+      });
+    });
+
+    describe('when user is soft deleted', () => {
+      let user: User;
+
+      beforeAll(async () => {
+        const ref = await factory.seed();
+        await ref.delete();
+        user = await Repository.with(User).findById(ref.toJson()._id);
+
+        req = mockRequest(user);
+        res = mockResponse();
+      });
+
+      it('should throw bad request error', async () => {
+        await expect(UserController.deleteUser(req, res)).rejects.toThrow(
+          ResourceNotFoundError.name
         );
       });
     });

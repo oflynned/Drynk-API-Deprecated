@@ -1,7 +1,11 @@
 import { User } from '../models/user.model';
 import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
-import { BadRequestError, UnauthorisedError } from '../infrastructure/errors';
+import {
+  BadRequestError,
+  ResourceNotFoundError,
+  UnauthorisedError
+} from '../infrastructure/errors';
 import { Repository } from 'mongoize-orm';
 
 export class UserController {
@@ -45,7 +49,7 @@ export class UserController {
 
   static async deleteUser(req: AuthenticatedRequest, res: Response) {
     if (req.user.toJson().deleted) {
-      throw new UnauthorisedError('User was already deleted');
+      throw new ResourceNotFoundError();
     }
 
     await req.user.delete();
