@@ -8,8 +8,14 @@ import {
 } from 'mongoize-orm';
 import { BadRequestError } from '../../infrastructure/errors';
 
-const mockRequest = (user: User, request: object): object => {
-  return { provider: { providerId: user.toJson().providerId }, ...request };
+const mockRequest = (user: User, body: object = {}): object => {
+  return {
+    provider: {
+      providerId: user.toJson().providerId
+    },
+    user,
+    body
+  };
 };
 
 const mockResponse = (): any => {
@@ -41,7 +47,7 @@ describe('user controller', () => {
     describe('when payload is valid', () => {
       beforeAll(async () => {
         const user: User = await factory.build();
-        req = mockRequest(user, { body: { ...user.toJson() } });
+        req = mockRequest(user, user.toJson());
         res = mockResponse();
         await UserController.createUser(req, res);
       });
@@ -58,7 +64,7 @@ describe('user controller', () => {
     describe('when payload is invalid', () => {
       beforeAll(async () => {
         const user: User = await factory.build();
-        req = mockRequest(user, { body: {} });
+        req = mockRequest(user);
         res = mockResponse();
       });
 
@@ -67,6 +73,25 @@ describe('user controller', () => {
           BadRequestError.name
         );
       });
+    });
+  });
+
+  describe('#findUser', () => {
+    let user: User;
+
+    beforeAll(async () => {
+      user = await factory.build();
+      req = mockRequest(user);
+      res = mockResponse();
+      await UserController.findUser(req, res);
+    });
+
+    it('should return 200', async () => {
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should return req user as json', async () => {
+      expect(res.json).toHaveBeenCalledWith(user.toJson());
     });
   });
 });
