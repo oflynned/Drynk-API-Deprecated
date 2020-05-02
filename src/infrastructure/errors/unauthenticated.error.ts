@@ -4,6 +4,6 @@ export class UnauthenticatedError extends HttpError {
   constructor(
     context: string = 'Unable to ascertain a resource for this account'
   ) {
-    super('Unauthenticated request', 401, context);
+    super(UnauthenticatedError.name, 401, context);
   }
 }
