@@ -17,7 +17,7 @@ const sitemap = (app: Application): void => {
   app.use(
     (error: HttpErrorType, req: Request, res: Response, next: NextFunction) => {
       // INFO HttpErrorType is used as it needs to extend `Error` for tests to accept a throw
-      //      and here we need to infer some internalproperties
+      //      and here we need to infer some internal properties
       res.status(error._status);
       res.json({
         name: error._name,
