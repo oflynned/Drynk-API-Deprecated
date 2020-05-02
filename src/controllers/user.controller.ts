@@ -48,6 +48,7 @@ export class UserController {
   }
 
   static async deleteUser(req: AuthenticatedRequest, res: Response) {
+    // TODO this could be moved to some default check in a middleware
     if (req.user.toJson().deleted) {
       throw new ResourceNotFoundError();
     }
