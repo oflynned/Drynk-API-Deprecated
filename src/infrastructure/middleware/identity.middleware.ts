@@ -11,6 +11,7 @@ import {
 } from './authenticated.request';
 import {
   BadRequestError,
+  ResourceNotFoundError,
   ServiceDownError,
   UnauthenticatedError,
   UnauthorisedError
@@ -39,7 +40,11 @@ export const requireUser = async (
   next: NextFunction
 ): Promise<void> => {
   if (!req.user) {
-    throw new UnauthenticatedError();
+    throw new ResourceNotFoundError();
+  }
+
+  if (req.user.toJson().deleted) {
+    throw new ResourceNotFoundError();
   }
 
   next();

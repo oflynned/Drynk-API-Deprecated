@@ -5,6 +5,7 @@ import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
 import { DigestiveSystem } from './digestive-system';
 import { Puke } from '../../models/puke.model';
 import { SessionUser } from '../../models/session-user.model';
+import { ResourceNotFoundError } from '../../infrastructure/errors';
 
 type Query = {
   sessionId?: string;
@@ -49,6 +50,12 @@ export class Timeline {
 
         return 0;
       });
+
+    if (events.length === 0) {
+      // TODO can this be gracefully handled?
+      //      user hasn't added a drink yet, cannot compute anything
+      throw new Error('empty dataset');
+    }
 
     const timeOfLastEvent = events[events.length - 1]
       .toJson()

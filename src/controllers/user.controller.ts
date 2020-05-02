@@ -1,10 +1,7 @@
 import { User } from '../models/user.model';
 import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
-import {
-  BadRequestError,
-  ResourceNotFoundError
-} from '../infrastructure/errors';
+import { BadRequestError } from '../infrastructure/errors';
 import { Repository } from 'mongoize-orm';
 
 export class UserController {
@@ -48,11 +45,6 @@ export class UserController {
   }
 
   static async deleteUser(req: AuthenticatedRequest, res: Response) {
-    // TODO this could be moved to some default check in a middleware
-    if (req.user.toJson().deleted) {
-      throw new ResourceNotFoundError();
-    }
-
     await req.user.delete();
     return res.status(204);
   }
