@@ -28,6 +28,10 @@ export class UserController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
+    if (!req.user) {
+      throw new UnauthenticatedError();
+    }
+
     try {
       const user = await req.user.update(req.body);
       return res.status(200).json(user.toJson());
