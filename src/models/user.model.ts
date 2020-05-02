@@ -1,5 +1,12 @@
-import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
+import {
+  BaseDocument,
+  BaseModelType,
+  DatabaseClient,
+  Joi,
+  Schema
+} from 'mongoize-orm';
 import { Sex } from '../common/helpers';
+import { InternalModelType } from 'mongoize-orm/dist/document/base-document/schema';
 
 export interface UserType extends BaseModelType {
   name: string;
