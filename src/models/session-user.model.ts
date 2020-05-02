@@ -29,7 +29,7 @@ export class SessionUser {
   }
 
   get isMale(): boolean {
-    return this.sex === 'MALE';
+    return this.sex === 'male';
   }
 
   get widmarkConstant(): number {

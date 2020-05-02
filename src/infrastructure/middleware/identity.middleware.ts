@@ -12,7 +12,8 @@ import {
 import {
   BadRequestError,
   ServiceDownError,
-  UnauthenticatedError
+  UnauthenticatedError,
+  UnauthorisedError
 } from '../errors';
 
 export const withUser = async (
@@ -83,6 +84,10 @@ export const withFirebaseUser = async (
 
     Object.assign(req, { ...headers });
   } catch (e) {
+    if (String(e.message).indexOf('Firebase ID token has expired.') > -1) {
+      throw new UnauthorisedError('Firebase token has expired');
+    }
+
     throw new ServiceDownError(
       'Firebase token verification is experiencing downtime'
     );

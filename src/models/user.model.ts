@@ -5,7 +5,7 @@ import {
   Joi,
   Schema
 } from 'mongoize-orm';
-import { Sex } from '../common/helpers';
+import { Sex, UnitPreference } from '../common/helpers';
 import { InternalModelType } from 'mongoize-orm/dist/document/base-document/schema';
 
 export interface UserType extends BaseModelType {
@@ -15,6 +15,7 @@ export interface UserType extends BaseModelType {
   weight?: number;
   height?: number;
   sex?: Sex;
+  unit?: UnitPreference;
 }
 
 class UserSchema extends Schema<UserType> {
@@ -32,7 +33,8 @@ class UserSchema extends Schema<UserType> {
     return {
       weight: Joi.number().min(1),
       height: Joi.number().min(1),
-      sex: Joi.string().valid('male', 'female')
+      sex: Joi.string().valid('male', 'female'),
+      unit: Joi.string().valid('metric')
     };
   }
 }

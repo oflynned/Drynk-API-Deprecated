@@ -9,8 +9,8 @@ export class UserFactory {
   }
 
   private static sex(): string {
-    const providers = ['male', 'female'];
-    return providers[Math.floor(Math.random() * providers.length)];
+    const sexes = ['male', 'female'];
+    return sexes[Math.floor(Math.random() * sexes.length)];
   }
 
   private static buildProperties(overrides?: Partial<UserType>): UserType {
@@ -23,7 +23,8 @@ export class UserFactory {
         providerId: random.uuid(),
         height: random.number({ min: 120, max: 200 }),
         weight: random.number({ min: 40, max: 150 }),
-        sex: this.sex()
+        sex: this.sex(),
+        unit: 'metric'
       } as UserType),
       ...overrides
     };
