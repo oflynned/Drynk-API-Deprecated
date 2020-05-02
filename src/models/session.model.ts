@@ -1,40 +1,56 @@
+import {
+  BaseDocument,
+  BaseModelType,
+  BaseRelationshipType,
+  Joi,
+  RelationalDocument,
+  Repository,
+  Schema
+} from 'mongoize-orm';
+import { Drink } from './drink.model';
+
 type Projection = {
   bloodAlcoholContent: number;
   time: number;
   eventHasHappened: boolean;
 };
 
-// TODO expose session service as a gql model here
-export class Session {
-  get initialState(): Projection {
+export interface SessionType extends BaseModelType {
+  userId: string;
+}
+
+export class SessionSchema extends Schema<SessionType> {
+  joiBaseSchema(): object {
     return {
-      bloodAlcoholContent: 0,
-      time: Date.now(),
-      eventHasHappened: true
+      userId: Joi.string()
+        .uuid()
+        .required()
     };
   }
 
-  get currentState(): Projection {
-    return {
-      bloodAlcoholContent: 0,
-      time: Date.now(),
-      eventHasHappened: true
-    };
+  joiUpdateSchema(): object {
+    return {};
+  }
+}
+
+export interface SessionRelationships extends BaseRelationshipType {
+  drinks: Drink[];
+}
+
+export class Session extends RelationalDocument<
+  SessionType,
+  SessionSchema,
+  SessionRelationships
+> {
+  joiSchema(): SessionSchema {
+    return new SessionSchema();
   }
 
-  get mostDrunkState(): Projection {
+  protected async relationalFields(): Promise<SessionRelationships> {
     return {
-      bloodAlcoholContent: 0,
-      time: Date.now(),
-      eventHasHappened: true
-    };
-  }
-
-  get soberState(): Projection {
-    return {
-      bloodAlcoholContent: 0,
-      time: Date.now(),
-      eventHasHappened: true
+      drinks: await Repository.with(Drink).findMany({
+        sessionId: this.toJson()._id
+      })
     };
   }
 }

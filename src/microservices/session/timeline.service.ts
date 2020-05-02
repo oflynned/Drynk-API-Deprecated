@@ -32,6 +32,8 @@ export class Timeline {
     return this;
   }
 
+  // TODO events should be passed, not a query
+  //      a look-up can be performed and the series can be regenerated as necessary
   async buildTimeSeries(query: Query): Promise<Point<number, number>[]> {
     const drinks: Drink[] = await Repository.with(Drink).findMany(query);
     const pukes: Puke[] = await Repository.with(Puke).findMany(query);
@@ -52,9 +54,8 @@ export class Timeline {
       });
 
     if (events.length === 0) {
-      // TODO can this be gracefully handled?
-      //      user hasn't added a drink yet, cannot compute anything
-      throw new Error('empty dataset');
+      // TODO can this be gracefully handled? the user hasn't added a drink yet, cannot compute anything
+      return [];
     }
 
     const timeOfLastEvent = events[events.length - 1]
@@ -101,6 +102,28 @@ export class Timeline {
 
   async estimateEventTimes(query: Query): Promise<object> {
     const timeSeries = await this.buildTimeSeries(query);
+    if (timeSeries.length === 0) {
+      return {
+        startedDrinkingAt: {
+          time: Date.now(),
+          bac: 0
+        },
+        currentState: {
+          time: new Date().getTime(),
+          bac: 0
+        },
+        mostDrunkAt: {
+          time: Date.now(),
+          bac: 0,
+          alreadyPassed: true
+        },
+        soberAt: {
+          time: Date.now(),
+          bac: 0
+        }
+      };
+    }
+
     const soberPoint = timeSeries[timeSeries.length - 1];
     const mostDrunkPoint: Point<number, number> = timeSeries.reduce(
       (

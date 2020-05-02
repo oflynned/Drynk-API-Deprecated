@@ -10,6 +10,9 @@ import {
 import { AuthenticatedRequest } from '../middleware/authenticated.request';
 import asyncHandler from 'express-async-handler';
 import { ResourceNotFoundError } from '../errors';
+import { Repository } from 'mongoize-orm';
+import { Session } from '../../models/session.model';
+import { Drink } from '../../models/drink.model';
 
 const routes = (): Router => {
   const router = Router();
@@ -29,19 +32,47 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
+        const sessions = await Repository.with(Session).findMany({
+          userId: req.user.toJson()._id
+        });
+        const sessionIds = sessions.map(
+          (session: Session) => session.toJson()._id
+        );
+        return res.status(200).json(sessionIds);
+      }
+    )
+  );
+
+  router.get(
+    '/:id/series',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        withUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
         const sessionUser = new SessionUser('NONE', req.user);
         const timeline = await Timeline.getInstance(sessionUser);
+
+        // TODO events should be passed to the microservice
+        //      it should not know about other collections
         const series = await timeline.buildTimeSeries({
           createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) }
         } as object);
-
         return res.status(200).json(series);
       }
     )
   );
 
   router.get(
-    '/:id',
+    '/:id/drinks',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withFirebaseUser(req, res, next)
     ),
@@ -55,23 +86,20 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const sessionUser = new SessionUser('NONE', req.user);
-        const timeline = await Timeline.getInstance(sessionUser);
-
-        try {
-          const series = await timeline.buildTimeSeries({
-            createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) }
-          } as object);
-          return res.status(200).json(series);
-        } catch (e) {
+        const session = await Repository.with(Session).findById(req.params.id, {
+          populate: true
+        });
+        if (session.toJson().userId !== req.user.toJson()._id) {
           throw new ResourceNotFoundError();
         }
+
+        return res.status(200).json(session.toJson().drinks);
       }
     )
   );
 
   router.get(
-    '/events',
+    '/state',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withFirebaseUser(req, res, next)
     ),
@@ -87,7 +115,6 @@ const routes = (): Router => {
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
         const sessionUser = new SessionUser('NONE', req.user);
         const timeline = await Timeline.getInstance(sessionUser);
-
         const eventEstimates = await timeline.estimateEventTimes({});
         return res.status(200).json(eventEstimates);
       }
