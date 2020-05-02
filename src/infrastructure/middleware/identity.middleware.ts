@@ -5,10 +5,15 @@ import { User } from '../../models/user.model';
 import { auth } from 'firebase-admin';
 import DecodedIdToken = auth.DecodedIdToken;
 import {
-  Provider,
+  AuthenticatedRequest,
   SocialProviderHeader,
   SocialRequest
 } from './authenticated.request';
+import {
+  BadRequestError,
+  ServiceDownError,
+  UnauthenticatedError
+} from '../errors';
 
 export const withUser = async (
   req: SocialRequest,
@@ -27,51 +32,59 @@ export const withUser = async (
   next();
 };
 
+export const requireUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  if (!req.user) {
+    throw new UnauthenticatedError();
+  }
+
+  next();
+};
+
 export const withFirebaseUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const firebaseId = req.headers['x-firebase-id'];
-  const firebaseToken = req.headers['x-firebase-token'];
-  const firebaseProvider = req.headers['x-firebase-provider'] as
-    | Provider
-    | undefined;
-
-  if (!firebaseId || !firebaseToken || !firebaseProvider) {
-    res
-      .status(400)
-      .json({ error: 'id and token headers are required headers' });
-    return;
+  const jwtToken = req.headers['authorization'];
+  if (!jwtToken) {
+    throw new BadRequestError('Token headers are required headers');
   }
 
-  if (
-    Array.isArray(firebaseId) ||
-    Array.isArray(firebaseToken) ||
-    Array.isArray(firebaseProvider)
-  ) {
-    res.status(400).json({ error: 'id and token headers are not arrays' });
-    return;
+  if (Array.isArray(jwtToken)) {
+    throw new BadRequestError('Token headers are not arrays');
   }
 
-  const decodedIdToken: DecodedIdToken = await auth().verifyIdToken(
-    firebaseToken,
-    false
-  );
-  if (decodedIdToken.uid !== firebaseId) {
-    res.status(403).json({ error: '' });
-    return;
+  // TODO check for revocation
+  const [realm, token] = jwtToken.split(' ');
+  if (realm !== 'Bearer') {
+    throw new BadRequestError('Authorisation must be a bearer token');
   }
 
-  const headers: SocialProviderHeader = {
-    provider: {
-      providerId: firebaseId,
-      providerToken: firebaseToken,
-      providerOrigin: firebaseProvider
-    }
-  };
+  if (!token) {
+    throw new BadRequestError('Authorisation must include a bearer token');
+  }
 
-  Object.assign(req, { ...headers });
+  try {
+    const decodedIdToken: DecodedIdToken = await auth().verifyIdToken(
+      token,
+      true
+    );
+    const headers: SocialProviderHeader = {
+      provider: {
+        providerId: decodedIdToken.uid
+      }
+    };
+
+    Object.assign(req, { ...headers });
+  } catch (e) {
+    throw new ServiceDownError(
+      'Firebase token verification is experiencing downtime'
+    );
+  }
 
   next();
 };

@@ -8,11 +8,6 @@ export class UserFactory {
     return new UserFactory();
   }
 
-  private static provider(): string {
-    const providers = ['google', 'facebook', 'twitter'];
-    return providers[Math.floor(Math.random() * providers.length)];
-  }
-
   private static sex(): string {
     const providers = ['male', 'female'];
     return providers[Math.floor(Math.random() * providers.length)];
@@ -25,7 +20,6 @@ export class UserFactory {
       ...({
         name: `${firstName} ${lastName}`,
         email: internet.email(firstName, lastName),
-        providerOrigin: UserFactory.provider(),
         providerId: random.uuid(),
         height: random.number({ min: 120, max: 200 }),
         weight: random.number({ min: 40, max: 150 }),
@@ -38,5 +32,9 @@ export class UserFactory {
   build(overrides?: Partial<UserType>): User {
     const properties = UserFactory.buildProperties(overrides);
     return new User().build(properties) as User;
+  }
+
+  async seed(overrides?: Partial<UserType>): Promise<User> {
+    return this.build(overrides).save();
   }
 }
