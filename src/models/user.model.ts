@@ -1,10 +1,9 @@
 import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
-import { Sex, UnitPreference } from '../common/helpers';
+import { Sex } from '../common/helpers';
 
 export interface UserType extends BaseModelType {
   name: string;
   email: string;
-  providerOrigin: string;
   providerId: string;
   weight?: number;
   height?: number;
@@ -18,20 +17,7 @@ class UserSchema extends Schema<UserType> {
       email: Joi.string()
         .email()
         .required(),
-      providerOrigin: Joi.string()
-        .valid('google', 'facebook', 'twitter')
-        .required(),
-      providerId: Joi.string().required(),
-
-      weight: Joi.number()
-        .min(1)
-        .required(),
-      height: Joi.number()
-        .min(1)
-        .required(),
-      sex: Joi.string()
-        .valid('male', 'female')
-        .required()
+      providerId: Joi.string().required()
     };
   }
 

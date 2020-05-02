@@ -5,12 +5,15 @@ import { User } from '../../models/user.model';
 import { auth } from 'firebase-admin';
 import DecodedIdToken = auth.DecodedIdToken;
 import {
-  Provider,
+  AuthenticatedRequest,
   SocialProviderHeader,
   SocialRequest
 } from './authenticated.request';
-import { BadRequestError } from '../errors/bad-request.error';
-import { UnauthorisedError } from '../errors/unauthorised.error';
+import {
+  BadRequestError,
+  ServiceDownError,
+  UnauthenticatedError
+} from '../errors';
 
 export const withUser = async (
   req: SocialRequest,
@@ -29,51 +32,59 @@ export const withUser = async (
   next();
 };
 
+export const requireUser = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  if (!req.user) {
+    throw new UnauthenticatedError();
+  }
+
+  next();
+};
+
 export const withFirebaseUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const firebaseId = req.headers['x-firebase-id'];
   const jwtToken = req.headers['authorization'];
-  const firebaseProvider = req.headers['x-firebase-provider'] as Provider;
-
-  if (!jwtToken || !firebaseId || !firebaseProvider) {
-    throw new BadRequestError('Id and token headers are required headers');
+  if (!jwtToken) {
+    throw new BadRequestError('Token headers are required headers');
   }
 
-  if (
-    Array.isArray(firebaseId) ||
-    Array.isArray(jwtToken) ||
-    Array.isArray(firebaseProvider)
-  ) {
-    throw new BadRequestError('Id and token headers are not arrays');
-  }
-
-  const [authorisation, token] = jwtToken.split(' ');
-  if (authorisation !== 'Bearer') {
-    throw new BadRequestError('Bearer authorization required');
+  if (Array.isArray(jwtToken)) {
+    throw new BadRequestError('Token headers are not arrays');
   }
 
   // TODO check for revocation
-  const decodedIdToken: DecodedIdToken = await auth().verifyIdToken(
-    decode(token),
-    true
-  );
-
-  if (decodedIdToken.uid !== firebaseId) {
-    throw new UnauthorisedError(
-      "The associated Firebase id doesn't match the one on record"
-    );
+  const [realm, token] = jwtToken.split(' ');
+  if (realm !== 'Bearer') {
+    throw new BadRequestError('Authorisation must be a bearer token');
   }
 
-  const headers: SocialProviderHeader = {
-    provider: {
-      providerId: firebaseId
-    }
-  };
+  if (!token) {
+    throw new BadRequestError('Authorisation must include a bearer token');
+  }
 
-  Object.assign(req, { ...headers });
+  try {
+    const decodedIdToken: DecodedIdToken = await auth().verifyIdToken(
+      token,
+      true
+    );
+    const headers: SocialProviderHeader = {
+      provider: {
+        providerId: decodedIdToken.uid
+      }
+    };
+
+    Object.assign(req, { ...headers });
+  } catch (e) {
+    throw new ServiceDownError(
+      'Firebase token verification is experiencing downtime'
+    );
+  }
 
   next();
 };
