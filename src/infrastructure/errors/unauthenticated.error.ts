@@ -5,5 +5,6 @@ export class UnauthenticatedError extends HttpError {
     context: string = 'Unable to ascertain a resource for this account'
   ) {
     super(UnauthenticatedError.name, 401, context);
+    Object.setPrototypeOf(this, UnauthenticatedError.prototype);
   }
 }

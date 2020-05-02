@@ -13,6 +13,7 @@ export class HttpError extends Error {
 
   constructor(name: string, status: number = 500, context: string) {
     super(name);
+    Object.setPrototypeOf(this, HttpError.prototype);
 
     this._name = name;
     this._context = context;

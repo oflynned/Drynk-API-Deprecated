@@ -8,8 +8,7 @@ import {
 } from 'mongoize-orm';
 import {
   BadRequestError,
-  ResourceNotFoundError,
-  UnauthorisedError
+  ResourceNotFoundError
 } from '../../infrastructure/errors';
 
 const mockRequest = (user: User, body: object = {}): object => {
@@ -77,7 +76,7 @@ describe('user controller', () => {
 
       it('should throw BadRequestError', async () => {
         await expect(UserController.createUser(req, res)).rejects.toThrow(
-          BadRequestError.name
+          BadRequestError
         );
       });
     });
@@ -134,7 +133,7 @@ describe('user controller', () => {
 
       it('should throw bad request error', async () => {
         await expect(UserController.updateUser(req, res)).rejects.toThrow(
-          BadRequestError.name
+          BadRequestError
         );
       });
     });
@@ -177,7 +176,7 @@ describe('user controller', () => {
 
       it('should throw bad request error', async () => {
         await expect(UserController.deleteUser(req, res)).rejects.toThrow(
-          ResourceNotFoundError.name
+          ResourceNotFoundError
         );
       });
     });
