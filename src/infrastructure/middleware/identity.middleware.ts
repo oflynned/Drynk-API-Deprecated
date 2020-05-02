@@ -51,11 +51,11 @@ export const withFirebaseUser = async (
 ): Promise<void> => {
   const jwtToken = req.headers['authorization'];
   if (!jwtToken) {
-    throw new BadRequestError('Token headers are required headers');
+    throw new BadRequestError('Authorization is a required header');
   }
 
   if (Array.isArray(jwtToken)) {
-    throw new BadRequestError('Token headers are not arrays');
+    throw new BadRequestError('Authorization header cannot be an array');
   }
 
   // TODO check for revocation
@@ -65,7 +65,9 @@ export const withFirebaseUser = async (
   }
 
   if (!token) {
-    throw new BadRequestError('Authorisation must include a bearer token');
+    throw new BadRequestError(
+      'Authorisation must include a bearer token value'
+    );
   }
 
   try {

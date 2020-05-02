@@ -3,8 +3,7 @@ import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated
 import { Response } from 'express';
 import {
   BadRequestError,
-  ResourceNotFoundError,
-  UnauthorisedError
+  ResourceNotFoundError
 } from '../infrastructure/errors';
 import { Repository } from 'mongoize-orm';
 
@@ -42,7 +41,8 @@ export class UserController {
       return res.status(200).json(user.toJson());
     } catch (e) {
       throw new BadRequestError(
-        `${e.details.map((e: any) => e.message) || 'Payload is malformed'}`
+        `${e.details.map((e: { message: string }) => e.message) ||
+          'Payload is malformed'}`
       );
     }
   }

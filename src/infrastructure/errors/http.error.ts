@@ -1,3 +1,10 @@
+export type HttpErrorType = {
+  _name: string;
+  _context: string;
+  _status: number;
+  _time: Date;
+};
+
 export class HttpError extends Error {
   private readonly _name: string;
   private readonly _context: string;
