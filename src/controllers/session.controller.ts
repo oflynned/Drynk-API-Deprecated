@@ -28,18 +28,21 @@ export class SessionController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
-    const sessions = await Repository.with(Session).findMany({
-      userId: req.user.toJson()._id
+    const sessions = await Repository.with(Session).findMany(
+      {
+        userId: req.user.toJson()._id
+      },
+      { populate: true }
+    );
+
+    const payload = sessions.map((session: Session) => {
+      return {
+        ...session.toJson(),
+        drinks: session.toJson().drinks.map((drink: Drink) => drink.toJson())
+      };
     });
 
-    return res.status(200).json(
-      sessions.map((session: Session) => {
-        return {
-          ...session.toJson(),
-          drinks: session.toJson().drinks.map((drink: Drink) => drink.toJson())
-        };
-      })
-    );
+    return res.status(200).json(payload);
   }
 
   static async getSessionSeries(

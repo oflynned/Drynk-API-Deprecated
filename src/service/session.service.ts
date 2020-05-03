@@ -26,7 +26,7 @@ export class SessionService {
   ): Promise<Session> {
     const session: Session = await Repository.with(Session).findOne({
       userId: user.toJson()._id,
-      soberAt: { $gt: Date.now() }
+      soberAt: { $gt: new Date() }
     });
 
     // no past sessions exist, the user has just created their account or is sober
@@ -47,13 +47,19 @@ export class SessionService {
     const user = await Repository.with(User).findById(session.toJson().userId);
     const drunkard = new Drunkard(session, user);
 
-    await Repository.with(Timeline).deleteMany({
-      sessionId: session.toJson()._id
-    });
+    // first purge the old cache containing the last known timeline
+    // TODO the global client is being overwritten when passing options!
+    await Repository.with(Timeline).deleteMany(
+      {
+        sessionId: session.toJson()._id
+      },
+      { hard: true, client: global.databaseClient }
+    );
 
     const timelineService: TimelineService = TimelineService.getInstance(
       drunkard
     );
+
     const series = await timelineService.buildTimeSeries(
       await session.events()
     );
@@ -65,6 +71,7 @@ export class SessionService {
     const events: TimelineEvents = await timelineService.estimateEventTimes(
       timeline.toJson().series
     );
+
     await SessionService.updateSessionCache(
       sessionId,
       new Date(events.soberAt.time)
@@ -78,7 +85,8 @@ export class SessionService {
   ): Promise<TimelineEvents> {
     const drunkard = new Drunkard(session, user);
     const timeline = await Repository.with(Timeline).findOne({
-      sessionId: session.toJson()._id
+      sessionId: session.toJson()._id,
+      deleted: false
     });
 
     if (!timeline) {
