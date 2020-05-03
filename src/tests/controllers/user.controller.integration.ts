@@ -150,6 +150,7 @@ describe('user controller', () => {
 
     it('should return 204', async () => {
       expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.send).toHaveBeenCalled();
     });
 
     it('should be soft deleted', async () => {
