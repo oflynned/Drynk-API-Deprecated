@@ -1,7 +1,7 @@
 import { expectedBacFromEthanolMass } from './widmark';
 import { Drink } from '../../models/drink.model';
 import { Event } from '../../models/event.type';
-import { SessionUser } from '../../models/session-user.model';
+import { Drunkard } from '../../models/drunkard.model';
 
 type StomachContents = {
   volumeLitres: number;
@@ -9,7 +9,7 @@ type StomachContents = {
 };
 
 export class DigestiveSystem {
-  private readonly _user: SessionUser;
+  private readonly drunkard: Drunkard;
   private _intaken: StomachContents = {
     volumeLitres: 0,
     ethanolGrams: 0
@@ -17,8 +17,8 @@ export class DigestiveSystem {
   private _absorbed = 0; // g of ethanol in blood
   private _excreted = 0; // g of ethanol pissed out
 
-  constructor(user: SessionUser) {
-    this._user = user;
+  constructor(drunkard: Drunkard) {
+    this.drunkard = drunkard;
   }
 
   get bloodAlcoholContent(): number {
@@ -27,7 +27,7 @@ export class DigestiveSystem {
     }
 
     // TODO ~10% difference due to absorption, this should be changed via the first order absorption method
-    return expectedBacFromEthanolMass(this._absorbed * 1.1, this._user);
+    return expectedBacFromEthanolMass(this._absorbed * 1.1, this.drunkard);
   }
 
   puke(): void {
@@ -57,7 +57,7 @@ export class DigestiveSystem {
 
   private addToStomach(drink: Drink): void {
     this._intaken.volumeLitres += drink.toJson().volume / 1000;
-    this._intaken.ethanolGrams += drink.ethanolMass('G').value;
+    this._intaken.ethanolGrams += drink.ethanolMass('g').value;
   }
 
   // TODO incorrect, absorption is a first-order eq, a rate of n grams per litre is cleared per hour
@@ -76,9 +76,9 @@ export class DigestiveSystem {
 
       // TODO wrong? this is the coefficient and not 1g per minute absorption
       const rate =
-        this._intaken.ethanolGrams < this._user.absorptionDelayCoefficient
+        this._intaken.ethanolGrams < this.drunkard.absorptionDelayCoefficient
           ? this._intaken.ethanolGrams
-          : this._user.absorptionDelayCoefficient;
+          : this.drunkard.absorptionDelayCoefficient;
       this._intaken.ethanolGrams -= rate;
       this._absorbed += rate;
     }
@@ -87,9 +87,9 @@ export class DigestiveSystem {
   private excreteFromBlood(): void {
     if (this._absorbed > 0) {
       const rate =
-        this._absorbed < this._user.excretionRate
+        this._absorbed < this.drunkard.excretionRate
           ? this._absorbed
-          : this._user.excretionRate;
+          : this.drunkard.excretionRate;
       this._absorbed -= rate;
       this._excreted += rate;
     }

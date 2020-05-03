@@ -12,7 +12,7 @@ import { Drink } from './drink.model';
 import { User } from './user.model';
 import { Session } from './session.model';
 
-export class SessionUser {
+export class Drunkard {
   private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
   private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 45; // mins
   private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 60; // mins
