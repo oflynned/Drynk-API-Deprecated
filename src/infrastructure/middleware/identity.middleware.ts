@@ -39,13 +39,16 @@ export const requireUser = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.user) {
+  const firebaseId = req.provider.providerId;
+  const user = await Repository.with(User).findOne({
+    providerId: firebaseId
+  } as object);
+
+  if (!user || user.toJson().deleted) {
     throw new ResourceNotFoundError();
   }
 
-  if (req.user.toJson().deleted) {
-    throw new ResourceNotFoundError();
-  }
+  Object.assign(req, { user });
 
   next();
 };
@@ -57,21 +60,21 @@ export const withFirebaseUser = async (
 ): Promise<void> => {
   const jwtToken = req.headers['authorization'];
   if (!jwtToken) {
-    throw new BadRequestError('Authorization is a required header');
+    throw new UnauthenticatedError('Authorization is a required header');
   }
 
   if (Array.isArray(jwtToken)) {
-    throw new BadRequestError('Authorization header cannot be an array');
+    throw new UnauthenticatedError('Authorization header cannot be an array');
   }
 
   // TODO check for revocation
   const [realm, token] = jwtToken.split(' ');
   if (realm !== 'Bearer') {
-    throw new BadRequestError('Authorisation must be a bearer token');
+    throw new UnauthenticatedError('Authorisation must be a bearer token');
   }
 
   if (!token) {
-    throw new BadRequestError(
+    throw new UnauthenticatedError(
       'Authorisation must include a bearer token value'
     );
   }

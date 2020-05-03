@@ -2,10 +2,8 @@ import { ApolloServer, gql } from 'apollo-server-express';
 import { Repository } from 'mongoize-orm';
 import { Application } from 'express';
 import { Drink, DrinkType } from '../../models/drink.model';
-import { Timeline } from '../../microservices/session/timeline.service';
-import { User } from '../../models/user.model';
 import { Puke } from '../../models/puke.model';
-import { SessionUser } from '../../models/session-user.model';
+import { Timeline } from '../../microservices/blood-alcohol/timeline.model';
 
 export const graphql = (app: Application) => {
   const typeDefs = gql`
@@ -81,13 +79,13 @@ export const graphql = (app: Application) => {
         context: object,
         args: { userId?: string }
       ): Promise<Timeline | {}> => {
-        const userProfile = await Repository.with(User).findById(args.userId);
-        if (!userProfile) {
-          return {};
-        }
-
-        const user = new SessionUser('NONE', userProfile);
-        return Timeline.getInstance(user);
+        // const userProfile = await Repository.with(User).findById(args.userId);
+        // if (!userProfile) {
+        //   return {};
+        // }
+        // const user = new SessionUser('NONE', userProfile);
+        // return Timeline.getInstance(user);
+        return {};
       }
     },
     Mutation: {
