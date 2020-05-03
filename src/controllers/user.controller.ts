@@ -44,7 +44,10 @@ export class UserController {
     }
   }
 
-  static async deleteUser(req: AuthenticatedRequest, res: Response) {
+  static async deleteUser(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<Response> {
     await req.user.delete();
     return res.status(204).send();
   }
