@@ -1,5 +1,4 @@
 import {
-  BaseDocument,
   BaseModelType,
   BaseRelationshipType,
   Joi,
@@ -9,16 +8,13 @@ import {
 } from 'mongoize-orm';
 import { Drink } from './drink.model';
 import { MealSize } from '../common/helpers';
-
-type Projection = {
-  bloodAlcoholContent: number;
-  time: number;
-  eventHasHappened: boolean;
-};
+import { Puke } from './puke.model';
+import { Event } from './event.type';
 
 export interface SessionType extends BaseModelType {
   userId: string;
   mealSize: MealSize;
+  soberAt?: Date;
 }
 
 export class SessionSchema extends Schema<SessionType> {
@@ -34,12 +30,15 @@ export class SessionSchema extends Schema<SessionType> {
   }
 
   joiUpdateSchema(): object {
-    return {};
+    return {
+      soberAt: Joi.date().required()
+    };
   }
 }
 
 export interface SessionRelationships extends BaseRelationshipType {
   drinks: Drink[];
+  pukes: Puke[];
 }
 
 export class Session extends RelationalDocument<
@@ -51,9 +50,29 @@ export class Session extends RelationalDocument<
     return new SessionSchema();
   }
 
+  async events(): Promise<Event[]> {
+    const { drinks, pukes } = await this.relationalFields();
+    return [...drinks, ...pukes].sort((a: Event, b: Event) => {
+      const firstTime = a.toJson().createdAt.getTime();
+      const secondTime = b.toJson().createdAt.getTime();
+      if (firstTime < secondTime) {
+        return -1;
+      }
+
+      if (firstTime > secondTime) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }
+
   protected async relationalFields(): Promise<SessionRelationships> {
     return {
       drinks: await Repository.with(Drink).findMany({
+        sessionId: this.toJson()._id
+      }),
+      pukes: await Repository.with(Puke).findMany({
         sessionId: this.toJson()._id
       })
     };

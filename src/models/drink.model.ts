@@ -54,53 +54,53 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   ethanolVolume(unit: Volume): MeasureType<Volume> {
     const mls = (this.toJson().abv / 100) * this.toJson().volume;
 
-    if (unit === 'ML') {
+    if (unit === 'ml') {
       return {
-        unit: 'ML',
+        unit: 'ml',
         value: mls
       };
     }
 
     return {
-      unit: 'L',
+      unit: 'l',
       value: mls * 1000
     };
   }
 
   ethanolMass(unit: Mass): MeasureType<Mass> {
     const grams =
-      this.ethanolVolume('ML').value * this.ETHANOL_DENSITY_GRAMS_PER_ML;
+      this.ethanolVolume('ml').value * this.ETHANOL_DENSITY_GRAMS_PER_ML;
 
-    if (unit === 'KG') {
+    if (unit === 'kg') {
       return {
         value: grams * 1000,
-        unit: 'KG'
+        unit: 'kg'
       };
     }
 
     return {
       value: grams,
-      unit: 'G'
+      unit: 'g'
     };
   }
 
   standardDrinks(): number {
-    return this.ethanolMass('G').value / Drink.STANDARD_DRINK_ETHANOL_GRAMS;
+    return this.ethanolMass('g').value / Drink.STANDARD_DRINK_ETHANOL_GRAMS;
   }
 
   timeSinceDrink(time: Time): MeasureType<Time> {
     const timeSinceDrink = Date.now() - this.toJson().createdAt.getTime();
 
-    if (time === 'HOURS') {
+    if (time === 'hours') {
       return {
         value: elapsedTimeFromMsToHours(timeSinceDrink),
-        unit: 'HOURS'
+        unit: 'hours'
       };
     }
 
     return {
       value: timeSinceDrink,
-      unit: 'MS'
+      unit: 'ms'
     };
   }
 }
