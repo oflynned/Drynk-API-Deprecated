@@ -17,15 +17,15 @@ export type UnitPreference = 'metric' | 'imperial';
 
 export type Sex = 'male' | 'female';
 
-export type Mass = 'KG' | 'G';
+export type Mass = 'kg' | 'g';
 
-export type Volume = 'L' | 'ML';
+export type Volume = 'l' | 'ml';
 
-export type Length = 'M' | 'CM';
+export type Length = 'm' | 'cm';
 
-export type MealSize = 'NONE' | 'SMALL' | 'LARGE';
+export type MealSize = 'none' | 'small' | 'large';
 
-export type Time = 'HOURS' | 'MINS' | 'SECS' | 'MS';
+export type Time = 'hours' | 'mins' | 'secs' | 'ms';
 
 export const toDecimalPlaces = (n: number, places = 3): number => {
   return parseFloat(n.toFixed(places));
