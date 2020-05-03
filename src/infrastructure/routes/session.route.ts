@@ -14,6 +14,7 @@ import { Session } from '../../models/session.model';
 import { TimelineService } from '../../microservices/blood-alcohol/timeline.service';
 import { requirePastSession } from '../middleware/session.middleware';
 import { SessionService } from '../../service/session.service';
+import { SessionController } from '../../controllers/session.controller';
 
 const routes = (): Router => {
   const router = Router();
@@ -28,12 +29,8 @@ const routes = (): Router => {
         requireUser(req, res, next)
     ),
     asyncHandler(
-      async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const sessions = await Repository.with(Session).findMany({
-          userId: req.user.toJson()._id
-        });
-        return res.status(200).json(sessions);
-      }
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
+        SessionController.getSessions(req, res)
     )
   );
 
@@ -51,20 +48,8 @@ const routes = (): Router => {
         requirePastSession(req, res, next)
     ),
     asyncHandler(
-      async (req: SessionRequest, res: Response): Promise<Response> => {
-        if (req.session.toJson().userId !== req.user.toJson()._id) {
-          throw new ResourceNotFoundError();
-        }
-
-        const timeline = await TimelineService.fetchSessionTimeline(
-          req.session
-        );
-        if (!timeline) {
-          throw new ResourceNotFoundError();
-        }
-
-        return res.status(200).json(timeline);
-      }
+      async (req: SessionRequest, res: Response): Promise<Response> =>
+        SessionController.getSessionSeries(req, res)
     )
   );
 
@@ -78,16 +63,8 @@ const routes = (): Router => {
         requireUser(req, res, next)
     ),
     asyncHandler(
-      async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const session = await Repository.with(Session).findById(req.params.id, {
-          populate: true
-        });
-        if (session.toJson().userId !== req.user.toJson()._id) {
-          throw new ResourceNotFoundError();
-        }
-
-        return res.status(200).json(session.toJson().drinks);
-      }
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
+        SessionController.getSessionDrinks(req, res)
     )
   );
 
@@ -105,17 +82,8 @@ const routes = (): Router => {
         requirePastSession(req, res, next)
     ),
     asyncHandler(
-      async (req: SessionRequest, res: Response): Promise<Response> => {
-        try {
-          const currentState = await SessionService.fetchTimelineEvents(
-            req.session,
-            req.user
-          );
-          return res.status(200).json(currentState);
-        } catch (e) {
-          throw new ResourceNotFoundError();
-        }
-      }
+      async (req: SessionRequest, res: Response): Promise<Response> =>
+        SessionController.getSessionState(req, res)
     )
   );
 
