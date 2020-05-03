@@ -6,10 +6,7 @@ import {
   InMemoryClient,
   Repository
 } from 'mongoize-orm';
-import {
-  BadRequestError,
-  ResourceNotFoundError
-} from '../../infrastructure/errors';
+import { BadRequestError } from '../../infrastructure/errors';
 
 const mockRequest = (user: User, body: object = {}): object => {
   return {
