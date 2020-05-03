@@ -9,6 +9,7 @@ import { ResourceNotFoundError } from '../infrastructure/errors';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { SessionService } from '../service/session.service';
 import { Drink } from '../models/drink.model';
+import { sortEvents } from '../models/event.type';
 
 export class SessionController {
   static async getSessions(
@@ -38,7 +39,10 @@ export class SessionController {
     const payload = sessions.map((session: Session) => {
       return {
         ...session.toJson(),
-        drinks: session.toJson().drinks.map((drink: Drink) => drink.toJson())
+        drinks: session
+          .toJson()
+          .drinks.sort(sortEvents)
+          .map((drink: Drink) => drink.toJson())
       };
     });
 

@@ -52,6 +52,7 @@ export class Session extends RelationalDocument<
 
   async events(): Promise<Event[]> {
     const { drinks, pukes } = await this.relationalFields();
+    // TODO pull this up to a generic level so that events can be sorted
     return [...drinks, ...pukes].sort((a: Event, b: Event) => {
       const firstTime = a.toJson().createdAt.getTime();
       const secondTime = b.toJson().createdAt.getTime();
