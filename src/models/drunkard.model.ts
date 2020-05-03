@@ -10,8 +10,9 @@ import {
 } from '../common/helpers';
 import { Drink } from './drink.model';
 import { User } from './user.model';
+import { Session } from './session.model';
 
-export class SessionUser {
+export class Drunkard {
   private readonly ABSORPTION_HALFLIFE_EMPTY_STOMACH = 30; // mins
   private readonly ABSORPTION_HALFLIFE_NORMAL_MEAL = 45; // mins
   private readonly ABSORPTION_HALFLIFE_LARGE_MEAL = 60; // mins
@@ -21,8 +22,8 @@ export class SessionUser {
   private readonly weightInKg: number;
   private readonly heightInCm: number;
 
-  constructor(mealSize: MealSize, user: User) {
-    this.mealSize = mealSize;
+  constructor(session: Session, user: User) {
+    this.mealSize = session.toJson().mealSize;
     this.sex = user.toJson().sex;
     this.weightInKg = user.toJson().weight;
     this.heightInCm = user.toJson().height;
@@ -33,8 +34,8 @@ export class SessionUser {
   }
 
   get widmarkConstant(): number {
-    const weight = this.weight('KG').value;
-    const height = this.height('CM').value;
+    const weight = this.weight('kg').value;
+    const height = this.height('cm').value;
 
     if (this.isMale) {
       const r = 0.3161 - 0.004821 * weight + 0.004632 * height;
@@ -48,7 +49,7 @@ export class SessionUser {
   get absorptionDelayCoefficient(): number {
     return (
       this.ABSORPTION_HALFLIFE_EMPTY_STOMACH /
-      this.absorptionHalflife('MINS').value
+      this.absorptionHalflife('mins').value
     );
   }
 
@@ -59,46 +60,46 @@ export class SessionUser {
 
   absorptionHalflife(time: Time): MeasureType<Time> {
     const halflife = () => {
-      if (this.mealSize === 'LARGE') {
+      if (this.mealSize === 'large') {
         return this.ABSORPTION_HALFLIFE_LARGE_MEAL;
       }
 
-      if (this.mealSize === 'SMALL') {
+      if (this.mealSize === 'small') {
         return this.ABSORPTION_HALFLIFE_NORMAL_MEAL;
       }
 
       return this.ABSORPTION_HALFLIFE_EMPTY_STOMACH;
     };
 
-    if (time === 'HOURS') {
+    if (time === 'hours') {
       return {
         value: halflife() / 60,
-        unit: 'HOURS'
+        unit: 'hours'
       };
     }
 
-    if (time === 'MINS') {
+    if (time === 'mins') {
       return {
         value: halflife(),
-        unit: 'MINS'
+        unit: 'mins'
       };
     }
 
-    if (time === 'SECS') {
+    if (time === 'secs') {
       return {
         value: halflife() * 60,
-        unit: 'SECS'
+        unit: 'secs'
       };
     }
 
     return {
       value: (halflife() / 60) * ONE_HOUR_IN_MS,
-      unit: 'MS'
+      unit: 'ms'
     };
   }
 
   height(unit: Length): MeasureType<Length> {
-    if (unit === 'CM') {
+    if (unit === 'cm') {
       return {
         value: this.heightInCm,
         unit
@@ -112,7 +113,7 @@ export class SessionUser {
   }
 
   weight(unit: Mass): MeasureType<Mass> {
-    if (unit === 'G') {
+    if (unit === 'g') {
       return {
         value: this.weightInKg * 1000,
         unit

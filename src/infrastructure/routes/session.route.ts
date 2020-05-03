@@ -1,53 +1,122 @@
-import { Response, Router } from 'express';
-import { Timeline } from '../../microservices/session/timeline.service';
-import { ONE_DAY_IN_MS } from '../../common/helpers';
-import { SessionUser } from '../../models/session-user.model';
-import { withFirebaseUser, withUser } from '../middleware/identity.middleware';
-import { AuthenticatedRequest } from '../middleware/authenticated.request';
+import { NextFunction, Request, Response, Router } from 'express';
+import {
+  requireUser,
+  withFirebaseUser
+} from '../middleware/identity.middleware';
+import {
+  AuthenticatedRequest,
+  SessionRequest
+} from '../middleware/authenticated.request';
+import asyncHandler from 'express-async-handler';
+import { ResourceNotFoundError } from '../errors';
+import { Repository } from 'mongoize-orm';
+import { Session } from '../../models/session.model';
+import { TimelineService } from '../../microservices/blood-alcohol/timeline.service';
+import { requirePastSession } from '../middleware/session.middleware';
+import { SessionService } from '../../service/session.service';
 
 const routes = (): Router => {
   const router = Router();
 
   router.get(
     '/',
-    withFirebaseUser,
-    withUser,
-    async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-      const sessionUser = new SessionUser('NONE', req.user);
-      const timeline = await Timeline.getInstance(sessionUser);
-      const series = await timeline.buildTimeSeries({
-        createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) }
-      } as object);
-      res.status(200).json(series);
-    }
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
+        const sessions = await Repository.with(Session).findMany({
+          userId: req.user.toJson()._id
+        });
+        return res.status(200).json(sessions);
+      }
+    )
   );
 
   router.get(
-    '/:id',
-    withFirebaseUser,
-    withUser,
-    async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-      const sessionUser = new SessionUser('NONE', req.user);
-      const timeline = await Timeline.getInstance(sessionUser);
+    '/:id/series',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requirePastSession(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response): Promise<Response> => {
+        if (req.session.toJson().userId !== req.user.toJson()._id) {
+          throw new ResourceNotFoundError();
+        }
 
-      const series = await timeline.buildTimeSeries({
-        createdAt: { $gte: new Date(Date.now() - ONE_DAY_IN_MS) }
-      } as object);
-      res.status(200).json(series);
-    }
+        const timeline = await TimelineService.fetchSessionTimeline(
+          req.session
+        );
+        if (!timeline) {
+          throw new ResourceNotFoundError();
+        }
+
+        return res.status(200).json(timeline);
+      }
+    )
   );
 
   router.get(
-    '/events',
-    withFirebaseUser,
-    withUser,
-    async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-      const sessionUser = new SessionUser('NONE', req.user);
-      const timeline = await Timeline.getInstance(sessionUser);
+    '/:id/drinks',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
+        const session = await Repository.with(Session).findById(req.params.id, {
+          populate: true
+        });
+        if (session.toJson().userId !== req.user.toJson()._id) {
+          throw new ResourceNotFoundError();
+        }
 
-      const eventEstimates = await timeline.estimateEventTimes({});
-      res.status(200).json(eventEstimates);
-    }
+        return res.status(200).json(session.toJson().drinks);
+      }
+    )
+  );
+
+  router.get(
+    '/now/state',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response, next: NextFunction) =>
+        requirePastSession(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response): Promise<Response> => {
+        try {
+          const currentState = await SessionService.fetchTimelineEvents(
+            req.session,
+            req.user
+          );
+          return res.status(200).json(currentState);
+        } catch (e) {
+          throw new ResourceNotFoundError();
+        }
+      }
+    )
   );
 
   return router;

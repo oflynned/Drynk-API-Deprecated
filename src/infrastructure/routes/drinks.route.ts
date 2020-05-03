@@ -1,27 +1,67 @@
-import { Request, Response, Router } from 'express';
-import { createDrink, findAllDrinks } from '../../controllers/drink.controller';
+import { NextFunction, Request, Response, Router } from 'express';
+import { DrinkController } from '../../controllers/drink.controller';
+import asyncHandler from 'express-async-handler';
+import {
+  requireUser,
+  withFirebaseUser
+} from '../middleware/identity.middleware';
+import {
+  AuthenticatedRequest,
+  SessionRequest
+} from '../middleware/authenticated.request';
+import { createSessionIfSober } from '../middleware/session.middleware';
 
 const routes = (): Router => {
   const router = Router();
 
   router.post(
     '/',
-    async (req: Request, res: Response): Promise<void> => {
-      try {
-        const drink = await createDrink(req.body);
-        res.status(201).json(drink);
-      } catch (e) {
-        res.status(400).json(e);
-      }
-    }
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response, next: NextFunction) =>
+        createSessionIfSober(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response): Promise<Response> =>
+        DrinkController.createDrink(req, res)
+    )
   );
 
   router.get(
     '/',
-    async (req: Request, res: Response): Promise<void> => {
-      const drinks = await findAllDrinks();
-      res.status(200).json(drinks);
-    }
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
+        DrinkController.findAllDrinks(req, res)
+    )
+  );
+
+  router.get(
+    '/:id',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
+        DrinkController.findDrink(req, res)
+    )
   );
 
   return router;

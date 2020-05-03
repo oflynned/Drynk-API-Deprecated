@@ -1,13 +1,15 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import { ResourceNotFoundError } from '../errors';
+import asyncHandler from 'express-async-handler';
 
 const registerRoutes = (): Router => {
   const router = Router();
 
   router.all(
     '*',
-    async (req: Request, res: Response): Promise<void> => {
-      res.status(404).send();
-    }
+    asyncHandler(async () => {
+      throw new ResourceNotFoundError();
+    })
   );
 
   return router;
