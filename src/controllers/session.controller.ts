@@ -8,6 +8,7 @@ import { Response } from 'express';
 import { ResourceNotFoundError } from '../infrastructure/errors';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { SessionService } from '../service/session.service';
+import { Drink } from '../models/drink.model';
 
 export class SessionController {
   static async getSessions(
@@ -18,7 +19,27 @@ export class SessionController {
       userId: req.user.toJson()._id
     });
 
-    return res.status(200).json(sessions);
+    return res
+      .status(200)
+      .json(sessions.map((session: Session) => session.toJson()));
+  }
+
+  static async getSessionsDrinks(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<Response> {
+    const sessions = await Repository.with(Session).findMany({
+      userId: req.user.toJson()._id
+    });
+
+    return res.status(200).json(
+      sessions.map((session: Session) => {
+        return {
+          ...session.toJson(),
+          drinks: session.toJson().drinks.map((drink: Drink) => drink.toJson())
+        };
+      })
+    );
   }
 
   static async getSessionSeries(
