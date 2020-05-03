@@ -46,6 +46,6 @@ export class UserController {
 
   static async deleteUser(req: AuthenticatedRequest, res: Response) {
     await req.user.delete();
-    return res.status(204);
+    return res.status(204).send();
   }
 }

@@ -3,6 +3,7 @@ import { Repository } from 'mongoize-orm';
 import { AuthenticatedRequest } from './authenticated.request';
 import { Session } from '../../models/session.model';
 import { SessionService } from '../../service/session.service';
+import { ResourceNotFoundError } from '../errors';
 
 export const requirePastSession = async (
   req: AuthenticatedRequest,
@@ -11,15 +12,14 @@ export const requirePastSession = async (
 ): Promise<Response | void> => {
   const session: Session = await Repository.with(Session).findOne({
     userId: req.user.toJson()._id,
-    soberAt: { $gt: Date.now() }
+    soberAt: { $gt: new Date() }
   });
 
   if (!session) {
-    // user is sober and/or hasn't added any drinks yet
-    return res.status(204);
+    throw new ResourceNotFoundError();
   }
 
-  Object.assign(req, session);
+  Object.assign(req, { session });
   next();
 };
 
