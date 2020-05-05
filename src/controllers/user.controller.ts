@@ -48,7 +48,7 @@ export class UserController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
-    await req.user.delete();
+    await req.user.softDelete();
     return res.status(204).send();
   }
 }

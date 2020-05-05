@@ -41,20 +41,16 @@ export class SessionService {
   }
 
   // purges old timelines and regenerates the new timeline on an event happening
-  static async onSessionEvent(sessionId: string): Promise<void> {
-    // TODO need a .refresh method to update the instance after an operation elsewhere
-    const session = await Repository.with(Session).findById(sessionId);
+  static async onSessionEvent(session: Session): Promise<void> {
+    await session.refresh();
     const user = await Repository.with(User).findById(session.toJson().userId);
     const drunkard = new Drunkard(session, user);
 
     // first purge the old cache containing the last known timeline
-    // TODO the global client is being overwritten when passing options!
-    await Repository.with(Timeline).deleteMany(
-      {
-        sessionId: session.toJson()._id
-      },
-      { hard: true, client: global.databaseClient }
-    );
+    // we don't care about the old timelines, so we can hard delete them
+    await Repository.with(Timeline).hardDeleteMany({
+      sessionId: session.toJson()._id
+    });
 
     const timelineService: TimelineService = TimelineService.getInstance(
       drunkard
@@ -73,7 +69,7 @@ export class SessionService {
     );
 
     await SessionService.updateSessionCache(
-      sessionId,
+      session,
       new Date(events.soberAt.time)
     );
   }
@@ -85,8 +81,7 @@ export class SessionService {
   ): Promise<TimelineEvents> {
     const drunkard = new Drunkard(session, user);
     const timeline = await Repository.with(Timeline).findOne({
-      sessionId: session.toJson()._id,
-      deleted: false
+      sessionId: session.toJson()._id
     });
 
     if (!timeline) {
@@ -100,13 +95,9 @@ export class SessionService {
 
   // only accessible internally as a facade for the microservice to use
   private static async updateSessionCache(
-    sessionId: string,
+    session: Session,
     soberAt: Date
   ): Promise<void> {
-    const session: Session = await Repository.with(Session).findById(sessionId);
-    if (session) {
-      // the user may delete their account and purge any session data between drinks
-      await session.update({ soberAt });
-    }
+    await session.update({ soberAt });
   }
 }

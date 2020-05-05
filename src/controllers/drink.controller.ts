@@ -16,15 +16,14 @@ export class DrinkController {
     req: SessionRequest,
     res: Response
   ): Promise<Response> {
-    const sessionId = req.session.toJson()._id;
     try {
       const drink: Drink = await new Drink()
         .build({
           ...req.body,
-          sessionId
+          sessionId: req.session.toJson()._id
         })
         .save();
-      await SessionService.onSessionEvent(sessionId);
+      await SessionService.onSessionEvent(req.session);
       return res.status(201).json(drink.toJson());
     } catch (e) {
       console.log(e);

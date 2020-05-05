@@ -96,7 +96,7 @@ export const graphql = (app: Application) => {
         context: object,
         args: { drinkId: string }
       ): Promise<Drink> => {
-        return Repository.with(Drink).deleteOne(args.drinkId);
+        return Repository.with(Drink).softDeleteOne(args.drinkId);
       },
       addPuke: async (context: object, sessionId: string): Promise<Puke> => {
         return new Puke().build({ sessionId }).save();
@@ -105,7 +105,7 @@ export const graphql = (app: Application) => {
         context: object,
         args: { pukeId: string }
       ): Promise<Puke> => {
-        return Repository.with(Puke).deleteOne(args.pukeId);
+        return Repository.with(Puke).softDeleteOne(args.pukeId);
       }
     }
   };
