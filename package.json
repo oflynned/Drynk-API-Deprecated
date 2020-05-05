@@ -35,7 +35,7 @@
     "helmet": "latest",
     "http-errors": "~1.6.3",
     "husky": "^4.2.5",
-    "mongoize-orm": "^1.0.1",
+    "mongoize-orm": "^1.0.2",
     "morgan": "~1.9.1"
   },
   "devDependencies": {
