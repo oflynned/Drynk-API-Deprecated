@@ -20,3 +20,20 @@ export const sortTimeDescending = (
 
   return 0;
 };
+
+export const sortTimeAscending = (
+  a: BaseDocument<any, any>,
+  b: BaseDocument<any, any>
+) => {
+  const firstTime = a.toJson().createdAt.getTime();
+  const secondTime = b.toJson().createdAt.getTime();
+  if (firstTime > secondTime) {
+    return 1;
+  }
+
+  if (firstTime < secondTime) {
+    return -1;
+  }
+
+  return 0;
+};

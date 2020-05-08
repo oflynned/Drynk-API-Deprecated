@@ -10,7 +10,7 @@ import { TimelineService } from '../microservices/blood-alcohol/timeline.service
 import { SessionService } from '../service/session.service';
 import { Drink } from '../models/drink.model';
 import { sortTimeDescending } from '../models/event.type';
-import { elapsedHoursToMs, elapsedTimeFromMsToHours } from '../common/helpers';
+import { elapsedTimeFromMsToHours } from '../common/helpers';
 
 export class SessionController {
   static async getSessions(
@@ -71,6 +71,25 @@ export class SessionController {
     }
 
     return res.status(200).json(timeline);
+  }
+
+  static async getLatestSessionSeries(
+    req: SessionRequest,
+    res: Response
+  ): Promise<Response> {
+    const sessions: Session[] = await Repository.with(Session).findMany({
+      userId: req.user.toJson()._id
+    });
+    // TODO this is inefficient, offload this to the query
+    const session = sessions.sort(sortTimeDescending)[0];
+    console.log(session);
+
+    const timeline = await TimelineService.fetchSessionTimeline(session);
+    if (!timeline) {
+      throw new ResourceNotFoundError();
+    }
+
+    return res.status(200).json(timeline.toJson());
   }
 
   static async getSessionDrinks(

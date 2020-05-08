@@ -9,12 +9,14 @@ import {
 import { Drink } from './drink.model';
 import { MealSize } from '../common/helpers';
 import { Puke } from './puke.model';
-import { Event, sortTimeDescending } from './event.type';
+import { Event, sortTimeAscending, sortTimeDescending } from './event.type';
 
 export interface SessionType extends BaseModelType {
   userId: string;
   mealSize: MealSize;
   soberAt?: Date;
+  mostDrunkAt?: Date;
+  highestBac?: number;
 }
 
 export class SessionSchema extends Schema<SessionType> {
@@ -31,7 +33,9 @@ export class SessionSchema extends Schema<SessionType> {
 
   joiUpdateSchema(): object {
     return {
-      soberAt: Joi.date().required()
+      soberAt: Joi.date().required(),
+      mostDrunkAt: Joi.date().required(),
+      highestBac: Joi.number().min(0)
     };
   }
 }
@@ -53,7 +57,7 @@ export class Session extends RelationalDocument<
   async events(): Promise<Event[]> {
     const { drinks, pukes } = await this.relationalFields();
     // TODO pull this up to a generic level so that events can be sorted
-    return [...drinks, ...pukes].sort(sortTimeDescending);
+    return [...drinks, ...pukes].sort(sortTimeAscending);
   }
 
   protected async relationalFields(): Promise<SessionRelationships> {

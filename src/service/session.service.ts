@@ -5,6 +5,7 @@ import { MealSize } from '../common/helpers';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { Drunkard } from '../models/drunkard.model';
 import { Timeline } from '../microservices/blood-alcohol/timeline.model';
+import { sortTimeAscending, sortTimeDescending } from '../models/event.type';
 
 export type Projection = {
   time: number;
@@ -70,7 +71,8 @@ export class SessionService {
 
     await SessionService.updateSessionCache(
       session,
-      new Date(events.soberAt.time)
+      events.soberAt,
+      events.mostDrunkAt
     );
   }
 
@@ -96,8 +98,13 @@ export class SessionService {
   // only accessible internally as a facade for the microservice to use
   private static async updateSessionCache(
     session: Session,
-    soberAt: Date
+    soberAt: Projection,
+    mostDrunkAt: Projection
   ): Promise<void> {
-    await session.update({ soberAt });
+    await session.update({
+      soberAt: new Date(soberAt.time),
+      mostDrunkAt: new Date(mostDrunkAt.time),
+      highestBac: mostDrunkAt.bac
+    });
   }
 }
