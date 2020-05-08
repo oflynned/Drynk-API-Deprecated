@@ -8,11 +8,9 @@ import {
   SessionRequest
 } from '../middleware/authenticated.request';
 import asyncHandler from 'express-async-handler';
-import { requirePastSession } from '../middleware/session.middleware';
+import { requireActiveSession } from '../middleware/session.middleware';
 import { SessionController } from '../../controllers/session.controller';
-import { SessionService } from '../../service/session.service';
-import { Repository } from 'mongoize-orm';
-import { Session } from '../../models/session.model';
+import { DrinkController } from '../../controllers/drink.controller';
 
 const routes = (): Router => {
   const router = Router();
@@ -28,7 +26,7 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: SessionRequest, res: Response, next: NextFunction) =>
-        requirePastSession(req, res, next)
+        requireActiveSession(req, res, next)
     ),
     asyncHandler(
       async (req: SessionRequest, res: Response): Promise<Response> =>
@@ -47,24 +45,11 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
-        requirePastSession(req, res, next)
+        requireActiveSession(req, res, next)
     ),
     asyncHandler(
       async (req: SessionRequest, res: Response): Promise<Response> =>
         SessionController.getLatestSessionSeries(req, res)
-    )
-  );
-
-  router.get(
-    '/on-event',
-    asyncHandler(
-      async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const session = await Repository.with(Session).findById(
-          '3ad93b26-084d-4c92-92ca-4e4fa6767beb'
-        );
-        await SessionService.onSessionEvent(session);
-        return res.status(200).json((await session.refresh()).toJson());
-      }
     )
   );
 
@@ -110,6 +95,25 @@ const routes = (): Router => {
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
         SessionController.getSessionDrinks(req, res)
+    )
+  );
+
+  router.delete(
+    '/now/drinks/:id',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireActiveSession(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response): Promise<Response> =>
+        DrinkController.destroyDrink(req, res)
     )
   );
 

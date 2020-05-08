@@ -5,7 +5,7 @@ import { Session } from '../../models/session.model';
 import { SessionService } from '../../service/session.service';
 import { ResourceNotFoundError } from '../errors';
 
-export const requirePastSession = async (
+export const requireActiveSession = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
