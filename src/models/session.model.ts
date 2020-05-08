@@ -1,6 +1,8 @@
 import {
+  BaseDocument,
   BaseModelType,
   BaseRelationshipType,
+  DatabaseClient,
   Joi,
   RelationalDocument,
   Repository,
@@ -10,6 +12,7 @@ import { Drink } from './drink.model';
 import { MealSize } from '../common/helpers';
 import { Puke } from './puke.model';
 import { Event, sortTimeAscending, sortTimeDescending } from './event.type';
+import { SessionService } from '../service/session.service';
 
 export interface SessionType extends BaseModelType {
   userId: string;
@@ -56,7 +59,6 @@ export class Session extends RelationalDocument<
 
   async events(): Promise<Event[]> {
     const { drinks, pukes } = await this.relationalFields();
-    // TODO pull this up to a generic level so that events can be sorted
     return [...drinks, ...pukes].sort(sortTimeAscending);
   }
 
@@ -69,5 +71,13 @@ export class Session extends RelationalDocument<
         sessionId: this.toJson()._id
       })
     };
+  }
+
+  async refresh(
+    client?: DatabaseClient
+  ): Promise<BaseDocument<SessionType, Schema<SessionType>>> {
+    await super.refresh(client);
+    await SessionService.onSessionEvent(this);
+    return this;
   }
 }
