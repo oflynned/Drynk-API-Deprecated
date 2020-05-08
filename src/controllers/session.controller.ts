@@ -82,8 +82,6 @@ export class SessionController {
     });
     // TODO this is inefficient, offload this to the query
     const session = sessions.sort(sortTimeDescending)[0];
-    console.log(session);
-
     const timeline = await TimelineService.fetchSessionTimeline(session);
     if (!timeline) {
       throw new ResourceNotFoundError();

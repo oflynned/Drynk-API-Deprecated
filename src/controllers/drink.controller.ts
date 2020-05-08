@@ -7,9 +7,10 @@ import {
 import { Response } from 'express';
 import {
   BadRequestError,
-  ResourceNotFoundError
+  ResourceNotFoundError,
+  UnauthorisedError
 } from '../infrastructure/errors';
-import { SessionService } from '../service/session.service';
+import { SessionController } from '../controllers/session.controller';
 
 export class DrinkController {
   static async createDrink(
@@ -23,7 +24,7 @@ export class DrinkController {
           sessionId: req.session.toJson()._id
         })
         .save();
-      await SessionService.onSessionEvent(req.session);
+      await req.session.refresh();
       return res.status(201).json(drink.toJson());
     } catch (e) {
       console.log(e);
@@ -64,5 +65,27 @@ export class DrinkController {
     }
 
     return res.status(200).json(drink.toJson());
+  }
+
+  static async destroyDrink(
+    req: SessionRequest,
+    res: Response
+  ): Promise<Response> {
+    const drink: Drink = await Repository.with(Drink).findOne(
+      {
+        _id: req.params.id,
+        sessionId: req.session.toJson()._id
+      },
+      { populate: true }
+    );
+
+    if (!drink) {
+      throw new ResourceNotFoundError();
+    }
+
+    await drink.hardDelete();
+    await req.session.refresh();
+
+    return SessionController.getSessionsDrinks(req, res);
   }
 }
