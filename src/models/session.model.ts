@@ -9,7 +9,7 @@ import {
 import { Drink } from './drink.model';
 import { MealSize } from '../common/helpers';
 import { Puke } from './puke.model';
-import { Event, sortEvents } from './event.type';
+import { Event, sortTimeDescending } from './event.type';
 
 export interface SessionType extends BaseModelType {
   userId: string;
@@ -53,7 +53,7 @@ export class Session extends RelationalDocument<
   async events(): Promise<Event[]> {
     const { drinks, pukes } = await this.relationalFields();
     // TODO pull this up to a generic level so that events can be sorted
-    return [...drinks, ...pukes].sort(sortEvents);
+    return [...drinks, ...pukes].sort(sortTimeDescending);
   }
 
   protected async relationalFields(): Promise<SessionRelationships> {

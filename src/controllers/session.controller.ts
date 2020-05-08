@@ -9,7 +9,8 @@ import { ResourceNotFoundError } from '../infrastructure/errors';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { SessionService } from '../service/session.service';
 import { Drink } from '../models/drink.model';
-import { sortEvents } from '../models/event.type';
+import { sortTimeDescending } from '../models/event.type';
+import { elapsedHoursToMs, elapsedTimeFromMsToHours } from '../common/helpers';
 
 export class SessionController {
   static async getSessions(
@@ -36,15 +37,22 @@ export class SessionController {
       { populate: true }
     );
 
-    const payload = sessions.map((session: Session) => {
-      return {
-        ...session.toJson(),
-        drinks: session
-          .toJson()
-          .drinks.sort(sortEvents)
-          .map((drink: Drink) => drink.toJson())
-      };
-    });
+    const payload = sessions
+      .sort(sortTimeDescending)
+      .map((session: Session) => {
+        return {
+          ...session.toJson(),
+          // TODO move this to the session object as it's useful
+          hoursDrunk: elapsedTimeFromMsToHours(
+            session.toJson().soberAt.getTime() -
+              session.toJson().createdAt.getTime()
+          ),
+          drinks: session
+            .toJson()
+            .drinks.sort(sortTimeDescending)
+            .map((drink: Drink) => drink.toJson())
+        };
+      });
 
     return res.status(200).json(payload);
   }
