@@ -17,5 +17,5 @@ export const dispatchBacUpdate = () => {
         await pubsub.publish(SESSION_UPDATE_AVAILABLE, timelineEvent);
       })
     );
-  }, 60 * 1000);
+  }, 5 * 1000);
 };
