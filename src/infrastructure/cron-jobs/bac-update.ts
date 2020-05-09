@@ -3,8 +3,14 @@ import { Repository } from 'mongoize-orm';
 import { SessionService, TimelineEvents } from '../../service/session.service';
 import { pubsub, SESSION_UPDATE_AVAILABLE } from '../graphql/pubsub';
 
-export const dispatchBacUpdate = () => {
+// every minute
+export const bacUpdateFrequency = '* * * * *';
+
+export const bacUpdateJob = () => {
+  // TODO use cron instead of setInterval in production
   setInterval(async () => {
+    console.log('running bac update job');
+
     const activeSessions: Session[] = await Repository.with(Session).findMany({
       soberAt: { $gt: new Date() }
     });
@@ -17,5 +23,5 @@ export const dispatchBacUpdate = () => {
         await pubsub.publish(SESSION_UPDATE_AVAILABLE, timelineEvent);
       })
     );
-  }, 5 * 1000);
+  }, 60 * 1000);
 };

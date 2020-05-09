@@ -8,12 +8,7 @@ import http from 'http';
 
 import { sitemap } from './sitemap';
 import { graphql } from './graphql';
-import { pubsub, SESSION_UPDATE_AVAILABLE } from './graphql/pubsub';
-import { Session } from '../models/session.model';
-import { Repository } from 'mongoize-orm';
-import { SessionService, TimelineEvents } from '../service/session.service';
-import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
-import { User } from '../models/user.model';
+import { registerCronJobs } from './cron-jobs';
 
 export class Server {
   private _httpServer: http.Server;
@@ -43,6 +38,7 @@ export class Server {
   async listen(port = this._app.get('port')): Promise<http.Server> {
     return this._httpServer.listen({ port }, () => {
       console.log(`Server ready on localhost:${port}`);
+      registerCronJobs();
     });
   }
 }
