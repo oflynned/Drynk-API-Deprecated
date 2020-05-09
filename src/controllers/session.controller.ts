@@ -110,8 +110,7 @@ export class SessionController {
   ): Promise<Response> {
     try {
       const currentState = await SessionService.fetchTimelineEvents(
-        req.session,
-        req.user
+        req.session
       );
       return res.status(200).json(currentState);
     } catch (e) {

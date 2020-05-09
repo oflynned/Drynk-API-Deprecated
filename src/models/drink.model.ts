@@ -21,7 +21,7 @@ export class DrinkSchema extends Schema<DrinkType> {
         .min(1)
         .required(),
       abv: Joi.number()
-        .min(1)
+        .min(0)
         .max(100)
         .required(),
       drinkName: Joi.string().required(),
@@ -35,7 +35,7 @@ export class DrinkSchema extends Schema<DrinkType> {
     return {
       volume: Joi.number().min(1),
       abv: Joi.number()
-        .min(1)
+        .min(0)
         .max(100),
       drinkName: Joi.string()
     };
