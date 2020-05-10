@@ -5,6 +5,7 @@ import { resolvers } from './resolvers';
 import { Server as HttpServer, createServer } from 'http';
 
 export const graphql = (app: Application): HttpServer => {
+  // TODO remove playground & introspection
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
