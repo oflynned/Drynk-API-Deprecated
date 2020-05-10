@@ -4,7 +4,9 @@ import { SessionService, TimelineEvents } from '../../service/session.service';
 import { pubsub, SESSION_UPDATE_AVAILABLE } from '../graphql/pubsub';
 
 // every minute
-export const bacUpdateFrequency = '0 * * * * *';
+// TODO should drinks have their series normalised to be eveyr minute at 0s
+//      so that the same update isn't broadcast twice as it doesn't decay exactly at the 0s mark?
+export const bacUpdateFrequency = '30 * * * * *';
 
 export const bacUpdateJob = async () => {
   const activeSessions: Session[] = await Repository.with(Session).findMany({
