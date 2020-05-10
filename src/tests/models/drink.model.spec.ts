@@ -23,8 +23,8 @@ describe('drink model', () => {
 
   describe('.abv', () => {
     it('should be above 0%', async () => {
-      await expect(factory.build({ abv: 0 }).validate()).rejects.toThrowError(
-        /must be larger than or equal to 1/
+      await expect(factory.build({ abv: -1 }).validate()).rejects.toThrowError(
+        /must be larger than or equal to 0/
       );
     });
 

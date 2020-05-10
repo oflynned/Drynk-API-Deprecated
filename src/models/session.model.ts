@@ -13,6 +13,7 @@ import { MealSize } from '../common/helpers';
 import { Puke } from './puke.model';
 import { Event, sortTimeAscending, sortTimeDescending } from './event.type';
 import { SessionService } from '../service/session.service';
+import { User } from './user.model';
 
 export interface SessionType extends BaseModelType {
   userId: string;
@@ -46,6 +47,7 @@ export class SessionSchema extends Schema<SessionType> {
 export interface SessionRelationships extends BaseRelationshipType {
   drinks: Drink[];
   pukes: Puke[];
+  user: User;
 }
 
 export class Session extends RelationalDocument<
@@ -62,6 +64,14 @@ export class Session extends RelationalDocument<
     return [...drinks, ...pukes].sort(sortTimeAscending);
   }
 
+  async refresh(
+    client?: DatabaseClient
+  ): Promise<BaseDocument<SessionType, Schema<SessionType>>> {
+    await super.refresh(client);
+    await SessionService.onSessionEvent(this);
+    return this;
+  }
+
   protected async relationalFields(): Promise<SessionRelationships> {
     return {
       drinks: await Repository.with(Drink).findMany({
@@ -69,15 +79,8 @@ export class Session extends RelationalDocument<
       }),
       pukes: await Repository.with(Puke).findMany({
         sessionId: this.toJson()._id
-      })
+      }),
+      user: await Repository.with(User).findById(this.toJson().userId)
     };
-  }
-
-  async refresh(
-    client?: DatabaseClient
-  ): Promise<BaseDocument<SessionType, Schema<SessionType>>> {
-    await super.refresh(client);
-    await SessionService.onSessionEvent(this);
-    return this;
   }
 }

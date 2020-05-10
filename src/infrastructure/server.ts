@@ -6,10 +6,12 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import http from 'http';
 
-import sitemap from './sitemap/sitemap';
+import { sitemap } from './sitemap';
 import { graphql } from './graphql';
+import { registerCronJobs } from './cron-jobs';
 
 export class Server {
+  private _httpServer: http.Server;
   private _app: Application;
 
   get app(): Application {
@@ -24,19 +26,19 @@ export class Server {
     app.use(helmet());
     app.use(cors());
 
-    graphql(app);
+    this._httpServer = graphql(app);
     sitemap(app);
 
+    // for use in integration testing
     this._app = app;
 
     return this;
   }
 
   async listen(port = this._app.get('port')): Promise<http.Server> {
-    return this._app.listen(port, () => {
-      console.log(
-        `The server is running and listening on http://localhost:${port}`
-      );
+    return this._httpServer.listen({ port }, () => {
+      registerCronJobs();
+      console.log(`Server ready on localhost:${port}`);
     });
   }
 }

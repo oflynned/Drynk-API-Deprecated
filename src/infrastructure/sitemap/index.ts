@@ -7,7 +7,7 @@ import userRouter from '../routes/user.route';
 import fallbackRouter from '../routes/fallback.route';
 import { HttpErrorType } from '../errors/http.error';
 
-const sitemap = (app: Application): void => {
+export const sitemap = (app: Application): void => {
   app.use('/', indexRouter);
   app.use('/drinks', drinksRouter);
   app.use('/sessions', sessionRouter);
@@ -32,5 +32,3 @@ const sitemap = (app: Application): void => {
     }
   );
 };
-
-export default sitemap;
