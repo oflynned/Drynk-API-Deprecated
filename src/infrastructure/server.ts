@@ -37,8 +37,8 @@ export class Server {
 
   async listen(port = this._app.get('port')): Promise<http.Server> {
     return this._httpServer.listen({ port }, () => {
-      console.log(`Server ready on localhost:${port}`);
       registerCronJobs();
+      console.log(`Server ready on localhost:${port}`);
     });
   }
 }
