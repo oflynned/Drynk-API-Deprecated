@@ -5,7 +5,12 @@ import { resolvers } from './resolvers';
 import { Server as HttpServer, createServer } from 'http';
 
 export const graphql = (app: Application): HttpServer => {
-  const apolloServer = new ApolloServer({ typeDefs, resolvers });
+  const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    playground: true,
+    introspection: true
+  });
   apolloServer.applyMiddleware({ app });
 
   const httpServer = createServer(app);
