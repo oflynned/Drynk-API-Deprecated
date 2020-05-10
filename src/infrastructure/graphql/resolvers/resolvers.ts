@@ -1,15 +1,15 @@
-import { Session } from '../../models/session.model';
+import { Session } from '../../../models/session.model';
 import { Repository } from 'mongoize-orm';
-import { sortTimeDescending } from '../../models/event.type';
-import { TimelineService } from '../../microservices/blood-alcohol/timeline.service';
-import { pubsub, SESSION_UPDATE_AVAILABLE } from './pubsub';
-import { ResourceNotFoundError } from '../errors';
-import { TimelineEvents } from '../../service/session.service';
-import { Drunkard } from '../../models/drunkard.model';
+import { sortTimeDescending } from '../../../models/event.type';
+import { TimelineService } from '../../../microservices/blood-alcohol/timeline.service';
+import { pubsub, SESSION_UPDATE_AVAILABLE } from '../pubsub';
+import { ResourceNotFoundError } from '../../errors';
+import { TimelineEvents } from '../../../service/session.service';
+import { Drunkard } from '../../../models/drunkard.model';
 
 export const resolvers = {
   Subscription: {
-    onSessionUpdate: {
+    onStateUpdate: {
       subscribe: () => pubsub.asyncIterator([SESSION_UPDATE_AVAILABLE]),
       resolve: (payload: TimelineEvents) => payload
     }
