@@ -5,11 +5,10 @@ import { MealSize } from '../common/helpers';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { Drunkard } from '../models/drunkard.model';
 import { Timeline } from '../microservices/blood-alcohol/timeline.model';
-import { sortTimeAscending, sortTimeDescending } from '../models/event.type';
 
 export type Projection = {
   time: number;
-  bac: number;
+  bloodAlcoholContent: number;
   alreadyPassed?: boolean;
 };
 
@@ -101,7 +100,7 @@ export class SessionService {
     await session.update({
       soberAt: new Date(soberAt.time),
       mostDrunkAt: new Date(mostDrunkAt.time),
-      highestBac: mostDrunkAt.bac
+      highestBac: mostDrunkAt.bloodAlcoholContent
     });
   }
 }
