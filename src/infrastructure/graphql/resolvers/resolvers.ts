@@ -6,12 +6,23 @@ import { pubsub, SESSION_UPDATE_AVAILABLE } from '../pubsub';
 import { ResourceNotFoundError } from '../../errors';
 import { TimelineEvents } from '../../../service/session.service';
 import { Drunkard } from '../../../models/drunkard.model';
+import { withFilter } from 'apollo-server-express';
+
+export type BackgroundUpdateType = { events: TimelineEvents; session: Session };
 
 export const resolvers = {
   Subscription: {
     onStateUpdate: {
-      subscribe: () => pubsub.asyncIterator([SESSION_UPDATE_AVAILABLE]),
-      resolve: (payload: TimelineEvents) => payload
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(SESSION_UPDATE_AVAILABLE),
+        (
+          payload: BackgroundUpdateType,
+          variables: { sessionId: string }
+        ): boolean => {
+          return payload.session.toJson()._id === variables.sessionId;
+        }
+      ),
+      resolve: (payload: BackgroundUpdateType): TimelineEvents => payload.events
     }
   },
   Query: {
