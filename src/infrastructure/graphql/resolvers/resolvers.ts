@@ -17,9 +17,9 @@ export const resolvers = {
         () => pubsub.asyncIterator(SESSION_UPDATE_AVAILABLE),
         (
           payload: BackgroundUpdateType,
-          variables: { sessionId: string }
+          variables: { userId: string }
         ): boolean => {
-          return payload.session.toJson()._id === variables.sessionId;
+          return payload.session.toJson().userId === variables.userId;
         }
       ),
       resolve: (payload: BackgroundUpdateType): TimelineEvents => payload.events
