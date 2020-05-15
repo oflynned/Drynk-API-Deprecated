@@ -22,7 +22,6 @@ export const bacUpdateJob = async () => {
         session
       );
 
-      // should filter updates by session id
       await pubsub.publish(SESSION_UPDATE_AVAILABLE, {
         events: timelineEvents,
         session
