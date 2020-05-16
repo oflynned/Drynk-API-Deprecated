@@ -5,6 +5,8 @@
   "scripts": {
     "build": "yarn clean && tsc",
     "clean": "rimraf ./dist",
+    "db:migration:create": "echo \"todo\"",
+    "db:migrate": "echo \"todo\"",
     "lint:code": "prettier --write '**/*.ts' --config ./.prettierrc",
     "lint:dependencies": "node_modules/.bin/ncu -u --semverLevel major && yarn && git add yarn.lock package.json && git commit -m 'auto-update dependencies'",
     "lint:dependencies:check": "node_modules/.bin/ncu -e 2 --semverLevel major",
