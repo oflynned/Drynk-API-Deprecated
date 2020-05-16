@@ -1,6 +1,7 @@
 import { Application, Response, Request, NextFunction } from 'express';
 
 import indexRouter from '../routes';
+import privacyRouter from '../routes/privacy.route';
 import drinksRouter from '../routes/drinks.route';
 import sessionRouter from '../routes/session.route';
 import userRouter from '../routes/user.route';
@@ -9,6 +10,7 @@ import { HttpErrorType } from '../errors/http.error';
 
 export const sitemap = (app: Application): void => {
   app.use('/', indexRouter);
+  app.use('/privacy', privacyRouter);
   app.use('/drinks', drinksRouter);
   app.use('/sessions', sessionRouter);
   app.use('/users', userRouter);
