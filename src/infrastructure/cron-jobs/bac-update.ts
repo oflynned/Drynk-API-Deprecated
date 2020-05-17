@@ -5,7 +5,7 @@ import { pubsub, SESSION_UPDATE_AVAILABLE } from '../graphql/pubsub';
 
 // TODO should drinks have their series normalised to be every minute at 0s
 //      so that the same update isn't broadcast twice as it doesn't decay exactly at the 0s mark?
-export const bacUpdateFrequency = '0 * * * * *';
+export const bacUpdateFrequency = '5 * * * * *';
 
 export const bacUpdateJob = async () => {
   const activeSessions: Session[] = await Repository.with(Session).findMany({
