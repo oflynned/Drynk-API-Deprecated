@@ -103,7 +103,7 @@ const routes = (): Router => {
 
   // TODO this should be set to dev-only when drinks can be retroactively added
   router.get(
-    '/:id/recalculate-session',
+    '/:id/recalculate',
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
         const session: Session = await Session.findById(req.params.id);
