@@ -3,6 +3,8 @@ import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated
 import { Response } from 'express';
 import { BadRequestError } from '../infrastructure/errors';
 import { Repository } from 'mongoize-orm';
+import { SessionService } from '../service/session.service';
+import { Session } from '../models/session.model';
 
 export class UserController {
   static async createUser(
@@ -35,6 +37,16 @@ export class UserController {
         req.user.toJson()._id,
         req.body
       );
+
+      const activeSessions: Session[] = await Session.findActiveByUserId(
+        user.toJson()._id
+      );
+      await Promise.all(
+        activeSessions.map((session: Session) =>
+          SessionService.onSessionEvent(session)
+        )
+      );
+
       return res.status(200).json(user.toJson());
     } catch (e) {
       throw new BadRequestError(
