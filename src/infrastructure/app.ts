@@ -5,7 +5,7 @@ import { bindGlobalDatabaseClient, MongoClient } from 'mongoize-orm';
 import { Server } from './server';
 
 import firebase from 'firebase-admin';
-import Sentry from '@sentry/node';
+import * as Sentry from '@sentry/node';
 
 import { firebaseConfig } from '../config/firebase.config';
 import { sentryConfig } from '../config/sentry.config';
@@ -25,6 +25,7 @@ export class App {
 
     firebase.initializeApp(firebaseConfig());
     Sentry.init(sentryConfig());
+    // Sentry.captureException(new Error('sentry works'));
 
     return new Server().build().listen(serverConfig.serverPort);
   }
