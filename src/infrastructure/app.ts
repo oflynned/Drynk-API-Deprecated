@@ -2,10 +2,14 @@ require('dotenv').config();
 
 import * as http from 'http';
 import { bindGlobalDatabaseClient, MongoClient } from 'mongoize-orm';
-import serverConfig from '../config/server.config';
 import { Server } from './server';
+
 import firebase from 'firebase-admin';
+import Sentry from '@sentry/node';
+
 import { firebaseConfig } from '../config/firebase.config';
+import { sentryConfig } from '../config/sentry.config';
+import serverConfig from '../config/server.config';
 
 export class App {
   private constructor() {}
@@ -20,6 +24,7 @@ export class App {
     await bindGlobalDatabaseClient(client, dbConfig());
 
     firebase.initializeApp(firebaseConfig());
+    Sentry.init(sentryConfig());
 
     return new Server().build().listen(serverConfig.serverPort);
   }
