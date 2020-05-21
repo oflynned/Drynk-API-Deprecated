@@ -11,6 +11,7 @@ export interface DrinkType extends BaseModelType {
   volume: number;
   abv: number;
   drinkName: string;
+  drinkType: 'wine' | 'beer' | 'spirit' | 'cocktail';
   sessionId: string;
 }
 
@@ -25,6 +26,9 @@ export class DrinkSchema extends Schema<DrinkType> {
         .max(100)
         .required(),
       drinkName: Joi.string().required(),
+      drinkType: Joi.string()
+        .valid('beer', 'wine', 'spirit', 'cocktail')
+        .required(),
       sessionId: Joi.string()
         .uuid()
         .required()
@@ -37,7 +41,8 @@ export class DrinkSchema extends Schema<DrinkType> {
       abv: Joi.number()
         .min(0)
         .max(100),
-      drinkName: Joi.string()
+      drinkName: Joi.string(),
+      drinkType: Joi.string().valid('beer', 'wine', 'spirit', 'cocktail')
     };
   }
 }
