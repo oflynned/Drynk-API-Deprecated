@@ -1,5 +1,5 @@
 import { Drink, DrinkType } from '../../models/drink.model';
-import { random } from 'faker';
+import { commerce, random } from 'faker';
 
 export class DrinkFactory {
   private constructor() {}
@@ -8,7 +8,7 @@ export class DrinkFactory {
     return new DrinkFactory();
   }
 
-  private static drinkName(): string {
+  private static drinkType(): string {
     const providers = ['beer', 'wine', 'cocktail', 'spirit'];
     return providers[Math.floor(Math.random() * providers.length)];
   }
@@ -16,7 +16,8 @@ export class DrinkFactory {
   private static buildProperties(overrides?: Partial<DrinkType>): DrinkType {
     return {
       ...({
-        drinkName: this.drinkName(),
+        drinkName: commerce.productName(),
+        drinkType: this.drinkType(),
         abv: random.number({ min: 1, max: 99 }),
         volume: random.number({ min: 35, max: 568 }),
         sessionId: random.uuid()

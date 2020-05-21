@@ -21,6 +21,20 @@ describe('drink model', () => {
     });
   });
 
+  describe('.drinkType', () => {
+    it('should require name from set', async () => {
+      await expect(
+        factory.build({ drinkType: 'beer' }).validate()
+      ).resolves.toBeDefined();
+    });
+
+    it('should not allow other genres', async () => {
+      await expect(
+        factory.build({ drinkType: 'not a beer' as any }).validate()
+      ).rejects.toThrowError(/must be one of/);
+    });
+  });
+
   describe('.abv', () => {
     it('should be above 0%', async () => {
       await expect(factory.build({ abv: -1 }).validate()).rejects.toThrowError(
