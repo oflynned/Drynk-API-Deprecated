@@ -37,8 +37,13 @@ export class SessionController {
       { populate: true }
     );
 
+    if (sessions.length === 0) {
+      throw new ResourceNotFoundError('No sessions have been created yet');
+    }
+
     const payload = sessions
       .sort(sortTimeDescending)
+      .filter((session: Session) => session.toJson().drinks.length > 0)
       .map((session: Session) => {
         return {
           ...session.toJson(),
