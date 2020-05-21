@@ -51,14 +51,17 @@ export class SessionService {
       sessionId: session.toJson()._id
     });
 
+    const sessionEvents = await session.events();
+    if (sessionEvents.length === 0) {
+      // the last drink of the session may have been deleted, we should purge the timeline
+      await session.hardDelete();
+      return;
+    }
+
     const timelineService: TimelineService = TimelineService.getInstance(
       drunkard
     );
-
-    const series = await timelineService.buildTimeSeries(
-      await session.events()
-    );
-
+    const series = await timelineService.buildTimeSeries(sessionEvents);
     const timeline: Timeline = await new Timeline()
       .build({ sessionId: session.toJson()._id, series })
       .save();
