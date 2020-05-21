@@ -5,6 +5,5 @@ dist/
 yalc.lock
 .env
 yarn-error.log
-*.json
 secrets/
 coverage/
