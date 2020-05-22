@@ -24,6 +24,7 @@ export class SessionService {
     user: User,
     mealSize?: MealSize
   ): Promise<Session> {
+    // TODO update this to look for the latest session with a sober by time within the last 3 hours
     const session: Session = await Repository.with(Session).findOne({
       userId: user.toJson()._id,
       soberAt: { $gt: new Date() }
