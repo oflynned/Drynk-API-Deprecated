@@ -1,15 +1,16 @@
 require('dotenv').config();
 
 import * as http from 'http';
-import { bindGlobalDatabaseClient, MongoClient } from 'mongoize-orm';
 import { Server } from './server';
-
-import firebase from 'firebase-admin';
-import * as Sentry from '@sentry/node';
 
 import { firebaseConfig } from '../config/firebase.config';
 import { sentryConfig } from '../config/sentry.config';
-import serverConfig from '../config/server.config';
+import { dbConfig } from '../config/database.config';
+import { serverConfig } from '../config/server.config';
+
+import { SentryHelper } from '../common/sentry';
+import { FirebaseHelper } from '../common/firebase';
+import { DatabaseHelper } from '../common/database';
 
 export class App {
   private constructor() {}
@@ -19,15 +20,11 @@ export class App {
   }
 
   async start(): Promise<http.Server> {
-    const client: MongoClient = new MongoClient();
-    const { dbConfig } = require('../config/database.config');
-    await bindGlobalDatabaseClient(client, dbConfig());
+    await DatabaseHelper.registerDatabase(dbConfig());
+    FirebaseHelper.registerFirebase(firebaseConfig());
+    SentryHelper.registerSentry(sentryConfig());
 
-    firebase.initializeApp(firebaseConfig());
-    Sentry.init(sentryConfig());
-    // Sentry.captureException(new Error('sentry works'));
-
-    return new Server().build().listen(serverConfig.serverPort);
+    return new Server().build().listen(serverConfig().port);
   }
 }
 

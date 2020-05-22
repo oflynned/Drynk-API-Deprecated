@@ -9,10 +9,12 @@ import http from 'http';
 import { sitemap } from './sitemap';
 import { graphql } from './graphql';
 import { registerCronJobs } from './cron-jobs';
+import { Logger } from '../common/logger';
 
 export class Server {
   private _httpServer: http.Server;
   private _app: Application;
+  private logger: Logger = Logger.getInstance('api.infrastructure.server');
 
   get app(): Application {
     return this._app;
@@ -38,7 +40,7 @@ export class Server {
   async listen(port = this._app.get('port')): Promise<http.Server> {
     return this._httpServer.listen({ port }, () => {
       registerCronJobs();
-      console.log(`Server ready on localhost:${port}`);
+      this.logger.info(`Server ready on localhost:${port}`);
     });
   }
 }

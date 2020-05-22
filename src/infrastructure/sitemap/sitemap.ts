@@ -7,6 +7,9 @@ import sessionRouter from '../routes/session.route';
 import userRouter from '../routes/user.route';
 import fallbackRouter from '../routes/fallback.route';
 import { HttpErrorType } from '../errors/http.error';
+import { Logger } from '../../common/logger';
+
+const logger: Logger = Logger.getInstance('api.infrastructure.sitemap');
 
 export const sitemap = (app: Application): void => {
   app.use('/', indexRouter);
@@ -20,7 +23,7 @@ export const sitemap = (app: Application): void => {
     (error: HttpErrorType, req: Request, res: Response, next: NextFunction) => {
       // INFO HttpErrorType is used as it needs to extend `Error` for tests to accept a throw
       //      and here we need to infer some internal properties
-      console.error(error);
+      logger.error(error);
 
       res.status(error._status);
       res.json({

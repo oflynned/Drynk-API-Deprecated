@@ -1,11 +1,14 @@
 import { CronJob } from 'cron';
 import { bacUpdateFrequency, bacUpdateJob } from './bac-update';
+import { Logger } from '../../common/logger';
+
+const logger: Logger = Logger.getInstance('api.infrastructure.cron-jobs');
 
 export const registerCronJobs = () => {
   new CronJob(bacUpdateFrequency, async () => {
-    console.log('Running bac update job');
+    logger.info('Running bac update job');
     await bacUpdateJob();
   }).start();
 
-  console.log('Registered bac update cron job');
+  logger.info('Registered bac update cron job');
 };
