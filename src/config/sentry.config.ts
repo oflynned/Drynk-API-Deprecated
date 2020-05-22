@@ -1,4 +1,4 @@
-type SentryOptions = {
+export type SentryOptions = {
   dsn: string;
 };
 
