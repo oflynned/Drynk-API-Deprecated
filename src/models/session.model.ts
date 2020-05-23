@@ -55,6 +55,12 @@ export class Session extends RelationalDocument<
   SessionSchema,
   SessionRelationships
 > {
+  static async findOngoingSessions(): Promise<Session[]> {
+    return Repository.with(Session).findMany({
+      soberAt: { $gt: new Date() }
+    });
+  }
+
   static async findById(sessionId: string): Promise<Session> {
     return Repository.with(Session).findById(sessionId);
   }
