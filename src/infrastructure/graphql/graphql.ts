@@ -3,14 +3,14 @@ import { Application } from 'express';
 import { Server as HttpServer, createServer } from 'http';
 import { typeDefs } from './type-definitions';
 import { resolvers } from './resolvers/resolvers';
+import { Environment } from '../../config/environment';
 
 export const graphql = (app: Application): HttpServer => {
-  // TODO remove playground & introspection
   const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    playground: true,
-    introspection: true
+    playground: Environment.isDevelopment(),
+    introspection: Environment.isDevelopment()
   });
   apolloServer.applyMiddleware({ app });
 
