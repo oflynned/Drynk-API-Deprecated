@@ -9,9 +9,9 @@ import {
   Schema
 } from 'mongoize-orm';
 import { Drink } from './drink.model';
-import { MealSize } from '../common/helpers';
+import { dateAtTimeAgo, MealSize } from '../common/helpers';
 import { Puke } from './puke.model';
-import { Event, sortTimeAscending, sortTimeDescending } from './event.type';
+import { Event, sortTimeAscending } from './event.type';
 import { SessionService } from '../service/session.service';
 import { User } from './user.model';
 
@@ -74,6 +74,35 @@ export class Session extends RelationalDocument<
 
   joiSchema(): SessionSchema {
     return new SessionSchema();
+  }
+
+  async isEventWithinTolerance(newEventCreationTime?: Date): Promise<boolean> {
+    if (!newEventCreationTime) {
+      // adding an event without a pre-determined time defaults to the current time in the session
+      return true;
+    }
+
+    if (newEventCreationTime > new Date()) {
+      // cannot be in the future
+      return false;
+    }
+
+    const firstEventAddedAt = (await this.firstEvent()).toJson().createdAt;
+    const limitNewDrinkTime = dateAtTimeAgo(
+      { value: 3, unit: 'hours' },
+      new Date(firstEventAddedAt)
+    );
+    return new Date(newEventCreationTime) > limitNewDrinkTime;
+  }
+
+  async firstEvent(): Promise<Event | undefined> {
+    const events = await this.events();
+    return events.length > 0 ? (events[0] as Event) : undefined;
+  }
+
+  async lastDrink(): Promise<Event | undefined> {
+    const events = await this.events();
+    return events.length > 0 ? (events[events.length] as Event) : undefined;
   }
 
   async events(): Promise<Event[]> {

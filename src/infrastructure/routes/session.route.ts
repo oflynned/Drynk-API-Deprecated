@@ -12,8 +12,9 @@ import { requireActiveSession } from '../middleware/session.middleware';
 import { SessionController } from '../../controllers/session.controller';
 import { DrinkController } from '../../controllers/drink.controller';
 import { SessionService } from '../../service/session.service';
-import { Repository } from 'mongoize-orm';
 import { Session } from '../../models/session.model';
+import { Environment } from '../../config/environment';
+import { ResourceNotFoundError, UnauthorisedError } from '../errors';
 
 const routes = (): Router => {
   const router = Router();
@@ -101,14 +102,21 @@ const routes = (): Router => {
     )
   );
 
-  // TODO this should be set to dev-only when drinks can be retroactively added
   router.get(
     '/:id/recalculate',
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
+        if (Environment.isProduction()) {
+          throw new UnauthorisedError();
+        }
+
         const session: Session = await Session.findById(req.params.id);
+        if (!session) {
+          throw new ResourceNotFoundError();
+        }
+
         await SessionService.onSessionEvent(session);
-        return res.status(200).send();
+        return res.status(200).send(session.toJson());
       }
     )
   );
