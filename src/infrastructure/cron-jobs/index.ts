@@ -1,7 +1,7 @@
 import { CronJob } from 'cron';
-import { BacUpdateJob } from './bac-update';
+import { BacUpdateJob } from './jobs/bac-update';
 import { Logger } from '../../common/logger';
-import { CleanInactiveUnonboardedUsersJob } from './clean-churned-users';
+import { CleanInactiveUnonboardedUsersJob } from './jobs/clean-churned-users';
 
 const logger: Logger = Logger.getInstance('api.infrastructure.cron-jobs');
 const bacUpdateJob = new BacUpdateJob();

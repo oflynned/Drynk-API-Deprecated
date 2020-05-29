@@ -1,5 +1,5 @@
-import { CronJob } from './cron-job';
-import { User } from '../../models/user.model';
+import { CronJob } from '../cron-job';
+import { User } from '../../../models/user.model';
 import { Repository } from 'mongoize-orm';
 
 export class CleanInactiveUnonboardedUsersJob extends CronJob {

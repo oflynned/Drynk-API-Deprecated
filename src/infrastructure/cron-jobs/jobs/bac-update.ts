@@ -1,7 +1,10 @@
-import { Session } from '../../models/session.model';
-import { SessionService, TimelineEvents } from '../../service/session.service';
-import { pubsub, SESSION_UPDATE_AVAILABLE } from '../graphql/pubsub';
-import { CronJob } from './cron-job';
+import { Session } from '../../../models/session.model';
+import {
+  SessionService,
+  TimelineEvents
+} from '../../../service/session.service';
+import { pubsub, SESSION_UPDATE_AVAILABLE } from '../../graphql/pubsub';
+import { CronJob } from '../cron-job';
 
 export class BacUpdateJob extends CronJob {
   async runJob(): Promise<void> {
