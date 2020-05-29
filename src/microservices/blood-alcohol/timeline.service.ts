@@ -36,17 +36,17 @@ export class TimelineService {
   // builds a timeline for a set of events
   // outputs a raw series of points <x (time), y (bac)> per minute
   async buildTimeSeries(events: Event[]): Promise<Point<number, number>[]> {
-    let timeOfFirstEvent = events[0].toJson().createdAt.getTime();
-
+    const timeOfFirstEvent = events[0].toJson().createdAt.getTime();
     const timeOfLastEvent = events[events.length - 1]
       .toJson()
       .createdAt.getTime();
 
     let timestamps = [];
+    let timestamp = timeOfFirstEvent;
 
-    while (timeOfFirstEvent < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
-      timestamps.push(timeOfFirstEvent);
-      timeOfFirstEvent += ONE_MINUTE_IN_MS;
+    while (timestamp < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
+      timestamps.push(timestamp);
+      timestamp += ONE_MINUTE_IN_MS;
     }
 
     const series: Point<number, number>[] = await Promise.all(
@@ -75,7 +75,11 @@ export class TimelineService {
           return true;
         }
 
-        return point.y > 0;
+        if (point.x > timeOfLastEvent) {
+          return point.y > 0;
+        }
+
+        return true;
       }
     );
   }
