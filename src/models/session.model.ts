@@ -65,6 +65,10 @@ export class Session extends RelationalDocument<
     return Repository.with(Session).findById(sessionId);
   }
 
+  static async findByUserId(userId: string): Promise<Session[]> {
+    return Repository.with(Session).findMany({ userId });
+  }
+
   static async findActiveByUserId(userId: string): Promise<Session[]> {
     return Repository.with(Session).findMany({
       userId,
