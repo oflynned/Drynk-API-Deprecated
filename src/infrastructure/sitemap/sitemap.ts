@@ -5,6 +5,7 @@ import privacyRouter from '../routes/privacy.route';
 import drinksRouter from '../routes/drinks.route';
 import sessionRouter from '../routes/session.route';
 import userRouter from '../routes/user.route';
+import statsRouter from '../routes/stats.route';
 import fallbackRouter from '../routes/fallback.route';
 import { HttpErrorType } from '../errors/http.error';
 import { Logger } from '../../common/logger';
@@ -17,6 +18,7 @@ export const sitemap = (app: Application): void => {
   app.use('/drinks', drinksRouter);
   app.use('/sessions', sessionRouter);
   app.use('/users', userRouter);
+  app.use('/stats', statsRouter);
   app.use(fallbackRouter);
 
   app.use(
