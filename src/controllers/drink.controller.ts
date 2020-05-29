@@ -7,23 +7,35 @@ import {
 import { Response } from 'express';
 import {
   BadRequestError,
-  ResourceNotFoundError,
-  UnauthorisedError
+  ResourceNotFoundError
 } from '../infrastructure/errors';
-import { SessionController } from '../controllers/session.controller';
+import { SessionController } from './session.controller';
+import { sortTimeAscending } from '../models/event.type';
 
 export class DrinkController {
   static async createDrink(
     req: SessionRequest,
     res: Response
   ): Promise<Response> {
+    if (new Date(req.body.createdAt) > new Date()) {
+      throw new BadRequestError('Drink start time cannot be in the future');
+    }
+
+    if (!(await req.session.isEventWithinTolerance(req.body.createdAt))) {
+      // the time passed is more than 3 hours before the session started
+      throw new BadRequestError('Drink start time is too far in the past');
+    }
+
     try {
       const drink: Drink = await new Drink()
         .build({
           ...req.body,
           sessionId: req.session.toJson()._id
         })
+        // if no created at is passed, default to date.now from the internal timestamps in mongoize-orm
+        .override(req.body.createdAt ? { createdAt: req.body.createdAt } : {})
         .save();
+
       await req.session.refresh();
       return res.status(201).json(drink.toJson());
     } catch (e) {
@@ -41,18 +53,11 @@ export class DrinkController {
       return res.status(200).json([]);
     }
 
-    drinks.sort((a: Drink, b: Drink) => {
-      if (a.toJson().createdAt.getTime() < b.toJson().createdAt.getTime()) {
-        return 1;
-      }
-      if (a.toJson().createdAt.getTime() > b.toJson().createdAt.getTime()) {
-        return -1;
-      }
-
-      return 0;
-    });
-
-    return res.status(200).json(drinks.map((drink: Drink) => drink.toJson()));
+    return res
+      .status(200)
+      .json(
+        drinks.sort(sortTimeAscending).map((drink: Drink) => drink.toJson())
+      );
   }
 
   static async findDrink(
