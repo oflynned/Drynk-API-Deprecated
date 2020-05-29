@@ -25,10 +25,29 @@ export type Length = 'm' | 'cm';
 
 export type MealSize = 'none' | 'small' | 'large';
 
-export type Time = 'hours' | 'mins' | 'secs' | 'ms';
+export type Time = 'days' | 'hours' | 'mins' | 'secs' | 'ms';
 
 export const toDecimalPlaces = (n: number, places = 3): number => {
   return parseFloat(n.toFixed(places));
+};
+
+export const dateAtTimeAgo = (
+  time: MeasureType<Time>,
+  timestamp: Date = new Date()
+): Date => {
+  switch (time.unit) {
+    case 'days':
+      return new Date(timestamp.getTime() - time.value * 24 * 60 * 60 * 1000);
+    default:
+    case 'hours':
+      return new Date(timestamp.getTime() - time.value * 60 * 60 * 1000);
+    case 'mins':
+      return new Date(timestamp.getTime() - time.value * 60 * 1000);
+    case 'secs':
+      return new Date(timestamp.getTime() - time.value * 1000);
+    case 'ms':
+      return new Date(timestamp.getTime() - time.value);
+  }
 };
 
 export const elapsedTimeFromMsToHours = (elapsedTime: number): number => {
