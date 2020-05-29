@@ -11,6 +11,7 @@ import {
 } from '../infrastructure/errors';
 import { SessionController } from './session.controller';
 import { sortTimeAscending } from '../models/event.type';
+import { SessionService } from '../service/session.service';
 
 export class DrinkController {
   static async createDrink(
@@ -78,7 +79,7 @@ export class DrinkController {
   ): Promise<Response> {
     const drink: Drink = await Repository.with(Drink).findOne(
       {
-        _id: req.params.id,
+        _id: req.params.drinkId,
         sessionId: req.session.toJson()._id
       },
       { populate: true }
@@ -89,6 +90,7 @@ export class DrinkController {
     }
 
     await drink.hardDelete();
+    await SessionService.onSessionEvent(req.session);
     await req.session.refresh();
 
     return SessionController.getSessionsDrinks(req, res);
