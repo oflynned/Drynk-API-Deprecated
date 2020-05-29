@@ -5,7 +5,7 @@ import {
   Repository,
   Schema
 } from 'mongoize-orm';
-import { Sex, UnitPreference } from '../common/helpers';
+import { dateAtTimeAgo, Sex, UnitPreference } from '../common/helpers';
 
 export interface UserType extends BaseModelType {
   name: string;
@@ -40,7 +40,7 @@ class UserSchema extends Schema<UserType> {
 
 export class User extends BaseDocument<UserType, UserSchema> {
   static async findInactive(): Promise<User[]> {
-    const date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const date = dateAtTimeAgo({ unit: 'days', value: 30 });
     return Repository.with(User).findMany({
       createdAt: { $lt: date },
       weight: undefined,
