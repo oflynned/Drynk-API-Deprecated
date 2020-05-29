@@ -8,13 +8,16 @@ import {
   SessionRequest
 } from '../middleware/authenticated.request';
 import asyncHandler from 'express-async-handler';
-import { requireActiveSession } from '../middleware/session.middleware';
+import {
+  requireActiveSession,
+  withSession
+} from '../middleware/session.middleware';
 import { SessionController } from '../../controllers/session.controller';
 import { DrinkController } from '../../controllers/drink.controller';
 import { SessionService } from '../../service/session.service';
 import { Session } from '../../models/session.model';
-import { Environment } from '../../config/environment';
-import { ResourceNotFoundError, UnauthorisedError } from '../errors';
+import { ResourceNotFoundError } from '../errors';
+import { withDevEnvironment } from '../middleware/development.middleware';
 
 const routes = (): Router => {
   const router = Router();
@@ -104,12 +107,11 @@ const routes = (): Router => {
 
   router.get(
     '/:id/recalculate',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withDevEnvironment(req, res, next)
+    ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        if (Environment.isProduction()) {
-          throw new UnauthorisedError();
-        }
-
         const session: Session = await Session.findById(req.params.id);
         if (!session) {
           throw new ResourceNotFoundError();
@@ -122,7 +124,7 @@ const routes = (): Router => {
   );
 
   router.delete(
-    '/now/drinks/:id',
+    '/:sessionId/drinks/:drinkId',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withFirebaseUser(req, res, next)
     ),
@@ -132,7 +134,7 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
-        requireActiveSession(req, res, next)
+        withSession(req, res, next)
     ),
     asyncHandler(
       async (req: SessionRequest, res: Response): Promise<Response> =>
