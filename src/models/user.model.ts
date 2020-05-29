@@ -1,5 +1,11 @@
-import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
-import { Sex, UnitPreference } from '../common/helpers';
+import {
+  BaseDocument,
+  BaseModelType,
+  Joi,
+  Repository,
+  Schema
+} from 'mongoize-orm';
+import { dateAtTimeAgo, Sex, UnitPreference } from '../common/helpers';
 
 export interface UserType extends BaseModelType {
   name: string;
@@ -33,7 +39,28 @@ class UserSchema extends Schema<UserType> {
 }
 
 export class User extends BaseDocument<UserType, UserSchema> {
+  static async findInactive(): Promise<User[]> {
+    const date = dateAtTimeAgo({ unit: 'days', value: 30 });
+    return Repository.with(User).findMany({
+      createdAt: { $lt: date },
+      weight: undefined,
+      height: undefined,
+      unit: undefined,
+      sex: undefined
+    });
+  }
+
   joiSchema(): UserSchema {
     return new UserSchema();
+  }
+
+  isOnboarded(): boolean {
+    const { height, weight, sex, unit } = this.toJson();
+    return (
+      height !== undefined &&
+      weight !== undefined &&
+      sex !== undefined &&
+      unit !== undefined
+    );
   }
 }

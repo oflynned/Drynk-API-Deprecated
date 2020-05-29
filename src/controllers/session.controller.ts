@@ -44,13 +44,13 @@ export class SessionController {
     const payload = sessions
       .sort(sortTimeDescending)
       .filter((session: Session) => session.toJson().drinks.length > 0)
-      .map((session: Session) => {
+      .map(async (session: Session) => {
         return {
           ...session.toJson(),
-          // TODO move this to the session object as it's useful
+          // TODO should a filter be done on only the _drunk_ time where bac > 0?
           hoursDrunk: elapsedTimeFromMsToHours(
             session.toJson().soberAt.getTime() -
-              session.toJson().createdAt.getTime()
+              (await session.firstEvent()).toJson().createdAt.getTime()
           ),
           drinks: session
             .toJson()

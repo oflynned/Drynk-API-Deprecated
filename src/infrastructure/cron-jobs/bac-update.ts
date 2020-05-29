@@ -1,31 +1,30 @@
 import { Session } from '../../models/session.model';
-import { Repository } from 'mongoize-orm';
 import { SessionService, TimelineEvents } from '../../service/session.service';
 import { pubsub, SESSION_UPDATE_AVAILABLE } from '../graphql/pubsub';
+import { CronJob } from './cron-job';
 
-// TODO should drinks have their series normalised to be every minute at 0s
-//      so that the same update isn't broadcast twice as it doesn't decay exactly at the 0s mark?
-export const bacUpdateFrequency = '5 * * * * *';
+export class BacUpdateJob extends CronJob {
+  async runJob(): Promise<void> {
+    const activeSessions: Session[] = await Session.findOngoingSessions();
+    if (activeSessions.length === 0) {
+      return;
+    }
 
-export const bacUpdateJob = async () => {
-  const activeSessions: Session[] = await Repository.with(Session).findMany({
-    soberAt: { $gt: new Date() }
-  });
+    await Promise.all(
+      activeSessions.map(async (session: Session) => {
+        const timelineEvents: TimelineEvents = await SessionService.fetchTimelineEvents(
+          session
+        );
 
-  if (activeSessions.length === 0) {
-    return;
+        await pubsub.publish(SESSION_UPDATE_AVAILABLE, {
+          events: timelineEvents,
+          session
+        });
+      })
+    );
   }
 
-  await Promise.all(
-    activeSessions.map(async (session: Session) => {
-      const timelineEvents: TimelineEvents = await SessionService.fetchTimelineEvents(
-        session
-      );
-
-      await pubsub.publish(SESSION_UPDATE_AVAILABLE, {
-        events: timelineEvents,
-        session
-      });
-    })
-  );
-};
+  cronFrequency(): string {
+    return '5 * * * * *';
+  }
+}

@@ -1,10 +1,11 @@
 import { Session } from '../models/session.model';
 import { User } from '../models/user.model';
 import { Repository } from 'mongoize-orm';
-import { MealSize } from '../common/helpers';
+import { dateAtTimeAgo, MealSize } from '../common/helpers';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { Drunkard } from '../models/drunkard.model';
 import { Timeline } from '../microservices/blood-alcohol/timeline.model';
+import { sortTimeDescending } from '../models/event.type';
 
 export type Projection = {
   time: number;
@@ -24,21 +25,18 @@ export class SessionService {
     user: User,
     mealSize?: MealSize
   ): Promise<Session> {
-    // TODO update this to look for the latest session with a sober by time within the last 3 hours
+    // find the latest session within the last 3 hours in case already sober
     const session: Session = await Repository.with(Session).findOne({
       userId: user.toJson()._id,
-      soberAt: { $gt: new Date() }
+      soberAt: { $gt: dateAtTimeAgo({ unit: 'hours', value: 3 }) }
     });
 
-    // no past sessions exist, the user has just created their account or is sober
-    if (!session) {
-      return new Session()
-        .build({ userId: user.toJson()._id, mealSize })
-        .save();
+    if (session) {
+      return session;
     }
 
-    // otherwise return the active session
-    return session;
+    // no past sessions exist, the user has just created their account or is sober
+    return new Session().build({ userId: user.toJson()._id, mealSize }).save();
   }
 
   // purges old timelines and regenerates the new timeline on an event happening
