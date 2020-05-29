@@ -1,4 +1,10 @@
-import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
+import {
+  BaseDocument,
+  BaseModelType,
+  Joi,
+  Repository,
+  Schema
+} from 'mongoize-orm';
 import {
   elapsedTimeFromMsToHours,
   Mass,
@@ -52,6 +58,16 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
 
   private readonly ETHANOL_DENSITY_GRAMS_PER_ML = 0.789; // 0.789 g/ml
 
+  static findBySessionIds(
+    ids: string[],
+    sinceStartTime: Date
+  ): Promise<Drink[]> {
+    return Repository.with(Drink).findMany({
+      sessionId: { $in: ids },
+      createdAt: { $gt: sinceStartTime }
+    });
+  }
+
   joiSchema(): DrinkSchema {
     return new DrinkSchema();
   }
@@ -70,6 +86,10 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
       unit: 'l',
       value: mls * 1000
     };
+  }
+
+  units(): number {
+    return (this.toJson().volume * this.toJson().abv) / 1000;
   }
 
   ethanolMass(unit: Mass): MeasureType<Mass> {
