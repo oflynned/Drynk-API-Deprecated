@@ -22,6 +22,20 @@ const routes = (): Router => {
     )
   );
 
+  router.get(
+    '/last-month',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        withUser(req, res, next)
+    ),
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
+      StatsController.unitsInLastMonth(req, res)
+    )
+  );
+
   return router;
 };
 
