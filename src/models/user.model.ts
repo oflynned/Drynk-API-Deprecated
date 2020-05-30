@@ -30,8 +30,12 @@ class UserSchema extends Schema<UserType> {
 
   joiUpdateSchema(): object {
     return {
-      weight: Joi.number().min(1),
-      height: Joi.number().min(1),
+      weight: Joi.number()
+        .min(1)
+        .max(999),
+      height: Joi.number()
+        .min(1)
+        .max(999),
       sex: Joi.string().valid('male', 'female'),
       unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial')
     };
