@@ -12,8 +12,7 @@ export interface MeasureType<Unit> {
   unit: Unit;
 }
 
-// TODO add british imperial
-export type UnitPreference = 'metric' | 'imperial';
+export type UnitPreference = 'metric' | 'us_imperial' | 'uk_imperial';
 
 export type Sex = 'male' | 'female';
 
