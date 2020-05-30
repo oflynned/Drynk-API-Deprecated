@@ -33,7 +33,7 @@ class UserSchema extends Schema<UserType> {
       weight: Joi.number().min(1),
       height: Joi.number().min(1),
       sex: Joi.string().valid('male', 'female'),
-      unit: Joi.string().valid('metric')
+      unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial')
     };
   }
 }
