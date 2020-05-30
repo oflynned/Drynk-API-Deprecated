@@ -38,7 +38,7 @@ export const requireActiveSession = async (
   });
 
   if (!session) {
-    throw new ResourceNotFoundError();
+    return res.status(204).send();
   }
 
   Object.assign(req, { session });

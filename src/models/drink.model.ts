@@ -82,6 +82,13 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
       };
     }
 
+    if (unit === 'cl') {
+      return {
+        unit: 'cl',
+        value: mls / 10
+      };
+    }
+
     return {
       unit: 'l',
       value: mls * 1000
@@ -92,17 +99,13 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
     return (this.toJson().volume * this.toJson().abv) / 1000;
   }
 
-  ethanolMass(unit: Mass): MeasureType<Mass> {
+  calories(): number {
+    return parseInt(String(this.ethanolMass().value * 7));
+  }
+
+  ethanolMass(): MeasureType<Mass> {
     const grams =
       this.ethanolVolume('ml').value * this.ETHANOL_DENSITY_GRAMS_PER_ML;
-
-    if (unit === 'kg') {
-      return {
-        value: grams * 1000,
-        unit: 'kg'
-      };
-    }
-
     return {
       value: grams,
       unit: 'g'
@@ -110,7 +113,7 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   standardDrinks(): number {
-    return this.ethanolMass('g').value / Drink.STANDARD_DRINK_ETHANOL_GRAMS;
+    return this.ethanolMass().value / Drink.STANDARD_DRINK_ETHANOL_GRAMS;
   }
 
   timeSinceDrink(time: Time): MeasureType<Time> {

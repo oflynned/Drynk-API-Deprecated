@@ -57,7 +57,7 @@ export class DigestiveSystem {
 
   private addToStomach(drink: Drink): void {
     this._intaken.volumeLitres += drink.toJson().volume / 1000;
-    this._intaken.ethanolGrams += drink.ethanolMass('g').value;
+    this._intaken.ethanolGrams += drink.ethanolMass().value;
   }
 
   // TODO incorrect, absorption is a first-order eq, a rate of n grams per litre is cleared per hour
