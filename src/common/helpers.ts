@@ -19,7 +19,7 @@ export type Sex = 'male' | 'female';
 
 export type Mass = 'kg' | 'g';
 
-export type Volume = 'l' | 'ml';
+export type Volume = 'l' | 'cl' | 'ml';
 
 export type Length = 'm' | 'cm';
 
