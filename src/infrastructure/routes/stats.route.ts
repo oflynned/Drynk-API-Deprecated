@@ -9,7 +9,7 @@ const routes = (): Router => {
   const router = Router();
 
   router.get(
-    '/last-week',
+    '/overview',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withFirebaseUser(req, res, next)
     ),
@@ -18,21 +18,7 @@ const routes = (): Router => {
         withUser(req, res, next)
     ),
     asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
-      StatsController.unitsInLastWeek(req, res)
-    )
-  );
-
-  router.get(
-    '/last-month',
-    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
-      withFirebaseUser(req, res, next)
-    ),
-    asyncHandler(
-      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
-        withUser(req, res, next)
-    ),
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
-      StatsController.unitsInLastMonth(req, res)
+      StatsController.unitsOverview(req, res)
     )
   );
 
