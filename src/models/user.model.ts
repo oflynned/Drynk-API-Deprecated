@@ -54,6 +54,10 @@ export class User extends BaseDocument<UserType, UserSchema> {
     return new UserSchema();
   }
 
+  isMale(): boolean {
+    return this.toJson().sex === 'male';
+  }
+
   isOnboarded(): boolean {
     const { height, weight, sex, unit } = this.toJson();
     return (
