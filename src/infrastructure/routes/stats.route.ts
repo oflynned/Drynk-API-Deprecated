@@ -18,7 +18,7 @@ const routes = (): Router => {
         withUser(req, res, next)
     ),
     asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
-      StatsController.unitsOverview(req, res)
+      StatsController.overview(req, res)
     )
   );
 
