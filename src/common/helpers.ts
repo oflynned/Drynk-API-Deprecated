@@ -57,6 +57,10 @@ export const elapsedHoursToMs = (elapsedTime: number): number => {
   return elapsedTime * ONE_HOUR_IN_MS;
 };
 
+export const percentage = (value: number, total: number): number => {
+  return (value / total) * 100;
+};
+
 export const sum = (series: number[]): number => {
   return series.reduce((a: number, b: number) => a + b, 0);
 };
