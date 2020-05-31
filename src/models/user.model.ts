@@ -5,7 +5,12 @@ import {
   Repository,
   Schema
 } from 'mongoize-orm';
-import { dateAtTimeAgo, Sex, UnitPreference } from '../common/helpers';
+import {
+  dateAtTimeAgo,
+  elapsedTimeFromMsToHours,
+  Sex,
+  UnitPreference
+} from '../common/helpers';
 
 export interface UserType extends BaseModelType {
   name: string;
@@ -52,6 +57,12 @@ export class User extends BaseDocument<UserType, UserSchema> {
       unit: undefined,
       sex: undefined
     });
+  }
+
+  daysSinceAccountCreation(): number {
+    return elapsedTimeFromMsToHours(
+      Date.now() - this.toJson().createdAt.getTime()
+    );
   }
 
   joiSchema(): UserSchema {
