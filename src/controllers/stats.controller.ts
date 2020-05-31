@@ -1,10 +1,9 @@
-import { Drink } from '../models/drink.model';
 import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { Session } from '../models/session.model';
 import { dateAtTimeAgo } from '../common/helpers';
 import { Repository } from 'mongoize-orm';
-import { StatisticsHelper } from './stats/helper';
+import { OverviewHelper } from './stats/overview.helper';
 
 // based off of nhs websites
 // https://www.nhs.uk/live-well/alcohol-support/calculating-alcohol-units/
@@ -43,14 +42,6 @@ export class StatsController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
-    const sessionsInAllTime: Session[] = await Repository.with(
-      Session
-    ).findMany({ userId: req.user.toJson()._id }, { populate: true });
-
-    if (sessionsInAllTime.length === 0) {
-      return res.status(204);
-    }
-
     const sessionsInLastWeek: Session[] = await Repository.with(
       Session
     ).findMany(
@@ -61,20 +52,14 @@ export class StatsController {
       { populate: true }
     );
 
-    const drinksInLastWeek: Drink[] = StatisticsHelper.flattenSessionDrinks(
+    if (sessionsInLastWeek.length === 0) {
+      return res.status(204);
+    }
+
+    const overview = await OverviewHelper.overview(
+      req.user,
       sessionsInLastWeek
     );
-
-    return res.status(200).json({
-      sex: req.user.toJson().sex,
-      units: await StatisticsHelper.intakeOverviewOverDays(
-        req.user,
-        drinksInLastWeek,
-        7
-      ),
-      calories: await StatisticsHelper.drinkCalories(drinksInLastWeek),
-      timeDrunk: await StatisticsHelper.totalHoursDrunk(sessionsInLastWeek),
-      bloodAlcoholContentPeaks: 0
-    });
+    return res.status(200).json(overview);
   }
 }

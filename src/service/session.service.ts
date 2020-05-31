@@ -1,11 +1,10 @@
 import { Session } from '../models/session.model';
 import { User } from '../models/user.model';
 import { Repository } from 'mongoize-orm';
-import { dateAtTimeAgo, MealSize } from '../common/helpers';
+import { dateAtTimeAgo, MealSize, Point } from '../common/helpers';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { Drunkard } from '../models/drunkard.model';
 import { Timeline } from '../microservices/blood-alcohol/timeline.model';
-import { sortTimeDescending } from '../models/event.type';
 
 export type Projection = {
   time: number;
@@ -74,6 +73,18 @@ export class SessionService {
       events.soberAt,
       events.mostDrunkAt
     );
+  }
+
+  static async fetchBloodAlcoholPeaks(
+    sessions: Session[]
+  ): Promise<Point<number, number>[]> {
+    const sessionIds = sessions.map((session: Session) => session.toJson()._id);
+    const timelines: Timeline[] = await Repository.with(Timeline).findMany({
+      sessionId: { $in: sessionIds }
+    });
+    return timelines
+      .map((timeline: Timeline) => timeline.dangerousPeaks())
+      .flat(1);
   }
 
   // fetches cached events from generated timeline

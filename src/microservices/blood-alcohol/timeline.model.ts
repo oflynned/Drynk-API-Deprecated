@@ -37,4 +37,54 @@ export class Timeline extends BaseDocument<TimelineType, TimelineSchema> {
   joiSchema(): TimelineSchema {
     return new TimelineSchema();
   }
+
+  dangerousPeaks(): Point<number, number>[] {
+    const series = this.toJson().series;
+    const peaks: Point<number, number>[] = [];
+
+    // 2nd and 2nd last elements to ensure there is +1 and -1 available
+    for (let i = 1; i < series.length - 1; i++) {
+      // is bac above 0.15? roughly about the point someone starts being sloppy
+      if (series[i].y >= 0.15) {
+        // is it a local max?
+        if (series[i].y > series[i - 1].y && series[i].y > series[i + 1].y) {
+          peaks.push(series[i]);
+          i += 2;
+        }
+      }
+    }
+
+    return peaks;
+  }
+
+  inflectionPoints(): Point<number, number>[] {
+    const series = this.toJson().series;
+    const peaks: Point<number, number>[] = [];
+
+    // 2nd and 2nd last elements to ensure there is +1 and -1 available
+    for (let i = 0; i < series.length; i++) {
+      if (i == 0 || i == series.length - 1) {
+        // top and tail
+        peaks.push(series[i]);
+        return;
+      } else if (
+        series[i].y > series[i - 1].y &&
+        series[i].y > series[i + 1].y
+      ) {
+        // local max
+        peaks.push(series[i]);
+        i += 2;
+        return;
+      } else if (
+        series[i].y < series[i - 1].y &&
+        series[i].y < series[i + 1].y
+      ) {
+        // local min
+        peaks.push(series[i]);
+        i += 2;
+      }
+    }
+
+    return peaks;
+  }
 }
