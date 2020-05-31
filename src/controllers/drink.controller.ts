@@ -11,8 +11,6 @@ import {
 } from '../infrastructure/errors';
 import { SessionController } from './session.controller';
 import { sortTimeAscending } from '../models/event.type';
-import { SessionService } from '../service/session.service';
-
 export class DrinkController {
   static async createDrink(
     req: SessionRequest,
@@ -23,10 +21,9 @@ export class DrinkController {
     }
 
     if (!(await req.session.isEventWithinTolerance(req.body.createdAt))) {
-      // the time passed is more than 3 hours before the session started
       throw new BadRequestError('Drink start time is too far in the past');
     }
-
+    // the time passed is more than 3 hours before the session started
     try {
       const drink: Drink = await new Drink()
         .build({
@@ -96,3 +93,5 @@ export class DrinkController {
     return SessionController.getSessionsDrinks(req, res);
   }
 }
+
+import { SessionService } from '../service/session.service';
