@@ -60,11 +60,15 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
 
   static findBySessionIds(
     ids: string[],
-    sinceStartTime: Date
+    sinceStartTime?: Date
   ): Promise<Drink[]> {
+    const startTime = sinceStartTime
+      ? { createdAt: { $gt: sinceStartTime } }
+      : {};
+
     return Repository.with(Drink).findMany({
       sessionId: { $in: ids },
-      createdAt: { $gt: sinceStartTime }
+      ...startTime
     });
   }
 
