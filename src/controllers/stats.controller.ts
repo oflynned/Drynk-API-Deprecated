@@ -4,6 +4,7 @@ import { Session } from '../models/session.model';
 import { dateAtTimeAgo } from '../common/helpers';
 import { Repository } from 'mongoize-orm';
 import { OverviewHelper } from './stats/overview.helper';
+import { ResourceNotFoundError } from '../infrastructure/errors';
 
 // based off of nhs websites
 // https://www.nhs.uk/live-well/alcohol-support/calculating-alcohol-units/
@@ -42,6 +43,13 @@ export class StatsController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
+    const sessionsOverAllTime: Session[] = await Session.findByUserId(
+      req.user.toJson()._id
+    );
+    if (sessionsOverAllTime.length === 0) {
+      throw new ResourceNotFoundError();
+    }
+
     const sessionsInLastWeek: Session[] = await Repository.with(
       Session
     ).findMany(
@@ -53,7 +61,7 @@ export class StatsController {
     );
 
     if (sessionsInLastWeek.length === 0) {
-      return res.status(204);
+      return res.status(204).send();
     }
 
     const overview = await OverviewHelper.overview(
