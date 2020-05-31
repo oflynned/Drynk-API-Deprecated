@@ -5,7 +5,12 @@ import {
   Repository,
   Schema
 } from 'mongoize-orm';
-import { Sex, UnitPreference } from '../common/helpers';
+import {
+  dateAtTimeAgo,
+  elapsedTimeFromMsToHours,
+  Sex,
+  UnitPreference
+} from '../common/helpers';
 
 export interface UserType extends BaseModelType {
   name: string;
@@ -30,17 +35,21 @@ class UserSchema extends Schema<UserType> {
 
   joiUpdateSchema(): object {
     return {
-      weight: Joi.number().min(1),
-      height: Joi.number().min(1),
+      weight: Joi.number()
+        .min(1)
+        .max(999),
+      height: Joi.number()
+        .min(1)
+        .max(999),
       sex: Joi.string().valid('male', 'female'),
-      unit: Joi.string().valid('metric')
+      unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial')
     };
   }
 }
 
 export class User extends BaseDocument<UserType, UserSchema> {
   static async findInactive(): Promise<User[]> {
-    const date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const date = dateAtTimeAgo({ unit: 'days', value: 30 });
     return Repository.with(User).findMany({
       createdAt: { $lt: date },
       weight: undefined,
@@ -50,8 +59,18 @@ export class User extends BaseDocument<UserType, UserSchema> {
     });
   }
 
+  daysSinceAccountCreation(): number {
+    return elapsedTimeFromMsToHours(
+      Date.now() - this.toJson().createdAt.getTime()
+    );
+  }
+
   joiSchema(): UserSchema {
     return new UserSchema();
+  }
+
+  isMale(): boolean {
+    return this.toJson().sex === 'male';
   }
 
   isOnboarded(): boolean {

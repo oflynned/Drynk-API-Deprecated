@@ -43,7 +43,7 @@ export const resolvers = {
       }
 
       const estimatedEventStates: TimelineEvents = await TimelineService.getInstance(
-        new Drunkard(session, session.toJson().user)
+        new Drunkard(session, session.toJsonWithRelationships().user)
       ).estimateEventTimes(timeline.toJson().series);
 
       return {

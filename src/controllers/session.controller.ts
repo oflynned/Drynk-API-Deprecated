@@ -8,9 +8,9 @@ import { Response } from 'express';
 import { ResourceNotFoundError } from '../infrastructure/errors';
 import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
 import { SessionService } from '../service/session.service';
-import { Drink } from '../models/drink.model';
 import { sortTimeDescending } from '../models/event.type';
 import { elapsedTimeFromMsToHours } from '../common/helpers';
+import { Drink } from '../models/drink.model';
 
 export class SessionController {
   static async getSessions(
@@ -23,7 +23,11 @@ export class SessionController {
 
     return res
       .status(200)
-      .json(sessions.map((session: Session) => session.toJson()));
+      .json(
+        sessions
+          .sort(sortTimeDescending)
+          .map((session: Session) => session.toJson())
+      );
   }
 
   static async getSessionsDrinks(
@@ -41,23 +45,28 @@ export class SessionController {
       throw new ResourceNotFoundError('No sessions have been created yet');
     }
 
-    const payload = sessions
-      .sort(sortTimeDescending)
-      .filter((session: Session) => session.toJson().drinks.length > 0)
-      .map((session: Session) => {
-        return {
-          ...session.toJson(),
-          // TODO move this to the session object as it's useful
-          hoursDrunk: elapsedTimeFromMsToHours(
-            session.toJson().soberAt.getTime() -
-              session.toJson().createdAt.getTime()
-          ),
-          drinks: session
-            .toJson()
-            .drinks.sort(sortTimeDescending)
-            .map((drink: Drink) => drink.toJson())
-        };
-      });
+    const payload = await Promise.all(
+      sessions
+        .filter(
+          (session: Session) =>
+            session.toJsonWithRelationships().drinks.length > 0
+        )
+        .sort(sortTimeDescending)
+        .map(async (session: Session) => {
+          return {
+            ...session.toJson(),
+            // TODO should a filter be done on only the _drunk_ time where bac > 0?
+            hoursDrunk: elapsedTimeFromMsToHours(
+              session.toJson().soberAt.getTime() -
+                (await session.firstEvent()).toJson().createdAt.getTime()
+            ),
+            drinks: session
+              .toJsonWithRelationships()
+              .drinks.sort(sortTimeDescending)
+              .map((drink: Drink) => drink.toJson())
+          };
+        })
+    );
 
     return res.status(200).json(payload);
   }
@@ -106,7 +115,7 @@ export class SessionController {
       throw new ResourceNotFoundError();
     }
 
-    return res.status(200).json(session.toJson().drinks);
+    return res.status(200).json(session.toJsonWithRelationships().drinks);
   }
 
   static async getSessionState(

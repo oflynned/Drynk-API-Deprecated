@@ -12,23 +12,41 @@ export interface MeasureType<Unit> {
   unit: Unit;
 }
 
-// TODO add british imperial
-export type UnitPreference = 'metric' | 'imperial';
+export type UnitPreference = 'metric' | 'us_imperial' | 'uk_imperial';
 
 export type Sex = 'male' | 'female';
 
 export type Mass = 'kg' | 'g';
 
-export type Volume = 'l' | 'ml';
+export type Volume = 'l' | 'cl' | 'ml';
 
 export type Length = 'm' | 'cm';
 
 export type MealSize = 'none' | 'small' | 'large';
 
-export type Time = 'hours' | 'mins' | 'secs' | 'ms';
+export type Time = 'days' | 'hours' | 'mins' | 'secs' | 'ms';
 
 export const toDecimalPlaces = (n: number, places = 3): number => {
   return parseFloat(n.toFixed(places));
+};
+
+export const dateAtTimeAgo = (
+  time: MeasureType<Time>,
+  timestamp: Date = new Date()
+): Date => {
+  switch (time.unit) {
+    case 'days':
+      return new Date(timestamp.getTime() - time.value * 24 * 60 * 60 * 1000);
+    default:
+    case 'hours':
+      return new Date(timestamp.getTime() - time.value * 60 * 60 * 1000);
+    case 'mins':
+      return new Date(timestamp.getTime() - time.value * 60 * 1000);
+    case 'secs':
+      return new Date(timestamp.getTime() - time.value * 1000);
+    case 'ms':
+      return new Date(timestamp.getTime() - time.value);
+  }
 };
 
 export const elapsedTimeFromMsToHours = (elapsedTime: number): number => {
@@ -37,6 +55,10 @@ export const elapsedTimeFromMsToHours = (elapsedTime: number): number => {
 
 export const elapsedHoursToMs = (elapsedTime: number): number => {
   return elapsedTime * ONE_HOUR_IN_MS;
+};
+
+export const percentage = (value: number, total: number): number => {
+  return (value / total) * 100;
 };
 
 export const sum = (series: number[]): number => {

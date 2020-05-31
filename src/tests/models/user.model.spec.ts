@@ -34,7 +34,7 @@ describe('user model', () => {
     });
 
     describe('.height', () => {
-      it('should not exist', async () => {
+      it('should not exist on build', async () => {
         await expect(
           factory.build({ height: 0 }).validate()
         ).resolves.not.toHaveProperty('height');
@@ -42,7 +42,7 @@ describe('user model', () => {
     });
 
     describe('.weight', () => {
-      it('should not exist', async () => {
+      it('should not exist on build', async () => {
         await expect(
           factory.build({ weight: 0 }).validate()
         ).resolves.not.toHaveProperty('weight');
@@ -50,7 +50,7 @@ describe('user model', () => {
     });
 
     describe('.sex', () => {
-      it('should not exist', async () => {
+      it('should not exist on build', async () => {
         await expect(
           factory.build({ sex: 'male' } as object).validate()
         ).resolves.not.toHaveProperty('weight');
@@ -68,6 +68,15 @@ describe('user model', () => {
             .validateUpdate({ height: 0 }).error.details[0].message
         ).toMatch(/must be larger than or equal to 1/);
       });
+
+      it('should be below 1000', async () => {
+        expect(
+          factory
+            .build()
+            .joiSchema()
+            .validateUpdate({ height: 1000 }).error.details[0].message
+        ).toMatch(/must be less than or equal to 999/);
+      });
     });
 
     describe('.weight', () => {
@@ -78,6 +87,15 @@ describe('user model', () => {
             .joiSchema()
             .validateUpdate({ weight: 0 }).error.details[0].message
         ).toMatch(/must be larger than or equal to 1/);
+      });
+
+      it('should be below 1000', async () => {
+        expect(
+          factory
+            .build()
+            .joiSchema()
+            .validateUpdate({ weight: 1000 }).error.details[0].message
+        ).toMatch(/must be less than or equal to 999/);
       });
     });
 
