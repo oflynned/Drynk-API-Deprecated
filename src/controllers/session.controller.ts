@@ -23,7 +23,11 @@ export class SessionController {
 
     return res
       .status(200)
-      .json(sessions.map((session: Session) => session.toJson()));
+      .json(
+        sessions
+          .sort(sortTimeDescending)
+          .map((session: Session) => session.toJson())
+      );
   }
 
   static async getSessionsDrinks(
@@ -43,7 +47,10 @@ export class SessionController {
 
     const payload = await Promise.all(
       sessions
-        .filter((session: Session) => session.toJson().drinks.length > 0)
+        .filter(
+          (session: Session) =>
+            session.toJsonWithRelationships().drinks.length > 0
+        )
         .sort(sortTimeDescending)
         .map(async (session: Session) => {
           return {
@@ -54,7 +61,7 @@ export class SessionController {
                 (await session.firstEvent()).toJson().createdAt.getTime()
             ),
             drinks: session
-              .toJson()
+              .toJsonWithRelationships()
               .drinks.sort(sortTimeDescending)
               .map((drink: Drink) => drink.toJson())
           };
@@ -108,7 +115,7 @@ export class SessionController {
       throw new ResourceNotFoundError();
     }
 
-    return res.status(200).json(session.toJson().drinks);
+    return res.status(200).json(session.toJsonWithRelationships().drinks);
   }
 
   static async getSessionState(

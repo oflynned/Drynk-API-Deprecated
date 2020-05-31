@@ -79,7 +79,10 @@ export class SessionService {
   // fetches cached events from generated timeline
   static async fetchTimelineEvents(session: Session): Promise<TimelineEvents> {
     await session.populate();
-    const drunkard = new Drunkard(session, session.toJson().user);
+    const drunkard = new Drunkard(
+      session,
+      session.toJsonWithRelationships().user
+    );
     const timeline = await Repository.with(Timeline).findOne({
       sessionId: session.toJson()._id
     });

@@ -9,7 +9,12 @@ import {
   Schema
 } from 'mongoize-orm';
 import { Drink } from './drink.model';
-import { dateAtTimeAgo, MealSize } from '../common/helpers';
+import {
+  dateAtTimeAgo,
+  elapsedTimeFromMsToHours,
+  MealSize,
+  sum
+} from '../common/helpers';
 import { Puke } from './puke.model';
 import { Event, sortTimeAscending } from './event.type';
 import { SessionService } from '../service/session.service';
@@ -74,6 +79,33 @@ export class Session extends RelationalDocument<
       userId,
       soberAt: { $gt: new Date() }
     });
+  }
+
+  hoursDrunk(): number {
+    // TODO use the timeline to omit any sober times between drinks in order to form a cohesive time where bac > 0
+    return elapsedTimeFromMsToHours(
+      this.toJson().soberAt.getTime() - this.toJson().createdAt.getTime()
+    );
+  }
+
+  async units(): Promise<number> {
+    if (!this.toJsonWithRelationships().drinks) {
+      await this.refresh();
+    }
+    return sum(
+      this.toJsonWithRelationships().drinks.map((drink: Drink) => drink.units())
+    );
+  }
+
+  async calories(): Promise<number> {
+    if (!this.toJsonWithRelationships().drinks) {
+      await this.refresh();
+    }
+    return sum(
+      this.toJsonWithRelationships().drinks.map((drink: Drink) =>
+        drink.calories()
+      )
+    );
   }
 
   joiSchema(): SessionSchema {
