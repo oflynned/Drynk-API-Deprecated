@@ -83,6 +83,10 @@ export class Session extends RelationalDocument<
 
   hoursDrunk(): number {
     // TODO use the timeline to omit any sober times between drinks in order to form a cohesive time where bac > 0
+    if (!this.toJson().soberAt) {
+      return 0;
+    }
+
     return elapsedTimeFromMsToHours(
       this.toJson().soberAt.getTime() - this.toJson().createdAt.getTime()
     );
@@ -92,6 +96,11 @@ export class Session extends RelationalDocument<
     if (!this.toJsonWithRelationships().drinks) {
       await this.refresh();
     }
+
+    if (this.toJsonWithRelationships().drinks.length === 0) {
+      return 0;
+    }
+
     return sum(
       this.toJsonWithRelationships().drinks.map((drink: Drink) => drink.units())
     );
@@ -101,6 +110,11 @@ export class Session extends RelationalDocument<
     if (!this.toJsonWithRelationships().drinks) {
       await this.refresh();
     }
+
+    if (this.toJsonWithRelationships().drinks.length === 0) {
+      return 0;
+    }
+
     return sum(
       this.toJsonWithRelationships().drinks.map((drink: Drink) =>
         drink.calories()
