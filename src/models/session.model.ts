@@ -137,7 +137,12 @@ export class Session extends RelationalDocument<
       return false;
     }
 
-    const firstEventAddedAt = (await this.firstEvent()).toJson().createdAt;
+    const sessionEvents = await this.events();
+    const hasAtLeastOneDrink = sessionEvents.length > 0;
+    const firstEventAddedAt = hasAtLeastOneDrink
+      ? (await this.firstEvent()).toJson().createdAt
+      : newEventCreationTime;
+
     const limitNewDrinkTime = dateAtTimeAgo(
       { value: 3, unit: 'hours' },
       new Date(firstEventAddedAt)
