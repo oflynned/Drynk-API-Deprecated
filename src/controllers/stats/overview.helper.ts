@@ -13,7 +13,7 @@ export class OverviewHelper {
       number
     >[] = await SessionService.fetchBloodAlcoholPeaks(sessions);
     return {
-      sex: user.toJson().sex,
+      user: user.toJson(),
       units: await StatisticsHelper.intakeOverviewOverDays(user, drinks, 7),
       calories: await StatisticsHelper.drinkCalories(drinks),
       timeDrunk: await StatisticsHelper.totalHoursDrunk(sessions),
