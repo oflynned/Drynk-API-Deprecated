@@ -18,6 +18,7 @@ export class CleanInactiveUnonboardedUsersJob extends CronJob {
   }
 
   cronFrequency(): string {
+    // 8am everyday
     return '0 0 8 * * *';
   }
 }
