@@ -1,6 +1,6 @@
 import { CronJob } from '../cron-job';
 import { User } from '../../../models/user.model';
-import { Repository } from 'mongoize-orm';
+import { auth } from 'firebase-admin';
 
 export class CleanInactiveUnonboardedUsersJob extends CronJob {
   async runJob(): Promise<void> {
@@ -9,12 +9,16 @@ export class CleanInactiveUnonboardedUsersJob extends CronJob {
       return;
     }
 
-    await Repository.with(User).hardDeleteMany({
-      _id: inactiveUsers.map((user: User) => user.toJson()._id)
-    });
+    await Promise.all(
+      inactiveUsers.map(async (user: User) => {
+        await auth().deleteUser(user.toJson().providerId);
+        await user.hardDelete();
+      })
+    );
   }
 
   cronFrequency(): string {
+    // 8am everyday
     return '0 0 8 * * *';
   }
 }
