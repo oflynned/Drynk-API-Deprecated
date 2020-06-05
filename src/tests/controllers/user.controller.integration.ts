@@ -154,7 +154,7 @@ describe('user controller', () => {
     });
 
     it('should be anonymised in store', async () => {
-      const refs = await Repository.with(User).findAll();
+      const refs = await Repository.with(User).findMany({ deleted: true });
       expect(refs.length).toEqual(1);
 
       const ref = refs[0].toJson();
