@@ -153,10 +153,16 @@ describe('user controller', () => {
       expect(res.send).toHaveBeenCalled();
     });
 
-    it('should be soft deleted', async () => {
-      const ref = await Repository.with(User).findById(user.toJson()._id);
-      expect(ref.toJson().deleted).toBeTruthy();
-      expect(ref.toJson().deletedAt).not.toBeNull();
+    it('should be anonymised in store', async () => {
+      const refs = await Repository.with(User).findAll();
+      expect(refs.length).toEqual(1);
+
+      const ref = refs[0].toJson();
+      expect(ref.deleted).toBeTruthy();
+      expect(ref.deletedAt).not.toBeNull();
+      expect(ref.name).toEqual('deleted');
+      expect(ref.email).toEqual('deleted');
+      expect(ref.providerId).toEqual('deleted');
     });
   });
 });

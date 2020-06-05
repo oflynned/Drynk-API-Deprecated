@@ -60,6 +60,7 @@ export class User extends BaseDocument<UserType, UserSchema> {
   }
 
   async softDeleteAndAnonymise(): Promise<User> {
+    await this.softDelete();
     const user = await this.update({
       name: 'deleted',
       email: 'deleted',
