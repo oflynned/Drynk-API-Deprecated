@@ -1,4 +1,10 @@
-import { BaseDocument, BaseModelType, Joi, Schema } from 'mongoize-orm';
+import {
+  BaseDocument,
+  BaseModelType,
+  Joi,
+  Repository,
+  Schema
+} from 'mongoize-orm';
 import { Point } from '../../common/helpers';
 
 export interface TimelineType extends BaseModelType {
@@ -34,6 +40,12 @@ export class TimelineSchema extends Schema<TimelineType> {
 }
 
 export class Timeline extends BaseDocument<TimelineType, TimelineSchema> {
+  static async findBySessionIds(sessionIds: string[]): Promise<Timeline[]> {
+    return Repository.with(Timeline).findMany({
+      sessionId: { $in: sessionIds }
+    });
+  }
+
   joiSchema(): TimelineSchema {
     return new TimelineSchema();
   }
