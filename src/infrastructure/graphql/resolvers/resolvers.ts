@@ -1,7 +1,7 @@
 import { Session } from '../../../models/session.model';
 import { Repository } from 'mongoize-orm';
 import { sortTimeDescending } from '../../../models/event.type';
-import { TimelineService } from '../../../microservices/blood-alcohol/timeline.service';
+import { TimelineService } from '../../../microservices/blood-alcohol-timeline/timeline.service';
 import { pubsub, SESSION_UPDATE_AVAILABLE } from '../pubsub';
 import { ResourceNotFoundError } from '../../errors';
 import { TimelineEvents } from '../../../service/session.service';

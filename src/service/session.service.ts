@@ -2,9 +2,9 @@ import { Session } from '../models/session.model';
 import { User } from '../models/user.model';
 import { Repository } from 'mongoize-orm';
 import { dateAtTimeAgo, MealSize, Point } from '../common/helpers';
-import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
+import { TimelineService } from '../microservices/blood-alcohol-timeline/timeline.service';
 import { Drunkard } from '../models/drunkard.model';
-import { Timeline } from '../microservices/blood-alcohol/timeline.model';
+import { Timeline } from '../microservices/blood-alcohol-timeline/timeline.model';
 
 export type Projection = {
   time: number;

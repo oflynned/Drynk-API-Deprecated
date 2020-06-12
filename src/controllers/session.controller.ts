@@ -6,7 +6,7 @@ import {
 } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { ResourceNotFoundError } from '../infrastructure/errors';
-import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
+import { TimelineService } from '../microservices/blood-alcohol-timeline/timeline.service';
 import { SessionService } from '../service/session.service';
 import { sortTimeDescending } from '../models/event.type';
 import { elapsedTimeFromMsToHours } from '../common/helpers';
