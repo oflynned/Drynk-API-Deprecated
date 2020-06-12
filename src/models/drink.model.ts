@@ -104,6 +104,7 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   calories(): number {
+    // 7 kcal per 1g of ethanol
     return parseInt(String(this.ethanolMass().value * 7));
   }
 

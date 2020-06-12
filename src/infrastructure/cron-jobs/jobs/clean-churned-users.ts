@@ -1,6 +1,6 @@
 import { CronJob } from '../cron-job';
 import { User } from '../../../models/user.model';
-import { auth } from 'firebase-admin';
+import { FirebaseHelper } from '../../../common/firebase';
 
 export class CleanInactiveUnonboardedUsersJob extends CronJob {
   async runJob(): Promise<void> {
@@ -11,7 +11,7 @@ export class CleanInactiveUnonboardedUsersJob extends CronJob {
 
     await Promise.all(
       inactiveUsers.map(async (user: User) => {
-        await auth().deleteUser(user.toJson().providerId);
+        await FirebaseHelper.purgeFirebaseAccount(user.toJson().providerId);
         await user.hardDelete();
       })
     );

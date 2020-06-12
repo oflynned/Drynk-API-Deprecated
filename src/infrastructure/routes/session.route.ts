@@ -61,21 +61,6 @@ const routes = (): Router => {
   );
 
   router.get(
-    '/',
-    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
-      withFirebaseUser(req, res, next)
-    ),
-    asyncHandler(
-      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
-        requireUser(req, res, next)
-    ),
-    asyncHandler(
-      async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
-        SessionController.getSessions(req, res)
-    )
-  );
-
-  router.get(
     '/drinks',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withFirebaseUser(req, res, next)
@@ -91,7 +76,7 @@ const routes = (): Router => {
   );
 
   router.get(
-    '/:id/drinks',
+    '/',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withFirebaseUser(req, res, next)
     ),
@@ -101,18 +86,56 @@ const routes = (): Router => {
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> =>
+        SessionController.getSessions(req, res)
+    )
+  );
+
+  router.get(
+    '/:sessionId/series',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        withSession(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response): Promise<Response> =>
+        SessionController.getSessionSeries(req, res)
+    )
+  );
+
+  router.get(
+    '/:sessionId/drinks',
+    asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
+      withFirebaseUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        requireUser(req, res, next)
+    ),
+    asyncHandler(
+      async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
+        withSession(req, res, next)
+    ),
+    asyncHandler(
+      async (req: SessionRequest, res: Response): Promise<Response> =>
         SessionController.getSessionDrinks(req, res)
     )
   );
 
   router.get(
-    '/:id/recalculate',
+    '/:sessionId/recalculate',
     asyncHandler(async (req: Request, res: Response, next: NextFunction) =>
       withDevEnvironment(req, res, next)
     ),
     asyncHandler(
       async (req: AuthenticatedRequest, res: Response): Promise<Response> => {
-        const session: Session = await Session.findById(req.params.id);
+        const session: Session = await Session.findById(req.params.sessionId);
         if (!session) {
           throw new ResourceNotFoundError();
         }

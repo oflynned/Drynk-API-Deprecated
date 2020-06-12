@@ -10,7 +10,6 @@ import {
   SocialRequest
 } from './authenticated.request';
 import {
-  BadRequestError,
   ResourceNotFoundError,
   ServiceDownError,
   UnauthenticatedError,

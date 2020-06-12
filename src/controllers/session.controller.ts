@@ -6,7 +6,7 @@ import {
 } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { ResourceNotFoundError } from '../infrastructure/errors';
-import { TimelineService } from '../microservices/blood-alcohol/timeline.service';
+import { TimelineService } from '../microservices/blood-alcohol-timeline/timeline.service';
 import { SessionService } from '../service/session.service';
 import { sortTimeDescending } from '../models/event.type';
 import { elapsedTimeFromMsToHours } from '../common/helpers';
@@ -17,17 +17,31 @@ export class SessionController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
-    const sessions = await Repository.with(Session).findMany({
-      userId: req.user.toJson()._id
-    });
+    const sessions = await Repository.with(Session).findMany(
+      {
+        userId: req.user.toJson()._id
+      },
+      { populate: true }
+    );
 
-    return res
-      .status(200)
-      .json(
-        sessions
-          .sort(sortTimeDescending)
-          .map((session: Session) => session.toJson())
-      );
+    const series = await Promise.all(
+      sessions
+        .sort(sortTimeDescending)
+        .filter(
+          (session: Session) =>
+            session.toJsonWithRelationships().drinks.length > 0
+        )
+        .map(async (session: Session) => {
+          return {
+            ...session.toJson(),
+            drinks: session
+              .toJsonWithRelationships()
+              .drinks.map((drink: Drink) => drink.toJson())
+          };
+        })
+    );
+
+    return res.status(200).json(series);
   }
 
   static async getSessionsDrinks(
@@ -78,13 +92,12 @@ export class SessionController {
     if (req.session.toJson().userId !== req.user.toJson()._id) {
       throw new ResourceNotFoundError();
     }
-
     const timeline = await TimelineService.fetchSessionTimeline(req.session);
     if (!timeline) {
       throw new ResourceNotFoundError();
     }
 
-    return res.status(200).json(timeline);
+    return res.status(200).json(timeline.toJson());
   }
 
   static async getLatestSessionSeries(

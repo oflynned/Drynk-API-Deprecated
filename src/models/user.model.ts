@@ -59,6 +59,16 @@ export class User extends BaseDocument<UserType, UserSchema> {
     });
   }
 
+  async softDeleteAndAnonymise(): Promise<User> {
+    await this.softDelete();
+    const user = await this.update({
+      name: 'deleted',
+      email: 'deleted',
+      providerId: 'deleted'
+    });
+    return user as User;
+  }
+
   daysSinceAccountCreation(): number {
     return elapsedTimeFromMsToHours(
       Date.now() - this.toJson().createdAt.getTime()

@@ -20,8 +20,8 @@
     "test:watch": "jest -c jest.config.js --watch"
   },
   "dependencies": {
-    "@sentry/node": "5.16.1",
-    "apollo-server": "^2.13.0",
+    "@sentry/node": "5.17.0",
+    "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.12.0",
     "cookie-parser": "~1.4.4",
     "cors": "2.8.5",

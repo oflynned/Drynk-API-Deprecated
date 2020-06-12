@@ -5,6 +5,7 @@ import { BadRequestError } from '../infrastructure/errors';
 import { Repository } from 'mongoize-orm';
 import { SessionService } from '../service/session.service';
 import { Session } from '../models/session.model';
+import { FirebaseHelper } from '../common/firebase';
 
 export class UserController {
   static async createUser(
@@ -60,7 +61,8 @@ export class UserController {
     req: AuthenticatedRequest,
     res: Response
   ): Promise<Response> {
-    await req.user.softDelete();
+    await FirebaseHelper.purgeFirebaseAccount(req.user.toJson().providerId);
+    await req.user.softDeleteAndAnonymise();
     return res.status(204).send();
   }
 }
