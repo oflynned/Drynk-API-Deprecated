@@ -1,6 +1,6 @@
 import { Event } from '../../models/event.type';
 import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
-import { DigestiveSystem } from './digestive-system';
+import { DigestService } from './digest.service';
 import { Drunkard } from '../../models/drunkard.model';
 import { TimelineEvents } from '../../service/session.service';
 import { Session } from '../../models/session.model';
@@ -13,7 +13,7 @@ import { Repository } from 'mongoize-orm';
 // https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
 export class TimelineService {
   private _drunkard: Drunkard;
-  private _digestiveSystem: DigestiveSystem;
+  private _digestiveSystem: DigestService;
 
   private constructor() {}
 
@@ -29,7 +29,7 @@ export class TimelineService {
 
   buildSession(drunkard: Drunkard): TimelineService {
     this._drunkard = drunkard;
-    this._digestiveSystem = new DigestiveSystem(drunkard);
+    this._digestiveSystem = new DigestService(drunkard);
     return this;
   }
 
