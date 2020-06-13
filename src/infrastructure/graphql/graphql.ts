@@ -1,7 +1,7 @@
 import { ApolloServer } from 'apollo-server-express';
 import { Application } from 'express';
 import { Server as HttpServer, createServer } from 'http';
-import { typeDefs } from './type-definitions';
+import { typeDefs } from './definitions';
 import { resolvers } from './resolvers/resolvers';
 import { Environment } from '../../config/environment';
 
