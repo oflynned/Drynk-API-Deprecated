@@ -1,2 +1,2 @@
-release: yarn db:migrate
+release: yarn seed:store
 web: yarn start:prod

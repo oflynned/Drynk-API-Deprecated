@@ -6,7 +6,9 @@ import drinksRouter from '../routes/drinks.route';
 import sessionRouter from '../routes/session.route';
 import userRouter from '../routes/user.route';
 import statsRouter from '../routes/stats.route';
+import searchRouter from '../../microservices/alcohol-store/search.route';
 import fallbackRouter from '../routes/fallback.route';
+
 import { HttpError, HttpErrorType } from '../errors/http.error';
 import { Logger } from '../../common/logger';
 import { SentryHelper } from '../../common/sentry';
@@ -21,6 +23,10 @@ export const sitemap = (app: Application): void => {
   app.use('/sessions', sessionRouter);
   app.use('/users', userRouter);
   app.use('/stats', statsRouter);
+
+  // microservices
+  app.use("/search", searchRouter)
+
   app.use(fallbackRouter);
 
   app.use(

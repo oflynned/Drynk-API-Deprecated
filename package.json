@@ -12,6 +12,7 @@
     "lint:dependencies:check": "node_modules/.bin/ncu -e 2 --semverLevel major",
     "lint:package": "sort-package-json",
     "lint:staged": "pretty-quick --staged",
+    "seed:store": "ts-node ./src/microservices/alcohol-store/index.ts",
     "start:dev": "NODE_ENV=development nodemon ./src/infrastructure/app.ts",
     "start:prod": "NODE_ENV=production node ./dist/infrastructure/app.js",
     "test": "jest -c jest.config.js",
@@ -43,6 +44,8 @@
     "husky": "^4.2.5",
     "mongoize-orm": "^1.0.6",
     "morgan": "~1.9.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3",
     "typescript-logging": "^0.6.4"
   },
   "devDependencies": {
@@ -76,8 +79,6 @@
     "sort-package-json": "^1.35.0",
     "supertest": "^4.0.2",
     "ts-jest": "^25.1.0",
-    "ts-node": "^8.6.2",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.8.3"
+    "tslint-config-prettier": "^1.18.0"
   }
 }
