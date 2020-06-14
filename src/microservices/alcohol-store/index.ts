@@ -4,7 +4,7 @@ import { Item } from './seeds/beer/item.model';
 import { DatabaseHelper } from '../../common/database';
 import { dbConfig } from '../../config/database.config';
 
-const seed = async (): Promise<void> => {
+const seed = async () => {
   await DatabaseHelper.registerDatabase(dbConfig());
 
   console.log('Purging old data');
@@ -14,6 +14,7 @@ const seed = async (): Promise<void> => {
   await seedBeers();
 
   console.log('Seeding complete!');
+  process.exit(0);
 };
 
 (async () => seed())();
