@@ -1,27 +1,19 @@
-type DatasetBeer = {
-  fields: Beer;
+import { seedBeers } from './seeds/beer/beer.seed';
+import { Repository } from 'mongoize-orm';
+import { Item } from './seeds/beer/item.model';
+import { DatabaseHelper } from '../../common/database';
+import { dbConfig } from '../../config/database.config';
+
+const seed = async (): Promise<void> => {
+  await DatabaseHelper.registerDatabase(dbConfig());
+
+  console.log('Purging old data');
+  await Repository.with(Item).hardDeleteMany({});
+
+  console.log('Starting seed');
+  await seedBeers();
+
+  console.log('Seeding complete!');
 };
 
-type Beer = {
-  abv: number;
-  name: string;
-};
-
-const analyseBeers = async () => {
-  const beers: DatasetBeer[] = require('./dataset/beers.json');
-  const validBeers = beers
-    .filter(
-      (beer: DatasetBeer) =>
-        beer.fields.abv && beer.fields.name && beer.fields.abv > 0
-    )
-    .map(
-      (beer: DatasetBeer): Beer => {
-        return {
-          ...beer.fields,
-          abv: parseInt(String(beer.fields.abv * 100)) / 100
-        };
-      }
-    );
-};
-
-(async () => analyseBeers())();
+(async () => seed())();
