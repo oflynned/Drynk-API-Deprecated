@@ -49,7 +49,7 @@ class UserSchema extends Schema<UserType> {
 
 export class User extends BaseDocument<UserType, UserSchema> {
   static async findInactive(): Promise<User[]> {
-    const date = dateAtTimeAgo({ unit: 'days', value: 30 });
+    const date = dateAtTimeAgo({ unit: 'days', value: 7 });
     return Repository.with(User).findMany({
       createdAt: { $lt: date },
       weight: undefined,
