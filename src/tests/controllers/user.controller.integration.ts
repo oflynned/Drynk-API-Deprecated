@@ -104,19 +104,36 @@ describe('user controller', () => {
       let user: User;
 
       beforeAll(async () => {
-        user = await factory.seed();
+        user = await factory.seed({ weight: 100 });
         req = mockRequest(user, { weight: 90 });
         res = mockResponse();
 
         await UserController.updateUser(req, res);
       });
 
-      it('should return 200', async () => {
+      it('should return 200', () => {
         expect(res.status).toHaveBeenCalledWith(200);
       });
 
       it('should return updated user', async () => {
         expect(res.json).toHaveBeenCalledWith({ ...user.toJson(), weight: 90 });
+      });
+    });
+
+    describe('when payload is banned internally', () => {
+      let user: User;
+
+      beforeAll(async () => {
+        user = await factory.seed({ weight: 100 });
+        req = mockRequest(user, { lastUpdatedAt: new Date(2000), weight: 90 });
+        res = mockResponse();
+
+        await UserController.updateUser(req, res);
+      });
+
+      it('should not update user given lastActiveAt', async () => {
+        await user.refresh();
+        expect(user.toJson().lastActiveAt).not.toEqual(new Date(2000));
       });
     });
 

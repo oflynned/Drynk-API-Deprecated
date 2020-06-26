@@ -25,7 +25,7 @@ export const sitemap = (app: Application): void => {
   app.use('/stats', statsRouter);
 
   // microservices
-  app.use("/search", searchRouter)
+  app.use('/search', searchRouter);
 
   app.use(fallbackRouter);
 

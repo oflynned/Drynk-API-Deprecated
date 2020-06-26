@@ -9,7 +9,10 @@ export interface ItemType extends BaseModelType {
 class ItemSchema extends Schema<ItemType> {
   joiBaseSchema(): object {
     return {
-      abv: Joi.number().required().min(0).max(100),
+      abv: Joi.number()
+        .required()
+        .min(0)
+        .max(100),
       name: Joi.string().required(),
       type: Joi.string().required()
     };

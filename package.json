@@ -5,8 +5,10 @@
   "scripts": {
     "build": "yarn clean && tsc",
     "clean": "rimraf ./dist",
-    "db:migrate": "echo \"todo\"",
-    "db:migration:create": "echo \"todo\"",
+    "db:migrate": "migrate-mongo up",
+    "db:migrate:create": "migrate-mongo create $NAME",
+    "db:migrate:revert": "migrate-mongo down",
+    "db:migrate:status": "migrate-mongo status",
     "lint:code": "prettier --write '**/*.ts' --config ./.prettierrc",
     "lint:dependencies": "node_modules/.bin/ncu -u --semverLevel major && yarn && git add yarn.lock package.json && git commit -m 'auto-update dependencies'",
     "lint:dependencies:check": "node_modules/.bin/ncu -e 2 --semverLevel major",
@@ -21,9 +23,10 @@
     "test:watch": "jest -c jest.config.js --watch"
   },
   "dependencies": {
-    "@sentry/node": "5.17.0",
+    "@sentry/node": "5.18.1",
     "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.12.0",
+    "connection-string-parser": "^1.0.3",
     "cookie-parser": "~1.4.4",
     "cors": "2.8.5",
     "cron": "^1.8.2",
@@ -42,6 +45,8 @@
     "helmet": "latest",
     "http-errors": "~1.6.3",
     "husky": "^4.2.5",
+    "migrate-mongo": "^7.2.1",
+    "migrate-mongo-ts": "^1.0.4",
     "mongoize-orm": "^1.0.6",
     "morgan": "~1.9.1",
     "ts-node": "^8.6.2",
