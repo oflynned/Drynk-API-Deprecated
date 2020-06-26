@@ -10,7 +10,8 @@ module.exports = {
         updatedAt: undefined,
         weight: { $exists: true },
         height: { $exists: true },
-        sex: { $exists: true }
+        sex: { $exists: true },
+        unit: { $exists: true }
       })
       .toArray();
 
