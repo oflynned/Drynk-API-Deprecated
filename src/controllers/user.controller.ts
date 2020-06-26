@@ -2,7 +2,6 @@ import { User } from '../models/user.model';
 import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { BadRequestError } from '../infrastructure/errors';
-import { Repository } from 'mongoize-orm';
 import { SessionService } from '../service/session.service';
 import { Session } from '../models/session.model';
 import { FirebaseHelper } from '../common/firebase';
@@ -34,14 +33,13 @@ export class UserController {
     res: Response
   ): Promise<Response> {
     try {
-      const user = await Repository.with(User).updateOne(
-        req.user.toJson()._id,
-        req.body
-      );
-
+      // a user should not be able to update their own lastActiveAt, it should be internal only
+      const { lastUpdatedAt, ...rest } = req.body;
+      const user = await req.user.update(rest);
       const activeSessions: Session[] = await Session.findActiveByUserId(
         user.toJson()._id
       );
+
       await Promise.all(
         activeSessions.map((session: Session) =>
           SessionService.onSessionEvent(session)
@@ -51,8 +49,8 @@ export class UserController {
       return res.status(200).json(user.toJson());
     } catch (e) {
       throw new BadRequestError(
-        `${e.details.map((e: { message: string }) => e.message) ||
-          'Payload is malformed'}`
+        `${e.details?.map((e: { message: string }) => e.message) ||
+        'Payload is malformed'}`
       );
     }
   }
