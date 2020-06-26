@@ -92,5 +92,3 @@ export class DrinkController {
     return SessionController.getSessionsDrinks(req, res);
   }
 }
-
-import { SessionService } from '../service/session.service';
