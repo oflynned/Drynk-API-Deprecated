@@ -87,7 +87,6 @@ export class DrinkController {
     }
 
     await drink.hardDelete();
-    await SessionService.onSessionEvent(req.session);
     await req.session.refresh();
 
     return SessionController.getSessionsDrinks(req, res);
