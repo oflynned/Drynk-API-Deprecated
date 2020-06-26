@@ -27,12 +27,15 @@ export const withUser = async (
   } as object);
 
   if (user) {
+    await user.updateLastActiveAt();
+    await user.refresh();
     Object.assign(req, { user });
   }
 
   next();
 };
 
+// TODO requireUser & withUser are really similar aside from the operator on user
 export const requireUser = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -47,6 +50,8 @@ export const requireUser = async (
     throw new ResourceNotFoundError();
   }
 
+  await user.updateLastActiveAt();
+  await user.refresh();
   Object.assign(req, { user });
 
   next();

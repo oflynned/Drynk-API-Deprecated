@@ -20,9 +20,10 @@ export interface UserType extends BaseModelType {
   height?: number;
   sex?: Sex;
   unit?: UnitPreference;
+  lastActiveAt?: Date;
 }
 
-class UserSchema extends Schema<UserType> {
+export class UserSchema extends Schema<UserType> {
   joiBaseSchema(): object {
     return {
       name: Joi.string().required(),
@@ -42,14 +43,19 @@ class UserSchema extends Schema<UserType> {
         .min(1)
         .max(999),
       sex: Joi.string().valid('male', 'female'),
-      unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial')
+      unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial'),
+      lastActiveAt: Joi.date()
     };
   }
 }
 
 export class User extends BaseDocument<UserType, UserSchema> {
+  static async findById(id: string): Promise<User> {
+    return Repository.with(User).findById(id);
+  }
+
   static async findInactive(): Promise<User[]> {
-    const date = dateAtTimeAgo({ unit: 'days', value: 30 });
+    const date = dateAtTimeAgo({ unit: 'days', value: 7 });
     return Repository.with(User).findMany({
       createdAt: { $lt: date },
       weight: undefined,
@@ -57,6 +63,14 @@ export class User extends BaseDocument<UserType, UserSchema> {
       unit: undefined,
       sex: undefined
     });
+  }
+
+  async updateLastActiveAt(): Promise<User> {
+    return Repository.with(User).updateOne(
+      this.toJson()._id,
+      { lastActiveAt: new Date() },
+      { validateUpdate: false }
+    );
   }
 
   async softDeleteAndAnonymise(): Promise<User> {
