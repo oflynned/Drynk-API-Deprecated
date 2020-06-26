@@ -35,7 +35,9 @@ export class UserController {
     try {
       // a user should not be able to update their own lastActiveAt, it should be internal only
       const { lastUpdatedAt, ...rest } = req.body;
-      const user = await req.user.update(rest);
+
+      const payload = await req.user.validateUpdate(rest);
+      const user = await req.user.update(payload);
       const activeSessions: Session[] = await Session.findActiveByUserId(
         user.toJson()._id
       );
@@ -50,7 +52,7 @@ export class UserController {
     } catch (e) {
       throw new BadRequestError(
         `${e.details?.map((e: { message: string }) => e.message) ||
-        'Payload is malformed'}`
+          'Payload is malformed'}`
       );
     }
   }
