@@ -1,4 +1,4 @@
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { Repository } from 'mongoize-orm';
 import { Item } from './seeds/beer/item.model';
 import { BadRequestError } from '../../infrastructure/errors';
