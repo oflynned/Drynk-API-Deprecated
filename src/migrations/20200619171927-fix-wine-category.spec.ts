@@ -1,5 +1,4 @@
-// @ts-ignore
-import { up } from './20200619171927-fix-wine-category.ts';
+import { up } from './20200619171927-fix-wine-category';
 import { bindGlobalDatabaseClient, InMemoryClient } from 'mongoize-orm';
 import { DrinkFactory } from '../factories/drink.factory';
 import { Drink } from '../models/drink.model';

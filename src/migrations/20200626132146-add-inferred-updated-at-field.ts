@@ -1,10 +1,11 @@
+import { Db, MongoClient } from 'mongodb';
 import { Drink } from '../models/drink.model';
-import { InternalModelType } from 'mongoize-orm/dist/document/base-document/schema';
+import { User } from '../models/user.model';
 
 const collection = new Drink().collection();
 
 module.exports = {
-  async up(db: any, client: any) {
+  async up(db: Db, client?: MongoClient) {
     // already onboarded users with no updated at timestamp
     const users = await db
       .collection(collection)
@@ -17,7 +18,8 @@ module.exports = {
       .toArray();
 
     await Promise.all(
-      users.map(async ({ _id, createdAt }: InternalModelType) => {
+      users.map(async (user: User) => {
+        const { _id, createdAt } = user.toJson();
         return db
           .collection(collection)
           .updateOne({ _id }, { $set: { updatedAt: createdAt } });
@@ -25,6 +27,6 @@ module.exports = {
     );
   },
 
-  async down(db: any, client: any) {
+  async down(db: Db, client?: MongoClient) {
   }
 };
