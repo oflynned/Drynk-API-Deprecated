@@ -1,5 +1,5 @@
 import { Session } from '../../../../models/session.model';
-import { TimelineEvents } from '../../../../service/session.service';
+import { TimelineEvents } from '../../../../services/session.service';
 import { Repository } from 'mongoize-orm';
 import { sortTimeDescending } from '../../../../models/event.type';
 import { TimelineService } from '../../../../microservices/blood-alcohol-timeline';

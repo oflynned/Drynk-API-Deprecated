@@ -2,7 +2,7 @@ import { User } from '../models/user.model';
 import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { BadRequestError } from '../infrastructure/errors';
-import { SessionService } from '../service/session.service';
+import { SessionService } from '../services/session.service';
 import { Session } from '../models/session.model';
 import { FirebaseHelper } from '../common/firebase';
 

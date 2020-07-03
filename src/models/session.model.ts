@@ -17,7 +17,7 @@ import {
 } from '../common/helpers';
 import { Puke } from './puke.model';
 import { Event, sortTimeAscending } from './event.type';
-import { SessionService } from '../service/session.service';
+import { SessionService } from '../services/session.service';
 import { User } from './user.model';
 
 export interface SessionType extends BaseModelType {
