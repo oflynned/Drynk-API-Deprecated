@@ -2,7 +2,7 @@ import { Session } from '../../models/session.model';
 import { Drink } from '../../models/drink.model';
 import { StatisticsHelper } from './helper';
 import { User } from '../../models/user.model';
-import { SessionService } from '../../service/session.service';
+import { SessionService } from '../../services/session.service';
 import { Point } from '../../common/helpers';
 
 export class OverviewHelper {

@@ -2,7 +2,7 @@ import { NextFunction, Response } from 'express';
 import { Repository } from 'mongoize-orm';
 import { AuthenticatedRequest } from './authenticated.request';
 import { Session } from '../../models/session.model';
-import { SessionService } from '../../service/session.service';
+import { SessionService } from '../../services/session.service';
 import { ResourceNotFoundError } from '../errors';
 
 export const withSession = async (

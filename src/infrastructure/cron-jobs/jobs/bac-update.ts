@@ -2,7 +2,7 @@ import { Session } from '../../../models/session.model';
 import {
   SessionService,
   TimelineEvents
-} from '../../../service/session.service';
+} from '../../../services/session.service';
 import { pubsub, SESSION_UPDATE_AVAILABLE } from '../../graphql/pubsub';
 import { CronJob } from '../cron-job';
 

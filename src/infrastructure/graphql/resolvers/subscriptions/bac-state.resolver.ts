@@ -1,5 +1,5 @@
 import { withFilter } from 'apollo-server-express';
-import { TimelineEvents } from '../../../../service/session.service';
+import { TimelineEvents } from '../../../../services/session.service';
 import { Session } from '../../../../models/session.model';
 import { pubsub, SESSION_UPDATE_AVAILABLE } from '../../pubsub';
 
