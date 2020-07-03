@@ -1,4 +1,3 @@
-// @ts-ignore
 import { up } from './20200703100421-fix-remaining-wine-types';
 import { bindGlobalDatabaseClient, InMemoryClient } from 'mongoize-orm';
 import { DrinkFactory } from '../factories/drink.factory';
@@ -18,7 +17,7 @@ describe('20200703100421-fix-remaining-wine-types', () => {
     beforeEach(async () => {
       await client.dropDatabase();
       await Promise.all([
-        factory.seed({ drinkName: 'Crémant d\'Alsace', drinkType: 'spirit' }),
+        factory.seed({ drinkName: "Crémant d'Alsace", drinkType: 'spirit' }),
         factory.seed({ drinkName: 'ROSE', drinkType: 'spirit' }),
         factory.seed({ drinkName: 'Rose', drinkType: 'spirit' }),
         factory.seed({ drinkName: 'Pinot Blanc', drinkType: 'spirit' })
@@ -46,7 +45,12 @@ describe('20200703100421-fix-remaining-wine-types', () => {
 
     it('should keep drink name intact', async () => {
       const names = drinks.map(drink => drink.toJson().drinkName).sort();
-      expect(names).toEqual(['Crémant d\'Alsace', 'Pinot Blanc', 'ROSE', 'Rose']);
+      expect(names).toEqual([
+        "Crémant d'Alsace",
+        'Pinot Blanc',
+        'ROSE',
+        'Rose'
+      ]);
     });
   });
 });
