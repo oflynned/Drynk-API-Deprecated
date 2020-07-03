@@ -21,8 +21,10 @@
     "./src/**/*.ts"
   ],
   "exclude": [
-    "./src/**/*.{spec,e2e,integration}.ts",
-    "./src/factories",
+    "**/*.spec.ts",
+    "**/*.integration.ts",
+    "**/*.e2e.ts",
+    "**/*/factories",
     "./node_modules"
   ]
 }
