@@ -1,7 +1,7 @@
 import { DrinkFactory } from '../factories/drink.factory';
 
 describe('drink model', () => {
-  const factory: DrinkFactory = DrinkFactory.getInstance();
+  const factory: DrinkFactory = new DrinkFactory();
 
   it('should be validated', async () => {
     await expect(factory.build().validate()).resolves.toBeDefined();

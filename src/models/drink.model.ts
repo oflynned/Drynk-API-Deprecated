@@ -58,6 +58,10 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
 
   private readonly ETHANOL_DENSITY_GRAMS_PER_ML = 0.789; // 0.789 g/ml
 
+  static findMany(query = {}): Promise<Drink[]> {
+    return Repository.with(Drink).findMany(query);
+  }
+
   static findBySessionIds(
     ids: string[],
     sinceStartTime?: Date
