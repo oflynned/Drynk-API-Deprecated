@@ -1,4 +1,4 @@
-import { Drink, DrinkType } from '../../models/drink.model';
+import { Drink, DrinkType } from '../models/drink.model';
 import { commerce, random } from 'faker';
 
 export class DrinkFactory {

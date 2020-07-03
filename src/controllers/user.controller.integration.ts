@@ -1,12 +1,12 @@
-import { UserController } from '../../controllers/user.controller';
-import { User } from '../../models/user.model';
+import { UserController } from './user.controller';
+import { User } from '../models/user.model';
 import { UserFactory } from '../factories/user.factory';
 import {
   bindGlobalDatabaseClient,
   InMemoryClient,
   Repository
 } from 'mongoize-orm';
-import { BadRequestError } from '../../infrastructure/errors';
+import { BadRequestError } from '../infrastructure/errors';
 
 const mockRequest = (user: User, body: object = {}): object => {
   return {

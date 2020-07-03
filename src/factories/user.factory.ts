@@ -1,4 +1,4 @@
-import { User, UserType } from '../../models/user.model';
+import { User, UserType } from '../models/user.model';
 import { name, internet, random } from 'faker';
 
 export class UserFactory {

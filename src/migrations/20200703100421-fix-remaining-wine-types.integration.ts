@@ -1,8 +1,8 @@
 // @ts-ignore
-import { up } from '../../migrations/20200703100421-fix-remaining-wine-types';
+import { up } from './20200703100421-fix-remaining-wine-types';
 import { bindGlobalDatabaseClient, InMemoryClient } from 'mongoize-orm';
 import { DrinkFactory } from '../factories/drink.factory';
-import { Drink } from '../../models/drink.model';
+import { Drink } from '../models/drink.model';
 
 describe('20200703100421-fix-remaining-wine-types', () => {
   const factory: DrinkFactory = new DrinkFactory();
