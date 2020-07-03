@@ -1,4 +1,4 @@
-const UserModel = require('../dist/models/user.model').User;
+const UserModel = require('../src/models/user.model').User;
 const collection = new UserModel().collection();
 
 module.exports = {

@@ -1,4 +1,4 @@
-const DrinkModel = require('../dist/models/drink.model').Drink;
+const DrinkModel = require('../src/models/drink.model').Drink;
 const collection = new DrinkModel().collection();
 
 module.exports = {
