@@ -1,8 +1,9 @@
-const DrinkModel = require('../src/models/drink.model').Drink;
-const collection = new DrinkModel().collection();
+import { Drink } from '../models/drink.model';
+
+const collection = new Drink().collection();
 
 module.exports = {
-  async up(db, client) {
+  async up(db: any, client: any) {
     await db.collection(collection).updateMany(
       {
         drinkName: 'Wine',
@@ -12,7 +13,7 @@ module.exports = {
     );
   },
 
-  async down(db, client) {
+  async down(db: any, client: any) {
     // no need to revert this
   }
 };

@@ -1,5 +1,5 @@
 // @ts-ignore
-import { up } from '../../../migrations/20200703100421-fix-remaining-wine-types';
+import { up } from '../../migrations/20200703100421-fix-remaining-wine-types';
 import { bindGlobalDatabaseClient, InMemoryClient } from 'mongoize-orm';
 import { DrinkFactory } from '../factories/drink.factory';
 import { Drink } from '../../models/drink.model';

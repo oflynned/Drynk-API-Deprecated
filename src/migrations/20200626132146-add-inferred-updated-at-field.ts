@@ -1,8 +1,10 @@
-const UserModel = require('../src/models/user.model').User;
-const collection = new UserModel().collection();
+import { Drink } from '../models/drink.model';
+import { InternalModelType } from 'mongoize-orm/dist/document/base-document/schema';
+
+const collection = new Drink().collection();
 
 module.exports = {
-  async up(db, client) {
+  async up(db: any, client: any) {
     // already onboarded users with no updated at timestamp
     const users = await db
       .collection(collection)
@@ -15,7 +17,7 @@ module.exports = {
       .toArray();
 
     await Promise.all(
-      users.map(async ({ _id, createdAt }) => {
+      users.map(async ({ _id, createdAt }: InternalModelType) => {
         return db
           .collection(collection)
           .updateOne({ _id }, { $set: { updatedAt: createdAt } });
@@ -23,5 +25,6 @@ module.exports = {
     );
   },
 
-  async down(db, client) {}
+  async down(db: any, client: any) {
+  }
 };
