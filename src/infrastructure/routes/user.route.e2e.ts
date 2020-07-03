@@ -1,12 +1,12 @@
 import { agent } from 'supertest';
-import Server from '../../../infrastructure/server';
+import Server from '../server';
 import { UserFactory } from '../../factories/user.factory';
 import {
   bindGlobalDatabaseClient,
   InMemoryClient,
   Repository
 } from 'mongoize-orm';
-import { User } from '../../../models/user.model';
+import { User } from '../../models/user.model';
 
 const request = agent(new Server().build().app);
 const endpoint = '/users';

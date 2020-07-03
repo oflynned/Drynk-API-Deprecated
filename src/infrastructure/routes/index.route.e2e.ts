@@ -1,4 +1,4 @@
-import Server from '../../../infrastructure/server';
+import Server from '../server';
 import { agent } from 'supertest';
 
 const request = agent(new Server().build().app);

@@ -1,12 +1,7 @@
-import { Drink, DrinkType } from '../../models/drink.model';
+import { Drink, DrinkType } from '../models/drink.model';
 import { commerce, random } from 'faker';
 
 export class DrinkFactory {
-  private constructor() {}
-
-  static getInstance(): DrinkFactory {
-    return new DrinkFactory();
-  }
 
   private static drinkType(): string {
     const providers = ['beer', 'wine', 'cocktail', 'spirit'];
@@ -29,5 +24,9 @@ export class DrinkFactory {
   build(overrides?: Partial<DrinkType>): Drink {
     const properties = DrinkFactory.buildProperties(overrides);
     return new Drink().build(properties) as Drink;
+  }
+
+  async seed(overrides?: Partial<DrinkType>): Promise<Drink> {
+    return this.build(overrides).save();
   }
 }
