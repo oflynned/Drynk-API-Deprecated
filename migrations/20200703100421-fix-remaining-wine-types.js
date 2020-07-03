@@ -1,11 +1,11 @@
-const DrinkModel = require('../dist/models/drink.model').Drink;
+const DrinkModel = require('../src/models/drink.model').Drink;
 const collection = new DrinkModel().collection();
 
 module.exports = {
   async up(db, client) {
     await db.collection(collection).updateMany(
       {
-        drinkName: {$in: ["ROSE", "Rose", "Pinot Blanc", "Crémant d'Alsace"]},
+        drinkName: { $in: ['ROSE', 'Rose', 'Pinot Blanc', "Crémant d'Alsace"] }
       },
       { $set: { drinkType: 'wine' } }
     );
