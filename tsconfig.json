@@ -3,7 +3,12 @@
     "target": "es5",
     "module": "commonjs",
     "noImplicitAny": true,
-    "lib": ["es5", "es2015", "es6", "dom"],
+    "lib": [
+      "es5",
+      "es2015",
+      "es6",
+      "dom"
+    ],
     "rootDir": "./src",
     "outDir": "./dist",
     "resolveJsonModule": true,
@@ -12,6 +17,14 @@
     "emitDecoratorMetadata": true,
     "baseUrl": "."
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["./src/tests", "./node_modules", "./assets"]
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.integration.ts",
+    "**/*.e2e.ts",
+    "**/*/factories",
+    "./node_modules"
+  ]
 }

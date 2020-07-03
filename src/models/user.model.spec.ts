@@ -1,5 +1,5 @@
 import { UserFactory } from '../factories/user.factory';
-import { Sex } from '../../common/helpers';
+import { Sex } from '../common/helpers';
 
 describe('user model', () => {
   const factory: UserFactory = UserFactory.getInstance();
