@@ -1,8 +1,8 @@
 import { Session } from '../models/session.model';
 import { User } from '../models/user.model';
 import { Repository } from 'mongoize-orm';
-import { dateAtTimeAgo, MealSize, Point } from '../common/helpers';
-import { TimelineService } from '../microservices/blood-alcohol-timeline/timeline.service';
+import { MealSize, Point } from '../common/helpers';
+import { TimelineService } from '../microservices/blood-alcohol-timeline';
 import { Drunkard } from '../models/drunkard.model';
 import { Timeline } from '../microservices/blood-alcohol-timeline/timeline.model';
 
@@ -25,11 +25,7 @@ export class SessionService {
     mealSize?: MealSize
   ): Promise<Session> {
     // find the latest session within the last 3 hours in case already sober
-    const session: Session = await Repository.with(Session).findOne({
-      userId: user.toJson()._id,
-      soberAt: { $gt: dateAtTimeAgo({ unit: 'hours', value: 3 }) }
-    });
-
+    const session: Session = await Session.findWithinLastHours(user.toJson()._id);
     if (session) {
       return session;
     }
