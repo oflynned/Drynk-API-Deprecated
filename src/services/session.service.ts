@@ -1,8 +1,8 @@
 import { Session } from '../models/session.model';
 import { User } from '../models/user.model';
 import { Repository } from 'mongoize-orm';
-import { dateAtTimeAgo, MealSize, Point } from '../common/helpers';
-import { TimelineService } from '../microservices/blood-alcohol-timeline/timeline.service';
+import { MealSize, Point } from '../common/helpers';
+import { TimelineService } from '../microservices/blood-alcohol-timeline';
 import { Drunkard } from '../models/drunkard.model';
 import { Timeline } from '../microservices/blood-alcohol-timeline/timeline.model';
 
@@ -25,11 +25,7 @@ export class SessionService {
     mealSize?: MealSize
   ): Promise<Session> {
     // find the latest session within the last 3 hours in case already sober
-    const session: Session = await Repository.with(Session).findOne({
-      userId: user.toJson()._id,
-      soberAt: { $gt: dateAtTimeAgo({ unit: 'hours', value: 3 }) }
-    });
-
+    const session: Session = await Session.findWithinLastHours(user.toJson()._id);
     if (session) {
       return session;
     }
@@ -79,9 +75,7 @@ export class SessionService {
     sessions: Session[]
   ): Promise<Point<number, number>[]> {
     const sessionIds = sessions.map((session: Session) => session.toJson()._id);
-    const timelines: Timeline[] = await Repository.with(Timeline).findMany({
-      sessionId: { $in: sessionIds }
-    });
+    const timelines: Timeline[] = await Timeline.findBySessionIds(sessionIds);
     return timelines
       .map((timeline: Timeline) => timeline.dangerousPeaks())
       .flat(1);
@@ -90,14 +84,13 @@ export class SessionService {
   // fetches cached events from generated timeline
   static async fetchTimelineEvents(session: Session): Promise<TimelineEvents> {
     await session.populate();
+    // TODO this syntax is awful, you should switch to Postgres with a Prisma layer
     const drunkard = new Drunkard(
       session,
       session.toJsonWithRelationships().user
     );
-    const timeline = await Repository.with(Timeline).findOne({
-      sessionId: session.toJson()._id
-    });
 
+    const timeline = await Timeline.findBySessionId(session.toJson()._id);
     if (!timeline) {
       throw new Error('Session does not have associated events');
     }

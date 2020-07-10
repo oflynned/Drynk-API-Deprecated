@@ -58,6 +58,13 @@ export interface SessionRelationships extends BaseRelationshipType {
 export class Session extends RelationalDocument<SessionType,
   SessionSchema,
   SessionRelationships> {
+  static async findWithinLastHours(userId: string, hours: number = 3): Promise<Session> {
+    return Repository.with(Session).findOne({
+      userId,
+      soberAt: { $gt: dateAtTimeAgo({ unit: 'hours', value: hours }) }
+    });
+  }
+
   static async findOngoingSessions(): Promise<Session[]> {
     return Repository.with(Session).findMany({
       soberAt: { $gt: new Date() }

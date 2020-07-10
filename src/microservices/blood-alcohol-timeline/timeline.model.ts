@@ -5,7 +5,7 @@ import {
   Repository,
   Schema
 } from 'mongoize-orm';
-import { Point } from '../../common/helpers';
+import { Point, Time } from '../../common/helpers';
 
 export interface TimelineType extends BaseModelType {
   sessionId: string;
@@ -44,6 +44,10 @@ export class Timeline extends BaseDocument<TimelineType, TimelineSchema> {
     return Repository.with(Timeline).findMany({
       sessionId: { $in: sessionIds }
     });
+  }
+
+  static async findBySessionId(sessionId:string):Promise<Timeline> {
+    return Repository.with(Timeline).findOne({ sessionId });
   }
 
   joiSchema(): TimelineSchema {
