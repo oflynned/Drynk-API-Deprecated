@@ -14,7 +14,7 @@ import {
 } from '../middleware/session.middleware';
 import { SessionController } from '../../controllers/session.controller';
 import { DrinkController } from '../../controllers/drink.controller';
-import { SessionService } from '../../service/session.service';
+import { SessionService } from '../../services/session.service';
 import { Session } from '../../models/session.model';
 import { ResourceNotFoundError } from '../errors';
 import { withDevEnvironment } from '../middleware/development.middleware';

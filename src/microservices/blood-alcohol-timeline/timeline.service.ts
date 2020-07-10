@@ -2,7 +2,7 @@ import { Event } from '../../models/event.type';
 import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
 import { DigestService } from './digest.service';
 import { Drunkard } from '../../models/drunkard.model';
-import { TimelineEvents } from '../../service/session.service';
+import { TimelineEvents } from '../../services/session.service';
 import { Session } from '../../models/session.model';
 import { Timeline } from './timeline.model';
 import { Repository } from 'mongoize-orm';

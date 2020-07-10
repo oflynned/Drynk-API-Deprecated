@@ -1,7 +1,14 @@
 import Server from '../server';
 import { agent } from 'supertest';
+import { Container } from '../dependency-injector';
 
-const request = agent(new Server().build().app);
+const mockDi: Container = {
+  orm: {} as any,
+  entityManager: {} as any,
+  alcoholRepository: {} as any
+};
+
+const request = agent(new Server().build(mockDi).app);
 
 describe('/health', () => {
   describe('GET', () => {

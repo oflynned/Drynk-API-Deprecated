@@ -1,19 +1,19 @@
 import { seedBeers } from './seeds/beer/beer.seed';
-import { Repository } from 'mongoize-orm';
-import { Item } from './seeds/beer/item.model';
-import { DatabaseHelper } from '../../common/database';
-import { dbConfig } from '../../config/database.config';
+import { DependencyInjector } from '../../infrastructure/dependency-injector';
 
 const seed = async () => {
-  await DatabaseHelper.registerDatabase(dbConfig());
+  const di = await new DependencyInjector().registerDependents();
 
-  console.log('Purging old data');
-  await Repository.with(Item).hardDeleteMany({});
+  try {
+    console.log('Starting seed');
+    await seedBeers(di.getContainer());
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await di.getContainer().orm.close();
+    console.log('Seeding complete!');
+  }
 
-  console.log('Starting seed');
-  await seedBeers();
-
-  console.log('Seeding complete!');
   process.exit(0);
 };
 

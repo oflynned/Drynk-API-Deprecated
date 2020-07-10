@@ -7,8 +7,15 @@ import {
   Repository
 } from 'mongoize-orm';
 import { User } from '../../models/user.model';
+import { Container } from '../dependency-injector';
 
-const request = agent(new Server().build().app);
+const mockDi: Container = {
+  orm: {} as any,
+  entityManager: {} as any,
+  alcoholRepository: {} as any
+};
+
+const request = agent(new Server().build(mockDi).app);
 const endpoint = '/users';
 
 describe(endpoint, () => {

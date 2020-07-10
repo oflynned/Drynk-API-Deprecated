@@ -17,7 +17,7 @@ import {
 } from '../common/helpers';
 import { Puke } from './puke.model';
 import { Event, sortTimeAscending } from './event.type';
-import { SessionService } from '../service/session.service';
+import { SessionService } from '../services/session.service';
 import { User } from './user.model';
 
 export interface SessionType extends BaseModelType {
@@ -55,11 +55,16 @@ export interface SessionRelationships extends BaseRelationshipType {
   user: User;
 }
 
-export class Session extends RelationalDocument<
-  SessionType,
+export class Session extends RelationalDocument<SessionType,
   SessionSchema,
-  SessionRelationships
-> {
+  SessionRelationships> {
+  static async findWithinLastHours(userId: string, hours: number = 3): Promise<Session> {
+    return Repository.with(Session).findOne({
+      userId,
+      soberAt: { $gt: dateAtTimeAgo({ unit: 'hours', value: hours }) }
+    });
+  }
+
   static async findOngoingSessions(): Promise<Session[]> {
     return Repository.with(Session).findMany({
       soberAt: { $gt: new Date() }
@@ -72,6 +77,18 @@ export class Session extends RelationalDocument<
 
   static async findByUserId(userId: string): Promise<Session[]> {
     return Repository.with(Session).findMany({ userId });
+  }
+
+  static async findWithinLastWeek(userId: string, populate = true): Promise<Session[]> {
+    return Repository.with(
+      Session
+    ).findMany(
+      {
+        userId,
+        createdAt: { $gt: dateAtTimeAgo({ unit: 'days', value: 7 }) }
+      },
+      { populate }
+    );
   }
 
   static async findActiveByUserId(userId: string): Promise<Session[]> {

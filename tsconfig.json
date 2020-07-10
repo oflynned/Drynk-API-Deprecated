@@ -25,6 +25,7 @@
     "**/*.integration.ts",
     "**/*.e2e.ts",
     "**/*/factories",
+    "**/*/scripts",
     "./node_modules"
   ]
 }
