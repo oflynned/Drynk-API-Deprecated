@@ -6,17 +6,19 @@ import drinksRouter from '../routes/drinks.route';
 import sessionRouter from '../routes/session.route';
 import userRouter from '../routes/user.route';
 import statsRouter from '../routes/stats.route';
-import searchRouter from '../../microservices/alcohol-store/search.route';
+import { searchRoute } from '../../microservices/alcohol-store/search.route';
 import fallbackRouter from '../routes/fallback.route';
 
 import { HttpError, HttpErrorType } from '../errors/http.error';
 import { Logger } from '../../common/logger';
 import { SentryHelper } from '../../common/sentry';
 import { Environment } from '../../config/environment';
+import { SearchController } from '../../microservices/alcohol-store/search.controller';
+import { Container } from '../dependency-injector';
 
 const logger: Logger = Logger.getInstance('api.infrastructure.sitemap');
 
-export const sitemap = (app: Application): void => {
+export const sitemap = (app: Application, di: Container): void => {
   app.use('/', indexRouter);
   app.use('/privacy', privacyRouter);
   app.use('/drinks', drinksRouter);
@@ -25,7 +27,8 @@ export const sitemap = (app: Application): void => {
   app.use('/stats', statsRouter);
 
   // microservices
-  app.use('/search', searchRouter);
+  const controller = new SearchController(di.entityManager, di.alcoholRepository);
+  app.use('/search', searchRoute(controller));
 
   app.use(fallbackRouter);
 
@@ -37,13 +40,13 @@ export const sitemap = (app: Application): void => {
       next: NextFunction
     ) => {
       if (Environment.isProduction()) {
-        logger.error(internalError.name)
+        logger.error(internalError.name);
 
         if (internalError.status >= 500) {
           SentryHelper.captureException(internalError);
         }
       } else {
-        logger.error("A stacktrace happened!")
+        logger.error('A stacktrace happened!');
         console.error(internalError);
       }
 
