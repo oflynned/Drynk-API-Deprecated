@@ -12,7 +12,7 @@ export const config: Options = {
   entitiesDirsTs: ['./src/**/entities'],
   debug: !Environment.isProduction(),
   type: 'postgresql',
-  clientUrl: process.env.DATABASE_URI
+  clientUrl: process.env.DATABASE_URL
 };
 
 export default config;
