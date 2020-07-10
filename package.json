@@ -8,6 +8,7 @@
     "db:dump:clean": "rimraf ./dump",
     "db:dump:create": "ts-node ./src/scripts/dump-db.script.ts",
     "db:dump:restore": "ts-node ./src/scripts/restore-db.script.ts",
+    "db:initialise": "ts-node ./src/common/mikro-orm.ts",
     "db:migrate": "migrate-mongo up",
     "db:migrate:create": "migrate-mongo create $NAME",
     "db:migrate:revert": "migrate-mongo down",
