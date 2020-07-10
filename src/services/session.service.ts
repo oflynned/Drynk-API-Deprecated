@@ -79,9 +79,7 @@ export class SessionService {
     sessions: Session[]
   ): Promise<Point<number, number>[]> {
     const sessionIds = sessions.map((session: Session) => session.toJson()._id);
-    const timelines: Timeline[] = await Repository.with(Timeline).findMany({
-      sessionId: { $in: sessionIds }
-    });
+    const timelines: Timeline[] = await Timeline.findBySessionIds(sessionIds);
     return timelines
       .map((timeline: Timeline) => timeline.dangerousPeaks())
       .flat(1);
@@ -90,14 +88,13 @@ export class SessionService {
   // fetches cached events from generated timeline
   static async fetchTimelineEvents(session: Session): Promise<TimelineEvents> {
     await session.populate();
+    // TODO this syntax is awful, you should switch to Postgres with a Prisma layer
     const drunkard = new Drunkard(
       session,
       session.toJsonWithRelationships().user
     );
-    const timeline = await Repository.with(Timeline).findOne({
-      sessionId: session.toJson()._id
-    });
 
+    const timeline = await Timeline.findBySessionId(session.toJson()._id);
     if (!timeline) {
       throw new Error('Session does not have associated events');
     }
