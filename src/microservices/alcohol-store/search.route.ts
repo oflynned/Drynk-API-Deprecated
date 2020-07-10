@@ -5,17 +5,13 @@ import { SearchController } from './search.controller';
 
 export type SearchRequest = Request & { query: { title: string } };
 
-const routes = (): Router => {
+export const searchRoute = (controller: SearchController): Router => {
   const router = Router();
 
   router.get(
     '/',
-    asyncHandler(async (req: SearchRequest, res: Response) =>
-      SearchController.search(req, res)
-    )
+    asyncHandler(async (req: SearchRequest, res: Response) => controller.get(req, res))
   );
 
   return router;
 };
-
-export default routes();
