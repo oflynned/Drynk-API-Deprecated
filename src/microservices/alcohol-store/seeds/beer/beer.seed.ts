@@ -25,7 +25,7 @@ export const seedBeers = async (di: Container) => {
 
   await di.alcoholRepository.nativeDelete({});
 
-  validBeers.map(({ abv, name, type }: ItemType) => {
+  validBeers.forEach(({ abv, name, type }: ItemType) => {
     const alcohol = new Alcohol(abv, name, type);
     di.entityManager.persistLater(alcohol);
   });
