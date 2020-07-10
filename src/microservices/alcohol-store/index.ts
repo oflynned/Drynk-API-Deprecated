@@ -4,6 +4,9 @@ import { DependencyInjector } from '../../infrastructure/dependency-injector';
 const seed = async () => {
   const di = await new DependencyInjector().registerDependents();
 
+  // ensure tables exist
+  await di.getContainer().orm.getSchemaGenerator().createSchema(false)
+
   try {
     console.log('Starting seed');
     await seedBeers(di.getContainer());
