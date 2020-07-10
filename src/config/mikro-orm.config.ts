@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import { MikroORM, Options } from 'mikro-orm';
 import { Alcohol } from '../microservices/alcohol-store/entities/alcohol.entity';
 import { Base } from '../models/entities/base.entity';
@@ -10,7 +12,7 @@ export const config: Options = {
   entitiesDirsTs: ['./src/**/entities'],
   debug: !Environment.isProduction(),
   type: 'postgresql',
-  clientUrl: process.env.DATABASE_URI || 'postgresql://postgres@localhost:5432/drynk'
+  clientUrl: process.env.DATABASE_URI
 };
 
 export default config;
