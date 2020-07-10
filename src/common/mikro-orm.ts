@@ -17,10 +17,10 @@ import { bootstrapMikro } from '../config/mikro-orm.config';
   const dropAndCreateDump = await generator.generate();
   console.log(dropAndCreateDump);
 
-  // or you can run those queries directly, but be sure to check them first!
-  await generator.dropSchema();
-  await generator.createSchema();
-  await generator.updateSchema();
+  // // or you can run those queries directly, but be sure to check them first!
+  // await generator.dropSchema();
+  // await generator.createSchema();
+  // await generator.updateSchema();
 
   await orm.close(true);
 })();
