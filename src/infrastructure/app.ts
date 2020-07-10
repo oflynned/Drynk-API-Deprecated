@@ -11,21 +11,23 @@ import { serverConfig } from '../config/server.config';
 import { SentryHelper } from '../common/sentry';
 import { FirebaseHelper } from '../common/firebase';
 import { DatabaseHelper } from '../common/database';
+import { DependencyInjector } from './dependency-injector';
 
 export class App {
-  private constructor() {}
-
-  static getInstance(): App {
-    return new App();
-  }
-
   async start(): Promise<http.Server> {
+    // postgres
+    const di = await new DependencyInjector().registerDependents();
+
+    // mongodb -- to be deprecated
     await DatabaseHelper.registerDatabase(dbConfig());
+
+    // other services
     FirebaseHelper.registerFirebase(firebaseConfig());
     SentryHelper.registerSentry(sentryConfig());
 
-    return new Server().build().listen(serverConfig().port);
+    const server = await new Server().build(di.getContainer());
+    return server.listen(serverConfig().port);
   }
 }
 
-(async () => await App.getInstance().start())();
+(async () => new App().start())();
