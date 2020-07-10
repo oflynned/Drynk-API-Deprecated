@@ -50,8 +50,10 @@
     "husky": "^4.2.5",
     "migrate-mongo": "^7.2.1",
     "migrate-mongo-ts": "^1.0.4",
+    "mikro-orm": "^3.6.15",
     "mongoize-orm": "^1.0.6",
     "morgan": "~1.9.1",
+    "pg": "^8.3.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.8.3",
     "typescript-logging": "^0.6.4"
@@ -90,5 +92,12 @@
     "supertest": "^4.0.2",
     "ts-jest": "^25.1.0",
     "tslint-config-prettier": "^1.18.0"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/config/mikro-orm.config.ts",
+      "./dist/config/mikro-orm.config.js"
+    ]
   }
 }
