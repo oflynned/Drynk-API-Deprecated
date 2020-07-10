@@ -12,6 +12,7 @@ import {
   Time,
   Volume
 } from '../common/helpers';
+import { InternalModelType } from 'mongoize-orm/dist/document/base-document/schema';
 
 export interface DrinkType extends BaseModelType {
   volume: number;
@@ -81,7 +82,7 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   ethanolVolume(unit: Volume): MeasureType<Volume> {
-    const mls = (this.toJson().abv / 100) * this.toJson().volume;
+    const mls = (this.record.abv / 100) * this.record.volume;
 
     if (unit === 'ml') {
       return {
@@ -104,12 +105,22 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   units(): number {
-    return (this.toJson().volume * this.toJson().abv) / 1000;
+    return (this.record.volume * this.record.abv) / 1000;
   }
 
   calories(): number {
     // 7 kcal per 1g of ethanol
     return parseInt(String(this.ethanolMass().value * 7));
+  }
+
+  toJson(): DrinkType & InternalModelType & any {
+    return {
+      ...this.record,
+      units: this.units(),
+      calories: this.calories(),
+      standardDrinks: this.standardDrinks(),
+      ethanolMass: this.ethanolMass().value
+    };
   }
 
   ethanolMass(): MeasureType<Mass> {
@@ -126,7 +137,7 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
   }
 
   timeSinceDrink(time: Time): MeasureType<Time> {
-    const timeSinceDrink = Date.now() - this.toJson().createdAt.getTime();
+    const timeSinceDrink = Date.now() - this.record.createdAt.getTime();
 
     if (time === 'hours') {
       return {

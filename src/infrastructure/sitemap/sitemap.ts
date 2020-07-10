@@ -37,11 +37,13 @@ export const sitemap = (app: Application): void => {
       next: NextFunction
     ) => {
       if (Environment.isProduction()) {
+        logger.error(internalError.name)
+
         if (internalError.status >= 500) {
-          // TODO tune this as necessary to prevent excess noise
           SentryHelper.captureException(internalError);
         }
       } else {
+        logger.error("A stacktrace happened!")
         console.error(internalError);
       }
 
