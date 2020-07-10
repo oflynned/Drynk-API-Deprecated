@@ -1,10 +1,12 @@
-import { Item, ItemType } from './item.model';
+import { ItemType } from './item.model';
+import { Container } from '../../../../infrastructure/dependency-injector';
+import { Alcohol } from '../../entities/alcohol.entity';
 
 type BeerType = {
   fields: ItemType;
 };
 
-export const seedBeers = async () => {
+export const seedBeers = async (di: Container) => {
   const beers: BeerType[] = require('./beers.json');
   const validBeers = beers
     .filter(
@@ -21,10 +23,12 @@ export const seedBeers = async () => {
       }
     );
 
-  await Promise.all(
-    validBeers.map(async (beer: ItemType, index: number) => {
-      console.log(`Seeding ${index + 1}/${validBeers.length}`);
-      await new Item().build(beer).save();
-    })
-  );
+  await di.alcoholRepository.nativeDelete({});
+
+  validBeers.map(({ abv, name, type }: ItemType) => {
+    const alcohol = new Alcohol(abv, name, type);
+    di.entityManager.persistLater(alcohol);
+  });
+
+  await di.entityManager.flush();
 };
