@@ -50,6 +50,11 @@ export class StatsController {
       throw new ResourceNotFoundError();
     }
 
+    const sessionsEver: Session[] = await Session.findByUserId(req.user.toJson()._id)
+    if (sessionsEver.length === 0) {
+      return res.status(204).send();
+    }
+
     const sessionsInLastWeek: Session[] = await Repository.with(
       Session
     ).findMany(
@@ -59,10 +64,6 @@ export class StatsController {
       },
       { populate: true }
     );
-
-    if (sessionsInLastWeek.length === 0) {
-      return res.status(204).send();
-    }
 
     const overview = await OverviewHelper.overview(
       req.user,
