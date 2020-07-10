@@ -55,11 +55,9 @@ export interface SessionRelationships extends BaseRelationshipType {
   user: User;
 }
 
-export class Session extends RelationalDocument<
-  SessionType,
+export class Session extends RelationalDocument<SessionType,
   SessionSchema,
-  SessionRelationships
-> {
+  SessionRelationships> {
   static async findOngoingSessions(): Promise<Session[]> {
     return Repository.with(Session).findMany({
       soberAt: { $gt: new Date() }
@@ -72,6 +70,18 @@ export class Session extends RelationalDocument<
 
   static async findByUserId(userId: string): Promise<Session[]> {
     return Repository.with(Session).findMany({ userId });
+  }
+
+  static async findWithinLastWeek(userId: string, populate = true): Promise<Session[]> {
+    return Repository.with(
+      Session
+    ).findMany(
+      {
+        userId,
+        createdAt: { $gt: dateAtTimeAgo({ unit: 'days', value: 7 }) }
+      },
+      { populate }
+    );
   }
 
   static async findActiveByUserId(userId: string): Promise<Session[]> {

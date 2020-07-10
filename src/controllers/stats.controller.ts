@@ -50,20 +50,7 @@ export class StatsController {
       throw new ResourceNotFoundError();
     }
 
-    const sessionsInLastWeek: Session[] = await Repository.with(
-      Session
-    ).findMany(
-      {
-        userId: req.user.toJson()._id,
-        createdAt: { $gt: dateAtTimeAgo({ unit: 'days', value: 7 }) }
-      },
-      { populate: true }
-    );
-
-    if (sessionsInLastWeek.length === 0) {
-      return res.status(204).send();
-    }
-
+    const sessionsInLastWeek: Session[] = await Session.findWithinLastWeek(req.user.toJson()._id);
     const overview = await OverviewHelper.overview(
       req.user,
       sessionsInLastWeek
