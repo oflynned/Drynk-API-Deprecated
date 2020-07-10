@@ -25,7 +25,7 @@ export class App {
     FirebaseHelper.registerFirebase(firebaseConfig());
     SentryHelper.registerSentry(sentryConfig());
 
-    const server = await new Server().build(di.getContainer());
+    const server = new Server().build(di.getContainer());
     return server.listen(serverConfig().port);
   }
 }

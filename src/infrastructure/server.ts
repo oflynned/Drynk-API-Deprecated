@@ -23,7 +23,7 @@ export class Server {
     return this._app;
   }
 
-  async build(di: Container): Promise<Server> {
+  build(di: Container): Server {
     const app = express();
     app.use(morgan('combined'));
     app.use(bodyParser.json());
