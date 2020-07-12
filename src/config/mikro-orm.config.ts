@@ -15,7 +15,9 @@ export const config: Options = {
   clientUrl: process.env.DATABASE_URL,
   driverOptions: {
     connection: {
-      ssl: true
+      ssl: {
+        rejectUnauthorized: false
+      }
     }
   }
 };
