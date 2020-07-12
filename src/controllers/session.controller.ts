@@ -139,9 +139,7 @@ export class SessionController {
       const currentState = await SessionService.fetchTimelineEvents(
         req.session
       );
-      return res
-        .status(200)
-        .json({ ...currentState, sessionId: req.session.toJson()._id });
+      return res.status(200).json(currentState);
     } catch (e) {
       throw new ResourceNotFoundError();
     }

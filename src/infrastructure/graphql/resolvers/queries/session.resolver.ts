@@ -13,14 +13,19 @@ export const sessionResolvers = {
     const sessions: Session[] = await Session.findByUserId(args.userId);
     // TODO this is inefficient, offload this to the query
     const mostRecentSession = sessions.sort(sortTimeDescending)[0];
-    const timeline = await TimelineService.fetchSessionTimeline(mostRecentSession);
+    const timeline = await TimelineService.fetchSessionTimeline(
+      mostRecentSession
+    );
 
     if (!timeline) {
       throw new ResourceNotFoundError();
     }
 
     const estimatedEventStates: TimelineEvents = await TimelineService.getInstance(
-      new Drunkard(mostRecentSession, mostRecentSession.toJsonWithRelationships().user)
+      new Drunkard(
+        mostRecentSession,
+        mostRecentSession.toJsonWithRelationships().user
+      )
     ).estimateEventTimes(timeline.toJson().series);
 
     return {
