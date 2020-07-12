@@ -2,7 +2,6 @@ import { Drink, DrinkType } from '../models/drink.model';
 import { commerce, random } from 'faker';
 
 export class DrinkFactory {
-
   private static drinkType(): string {
     const providers = ['beer', 'wine', 'cocktail', 'spirit'];
     return providers[Math.floor(Math.random() * providers.length)];

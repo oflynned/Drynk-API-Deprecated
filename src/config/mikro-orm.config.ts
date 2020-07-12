@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config();
 
 import { MikroORM, Options } from 'mikro-orm';
 import { Alcohol } from '../microservices/alcohol-store/entities/alcohol.entity';

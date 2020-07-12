@@ -1,4 +1,4 @@
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient } from 'mongodb';
 import { Drink } from '../models/drink.model';
 
 const collection = new Drink().collection();

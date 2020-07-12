@@ -3,10 +3,10 @@ import { Alcohol } from '../../microservices/alcohol-store/entities/alcohol.enti
 import { EntityManager, EntityRepository, MikroORM } from 'mikro-orm';
 
 export type Container = {
-  orm: MikroORM,
-  entityManager: EntityManager,
-  alcoholRepository: EntityRepository<Alcohol>
-}
+  orm: MikroORM;
+  entityManager: EntityManager;
+  alcoholRepository: EntityRepository<Alcohol>;
+};
 
 export class DependencyInjector {
   private container = {} as Container;

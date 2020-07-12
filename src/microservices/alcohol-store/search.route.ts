@@ -10,7 +10,9 @@ export const searchRoute = (controller: SearchController): Router => {
 
   router.get(
     '/',
-    asyncHandler(async (req: SearchRequest, res: Response) => controller.get(req, res))
+    asyncHandler(async (req: SearchRequest, res: Response) =>
+      controller.get(req, res)
+    )
   );
 
   return router;
