@@ -46,7 +46,7 @@ export class Timeline extends BaseDocument<TimelineType, TimelineSchema> {
     });
   }
 
-  static async findBySessionId(sessionId:string):Promise<Timeline> {
+  static async findBySessionId(sessionId: string): Promise<Timeline> {
     return Repository.with(Timeline).findOne({ sessionId });
   }
 

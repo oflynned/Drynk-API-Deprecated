@@ -25,7 +25,9 @@ export class SessionService {
     mealSize?: MealSize
   ): Promise<Session> {
     // find the latest session within the last 3 hours in case already sober
-    const session: Session = await Session.findWithinLastHours(user.toJson()._id);
+    const session: Session = await Session.findWithinLastHours(
+      user.toJson()._id
+    );
     if (session) {
       return session;
     }

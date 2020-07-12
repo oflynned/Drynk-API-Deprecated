@@ -28,6 +28,5 @@ module.exports = {
     );
   },
 
-  async down(db: Db, client?: MongoClient) {
-  }
+  async down(db: Db, client?: MongoClient) {}
 };

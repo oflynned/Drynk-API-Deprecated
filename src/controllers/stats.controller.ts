@@ -50,7 +50,9 @@ export class StatsController {
       throw new ResourceNotFoundError();
     }
 
-    const sessionsInLastWeek: Session[] = await Session.findWithinLastWeek(req.user.toJson()._id);
+    const sessionsInLastWeek: Session[] = await Session.findWithinLastWeek(
+      req.user.toJson()._id
+    );
     const overview = await OverviewHelper.overview(
       req.user,
       sessionsInLastWeek
