@@ -27,10 +27,7 @@ export const sitemap = (app: Application, di: Container): void => {
   app.use('/stats', statsRouter);
 
   // microservices
-  const controller = new SearchController(
-    di.entityManager,
-    di.alcoholRepository
-  );
+  const controller = new SearchController(di.alcoholRepository);
   app.use('/search', searchRoute(controller));
 
   app.use(fallbackRouter);

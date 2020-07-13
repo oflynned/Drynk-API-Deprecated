@@ -8,8 +8,8 @@ import { Alcohol } from './entities/alcohol.entity';
 export class SearchController {
   private alcoholService: AlcoholService;
 
-  constructor(entityManager: EntityManager, repo: EntityRepository<Alcohol>) {
-    this.alcoholService = new AlcoholService(entityManager, repo);
+  constructor(repo: EntityRepository<Alcohol>) {
+    this.alcoholService = new AlcoholService(repo);
   }
 
   async get(req: SearchRequest, res: Response): Promise<Response> {
