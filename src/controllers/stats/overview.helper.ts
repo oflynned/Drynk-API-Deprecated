@@ -11,7 +11,7 @@ export class OverviewHelper {
     const dangerousPeaks: Point<
       number,
       number
-    >[] = await SessionService.fetchBloodAlcoholPeaks(sessions);
+    >[] = await SessionService.getBloodAlcoholPeaks(sessions);
     return {
       user: user.toJson(),
       units: await StatisticsHelper.intakeOverviewOverDays(user, drinks, 7),
