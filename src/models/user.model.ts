@@ -44,7 +44,8 @@ export class UserSchema extends Schema<UserType> {
         .max(999),
       sex: Joi.string().valid('male', 'female'),
       unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial'),
-      lastActiveAt: Joi.date()
+      lastActiveAt: Joi.date(),
+      pushToken: Joi.string()
     };
   }
 }
