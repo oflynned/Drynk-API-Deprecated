@@ -1,4 +1,4 @@
-import { Entity, Index, Property, Unique } from 'mikro-orm';
+import { Entity, Index, Property } from 'mikro-orm';
 import { Base } from '../../../models/entities/base.entity';
 
 @Entity()
@@ -11,12 +11,16 @@ export class Alcohol extends Base {
   name: string;
 
   @Property()
+  style: string;
+
+  @Property()
   type: string;
 
-  constructor(abv: number, name: string, type: string) {
+  constructor(abv: number, name: string, style: string, type: string) {
     super();
     this.abv = abv;
     this.name = name;
+    this.style = style;
     this.type = type;
   }
 }
