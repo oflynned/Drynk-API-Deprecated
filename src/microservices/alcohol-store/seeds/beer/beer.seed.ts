@@ -23,6 +23,11 @@ export const seedBeers = async (di: Container) => {
       }
     );
 
+  if (await di.alcoholRepository.count({}) > 0) {
+    console.log('Seeding was already run before');
+    return;
+  }
+
   await di.alcoholRepository.nativeDelete({});
 
   validBeers.forEach(({ abv, name, type }: ItemType) => {
