@@ -21,7 +21,7 @@ class StatsController {
     ).findMany({ userId: req.user.toJson()._id }, { populate: true });
 
     if (sessionsInAllTime.length === 0) {
-      return res.status(204);
+      return res.status(204).send();
     }
 
     const drinksInAllTime: Drink[] = StatisticsHelper.flattenSessionDrinks(

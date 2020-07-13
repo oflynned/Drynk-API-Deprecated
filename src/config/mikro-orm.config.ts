@@ -12,7 +12,14 @@ export const config: Options = {
   entitiesDirsTs: ['./src/**/entities'],
   debug: !Environment.isProduction(),
   type: 'postgresql',
-  clientUrl: process.env.DATABASE_URL
+  clientUrl: process.env.DATABASE_URL,
+  driverOptions: {
+    connection: {
+      ssl: {
+        rejectUnauthorized: false
+      }
+    }
+  }
 };
 
 export default config;

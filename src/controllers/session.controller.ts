@@ -136,7 +136,7 @@ export class SessionController {
     res: Response
   ): Promise<Response> {
     try {
-      const currentState = await SessionService.fetchTimelineEvents(
+      const currentState = await SessionService.getTimelineEvents(
         req.session
       );
       return res.status(200).json(currentState);

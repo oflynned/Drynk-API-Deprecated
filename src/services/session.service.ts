@@ -73,7 +73,7 @@ export class SessionService {
     );
   }
 
-  static async fetchBloodAlcoholPeaks(
+  static async getBloodAlcoholPeaks(
     sessions: Session[]
   ): Promise<Point<number, number>[]> {
     const sessionIds = sessions.map((session: Session) => session.toJson()._id);
@@ -84,7 +84,7 @@ export class SessionService {
   }
 
   // fetches cached events from generated timeline
-  static async fetchTimelineEvents(session: Session): Promise<TimelineEvents> {
+  static async getTimelineEvents(session: Session): Promise<TimelineEvents> {
     await session.populate();
     // TODO this syntax is awful, you should switch to Postgres with a Prisma layer
     const drunkard = new Drunkard(

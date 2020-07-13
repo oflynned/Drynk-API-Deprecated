@@ -15,7 +15,7 @@ export class BacUpdateJob extends CronJob {
 
     await Promise.all(
       activeSessions.map(async (session: Session) => {
-        const timelineEvents: TimelineEvents = await SessionService.fetchTimelineEvents(
+        const timelineEvents: TimelineEvents = await SessionService.getTimelineEvents(
           session
         );
 
