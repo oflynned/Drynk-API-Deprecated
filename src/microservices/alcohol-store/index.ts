@@ -11,6 +11,8 @@ const seed = async () => {
     console.log('Starting seed');
 
     await container.alcoholRepository.nativeDelete({});
+    await container.orm.getSchemaGenerator().dropSchema();
+
     await new OpenBeerDatabaseSeed().run(container);
     await new CraftBeerDatabaseSeed().run(container);
     await new KaggleDatabaseSeed().run(container);
