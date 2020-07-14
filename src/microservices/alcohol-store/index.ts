@@ -10,7 +10,9 @@ const seed = async () => {
   try {
     console.log('Starting seed');
 
-    await container.alcoholRepository.nativeDelete({});
+    if (await container.alcoholRepository.count({}) > 0) {
+      await container.alcoholRepository.nativeDelete({});
+    }
 
     await new OpenBeerDatabaseSeed().run(container);
     await new CraftBeerDatabaseSeed().run(container);
