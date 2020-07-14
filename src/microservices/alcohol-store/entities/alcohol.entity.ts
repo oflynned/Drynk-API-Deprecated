@@ -10,7 +10,7 @@ export class Alcohol extends Base {
   @Property()
   name: string;
 
-  @Property()
+  @Property({ nullable: true })
   style: string;
 
   @Property()
