@@ -29,7 +29,7 @@
     "test:watch": "jest -c jest.config.js --watch"
   },
   "dependencies": {
-    "@sentry/node": "5.19.1",
+    "@sentry/node": "5.19.2",
     "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.12.0",
     "connection-string-parser": "^1.0.3",
