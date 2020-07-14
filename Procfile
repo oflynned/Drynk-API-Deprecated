@@ -1,2 +1,2 @@
-release: yarn db:initialise && yarn db:migrate && yarn seed:store
+release: sh ./db/initialise-postgres.sh && yarn db:mongo:migrate
 web: yarn start:prod
