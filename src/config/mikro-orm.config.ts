@@ -11,20 +11,18 @@ const baseConfig: Options = {
   entities: [Base, Alcohol],
   entitiesDirsTs: ['./src/**/entities'],
   type: 'postgresql',
-  clientUrl: process.env.DATABASE_URL,
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD
+  clientUrl: process.env.DATABASE_URL
 };
 
 const devConfig: Partial<Options> = {
-  debug: true
-  // driverOptions: {
-  //   connection: {
-  //     ssl: {
-  //       rejectUnauthorized: false
-  //     }
-  //   }
-  // }
+  debug: true,
+  driverOptions: {
+    connection: {
+      ssl: {
+        rejectUnauthorized: false
+      }
+    }
+  }
 };
 
 const prodConfig: Partial<Options> = {
@@ -36,5 +34,7 @@ export const config: Options = {
   ...devConfig
   // ...(Environment.isProduction() ? prodConfig : devConfig)
 };
+
+console.log(config)
 
 export default config;
