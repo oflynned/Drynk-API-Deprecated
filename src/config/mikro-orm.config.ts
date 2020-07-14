@@ -7,15 +7,17 @@ import { Environment } from './environment';
 
 export const bootstrapMikro = (): Promise<MikroORM> => MikroORM.init(config);
 
-const baseConfig = {
+const baseConfig: Options = {
   entities: [Base, Alcohol],
   entitiesDirsTs: ['./src/**/entities'],
   type: 'postgresql',
-  clientUrl: process.env.DATABASE_URL
+  clientUrl: process.env.DATABASE_URL,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD
 };
 
-const devConfig = {
-  debug: true,
+const devConfig: Partial<Options> = {
+  debug: true
   // driverOptions: {
   //   connection: {
   //     ssl: {
@@ -25,7 +27,7 @@ const devConfig = {
   // }
 };
 
-const prodConfig = {
+const prodConfig: Partial<Options> = {
   debug: false
 };
 
