@@ -19,8 +19,6 @@
     "lint:package": "sort-package-json",
     "lint:staged": "pretty-quick --staged",
     "seed:store": "ts-node ./src/microservices/alcohol-store/index.ts",
-    "seed:beer:store": "ts-node src/microservices/alcohol-store/seeds/open-beer/beer.seed.ts",
-    "seed:kaggle:store": "ts-node ./src/microservices/alcohol-store/seeds/kaggle-beer/kaggle-beer.seed.ts",
     "start:dev": "NODE_ENV=development nodemon ./src/infrastructure/app.ts",
     "start:prod": "NODE_ENV=production node ./dist/infrastructure/app.js",
     "test": "jest -c jest.config.js",
