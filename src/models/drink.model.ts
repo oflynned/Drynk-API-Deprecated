@@ -27,6 +27,7 @@ export class DrinkSchema extends Schema<DrinkType> {
     return {
       volume: Joi.number()
         .min(1)
+        .max(10000)
         .required(),
       abv: Joi.number()
         .min(0)
