@@ -31,10 +31,7 @@ const prodConfig: Partial<Options> = {
 
 export const config: Options = {
   ...baseConfig,
-  ...devConfig
-  // ...(Environment.isProduction() ? prodConfig : devConfig)
+  ...(Environment.isProduction() ? prodConfig : devConfig)
 };
-
-console.log(config)
 
 export default config;

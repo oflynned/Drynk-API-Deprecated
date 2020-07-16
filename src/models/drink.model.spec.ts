@@ -55,6 +55,12 @@ describe('drink model', () => {
         factory.build({ volume: 0 }).validate()
       ).rejects.toThrowError(/must be larger than or equal to 1/);
     });
+
+    it('should be below 10L', async () => {
+      await expect(
+        factory.build({ volume: 10001 }).validate()
+      ).rejects.toThrowError(/must be less than or equal to 10000/);
+    });
   });
 
   describe('.sessionId', () => {
