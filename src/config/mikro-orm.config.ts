@@ -11,11 +11,7 @@ const baseConfig: Options = {
   entities: [Base, Alcohol],
   entitiesDirsTs: ['./src/**/entities'],
   type: 'postgresql',
-  clientUrl: process.env.DATABASE_URL
-};
-
-const devConfig: Partial<Options> = {
-  debug: true,
+  clientUrl: process.env.DATABASE_URL,
   driverOptions: {
     connection: {
       ssl: {
@@ -25,8 +21,12 @@ const devConfig: Partial<Options> = {
   }
 };
 
+const devConfig: Partial<Options> = {
+  debug: true
+};
+
 const prodConfig: Partial<Options> = {
-  debug: false
+  debug: true
 };
 
 export const config: Options = {
