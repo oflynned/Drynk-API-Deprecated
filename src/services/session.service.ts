@@ -38,7 +38,7 @@ export class SessionService {
 
   // purges old timelines and regenerates the new timeline on an event happening
   static async onSessionEvent(session: Session): Promise<void> {
-    const user = await Repository.with(User).findById(session.toJson().userId);
+    const user = await User.findById(session.toJson().userId);
     const drunkard = new Drunkard(session, user);
 
     // first purge the old cache containing the last known timeline

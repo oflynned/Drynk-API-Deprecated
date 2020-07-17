@@ -12,13 +12,13 @@ import { Repository } from 'mongoize-orm';
 // http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
 // https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
 export class TimelineService {
-  private _drunkard: Drunkard;
-  private _digestiveSystem: DigestService;
+  private digestiveSystem: DigestService;
 
-  private constructor() {}
+  private constructor() {
+  }
 
   static getInstance(drunkard: Drunkard) {
-    return new TimelineService().buildSession(drunkard);
+    return new TimelineService().withDrunkard(drunkard);
   }
 
   static async fetchSessionTimeline(session: Session): Promise<Timeline> {
@@ -27,9 +27,8 @@ export class TimelineService {
     });
   }
 
-  buildSession(drunkard: Drunkard): TimelineService {
-    this._drunkard = drunkard;
-    this._digestiveSystem = new DigestService(drunkard);
+  withDrunkard(drunkard: Drunkard): TimelineService {
+    this.digestiveSystem = new DigestService(drunkard);
     return this;
   }
 
@@ -41,7 +40,7 @@ export class TimelineService {
       .toJson()
       .createdAt.getTime();
 
-    let timestamps = [];
+    let timestamps: any[] = [];
     let timestamp = timeOfFirstEvent;
 
     while (timestamp < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
@@ -49,25 +48,33 @@ export class TimelineService {
       timestamp += ONE_MINUTE_IN_MS;
     }
 
-    const series: Point<number, number>[] = await Promise.all(
-      timestamps.map(
-        async (time: number): Promise<Point<number, number>> => {
-          const timeframeEvents: Event[] = events.filter((event: Event) => {
+    console.log(timestamps.length);
+
+    const series: Point<number, number>[] = timestamps.map(
+      (time: number, index: number): Point<number, number> => {
+        const timeframeEvents: Event[] = events.filter(
+          (event: Event) => {
             const drinkAddedTime = event.toJson().createdAt.getTime();
             const lowerBound = drinkAddedTime - ONE_MINUTE_IN_MS / 2;
             const upperBound = drinkAddedTime + ONE_MINUTE_IN_MS / 2;
             return time > lowerBound && time < upperBound;
-          });
+          }
+        );
 
-          this._digestiveSystem.process(timeframeEvents);
+        this.digestiveSystem.process(timeframeEvents);
 
-          return {
-            x: time,
-            y: this._digestiveSystem.bloodAlcoholContent
-          };
+        if (this.digestiveSystem.bloodAlcoholContent > 0 && index === timestamps.length - 1) {
+          timestamps.push(time + ONE_MINUTE_IN_MS);
         }
-      )
+
+        return {
+          x: time,
+          y: this.digestiveSystem.bloodAlcoholContent
+        };
+      }
     );
+
+    console.log(timestamps.length);
 
     return series.filter(
       (point: Point<number, number>, index: number): boolean => {
