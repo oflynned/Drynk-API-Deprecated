@@ -10,7 +10,7 @@ const seed = async () => {
   try {
     console.log('Starting seed');
 
-    if (await container.alcoholRepository.count({}) > 0) {
+    if ((await container.alcoholRepository.count({})) > 0) {
       await container.alcoholRepository.nativeDelete({});
     }
 
