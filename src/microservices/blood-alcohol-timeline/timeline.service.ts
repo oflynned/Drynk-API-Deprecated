@@ -1,5 +1,5 @@
 import { Event } from '../../models/event.type';
-import { ONE_HOUR_IN_MS, ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
+import { ONE_MINUTE_IN_MS, Point } from '../../common/helpers';
 import { DigestService } from './digest.service';
 import { Drunkard } from '../../models/drunkard.model';
 import { TimelineEvents } from '../../services/session.service';
@@ -12,13 +12,12 @@ import { Repository } from 'mongoize-orm';
 // http://www.appstate.edu/~spruntwh/bac_ncctm.pdf
 // https://staff.fnwi.uva.nl/a.j.p.heck/research/alcohol/lesson/pharmacokinetics.pdf
 export class TimelineService {
-  private _drunkard: Drunkard;
-  private _digestiveSystem: DigestService;
+  private digestiveSystem: DigestService;
 
   private constructor() {}
 
   static getInstance(drunkard: Drunkard) {
-    return new TimelineService().buildSession(drunkard);
+    return new TimelineService().withDrunkard(drunkard);
   }
 
   static async fetchSessionTimeline(session: Session): Promise<Timeline> {
@@ -27,9 +26,8 @@ export class TimelineService {
     });
   }
 
-  buildSession(drunkard: Drunkard): TimelineService {
-    this._drunkard = drunkard;
-    this._digestiveSystem = new DigestService(drunkard);
+  withDrunkard(drunkard: Drunkard): TimelineService {
+    this.digestiveSystem = new DigestService(drunkard);
     return this;
   }
 
@@ -41,33 +39,40 @@ export class TimelineService {
       .toJson()
       .createdAt.getTime();
 
-    let timestamps = [];
-    let timestamp = timeOfFirstEvent;
+    let index = 0;
+    let timestamps: number[] = [timeOfFirstEvent];
+    const series: Point<number, number>[] = [];
 
-    while (timestamp < timeOfLastEvent + 24 * ONE_HOUR_IN_MS) {
-      timestamps.push(timestamp);
-      timestamp += ONE_MINUTE_IN_MS;
-    }
-
-    const series: Point<number, number>[] = await Promise.all(
-      timestamps.map(
-        async (time: number): Promise<Point<number, number>> => {
-          const timeframeEvents: Event[] = events.filter((event: Event) => {
-            const drinkAddedTime = event.toJson().createdAt.getTime();
-            const lowerBound = drinkAddedTime - ONE_MINUTE_IN_MS / 2;
-            const upperBound = drinkAddedTime + ONE_MINUTE_IN_MS / 2;
-            return time > lowerBound && time < upperBound;
-          });
-
-          this._digestiveSystem.process(timeframeEvents);
-
-          return {
-            x: time,
-            y: this._digestiveSystem.bloodAlcoholContent
-          };
+    do {
+      const time: number = timestamps[index];
+      const relevantEventsForGivenTime: Event[] = events.filter(
+        (event: Event) => {
+          const drinkAddedTime = event.toJson().createdAt.getTime();
+          const lowerBound = drinkAddedTime - ONE_MINUTE_IN_MS / 2;
+          const upperBound = drinkAddedTime + ONE_MINUTE_IN_MS / 2;
+          return time > lowerBound && time < upperBound;
         }
-      )
-    );
+      );
+
+      this.digestiveSystem.process(relevantEventsForGivenTime);
+      series.push({ x: time, y: this.digestiveSystem.bloodAlcoholContent });
+
+      if (
+        this.digestiveSystem.bloodAlcoholContent > 0 ||
+        time < timeOfLastEvent
+      ) {
+        // extend the array if the bac has not reached 0 yet for the series
+        // extend the array if the bac may be 0, but there are more events to process within tolerance in the future
+        timestamps = [
+          ...timestamps,
+          timestamps[timestamps.length - 1] + ONE_MINUTE_IN_MS
+        ];
+        index += 1;
+      } else {
+        // otherwise we're done and the system has processed everything it needs to process
+        break;
+      }
+    } while (true);
 
     return series.filter(
       (point: Point<number, number>, index: number): boolean => {

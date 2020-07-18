@@ -6,7 +6,7 @@ import {
 } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { ResourceNotFoundError } from '../infrastructure/errors';
-import { TimelineService } from '../microservices/blood-alcohol-timeline/timeline.service';
+import { TimelineService } from '../microservices/blood-alcohol-timeline';
 import { SessionService } from '../services/session.service';
 import { sortTimeDescending } from '../models/event.type';
 import { elapsedTimeFromMsToHours } from '../common/helpers';
@@ -136,9 +136,7 @@ export class SessionController {
     res: Response
   ): Promise<Response> {
     try {
-      const currentState = await SessionService.getTimelineEvents(
-        req.session
-      );
+      const currentState = await SessionService.getTimelineEvents(req.session);
       return res.status(200).json(currentState);
     } catch (e) {
       throw new ResourceNotFoundError();

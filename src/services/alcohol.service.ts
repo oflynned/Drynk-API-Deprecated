@@ -7,8 +7,7 @@ import {
 import { Alcohol } from '../microservices/alcohol-store/entities/alcohol.entity';
 
 export class AlcoholService {
-
-  private readonly repo: EntityRepository<Alcohol>
+  private readonly repo: EntityRepository<Alcohol>;
 
   constructor(repo: EntityRepository<Alcohol>) {
     this.repo = repo;
