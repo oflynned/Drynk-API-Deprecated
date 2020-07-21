@@ -14,7 +14,8 @@ import { Repository } from 'mongoize-orm';
 export class TimelineService {
   private digestiveSystem: DigestService;
 
-  private constructor() {}
+  private constructor() {
+  }
 
   static getInstance(drunkard: Drunkard) {
     return new TimelineService().withDrunkard(drunkard);
@@ -63,10 +64,13 @@ export class TimelineService {
       ) {
         // extend the array if the bac has not reached 0 yet for the series
         // extend the array if the bac may be 0, but there are more events to process within tolerance in the future
+        const lastTimestampInSeries = timestamps[timestamps.length - 1];
+
         timestamps = [
           ...timestamps,
-          timestamps[timestamps.length - 1] + ONE_MINUTE_IN_MS
+          lastTimestampInSeries + ONE_MINUTE_IN_MS
         ];
+
         index += 1;
       } else {
         // otherwise we're done and the system has processed everything it needs to process
@@ -74,19 +78,7 @@ export class TimelineService {
       }
     } while (true);
 
-    return series.filter(
-      (point: Point<number, number>, index: number): boolean => {
-        if (index === 0) {
-          return true;
-        }
-
-        if (point.x > timeOfLastEvent) {
-          return point.y > 0;
-        }
-
-        return true;
-      }
-    );
+    return series;
   }
 
   // returns current state for a given set of events

@@ -1,8 +1,6 @@
 import { AuthenticatedRequest } from '../infrastructure/middleware/authenticated.request';
 import { Response } from 'express';
 import { Session } from '../models/session.model';
-import { dateAtTimeAgo } from '../common/helpers';
-import { Repository } from 'mongoize-orm';
 import { OverviewHelper } from './stats/overview.helper';
 import { ResourceNotFoundError } from '../infrastructure/errors';
 
