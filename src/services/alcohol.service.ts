@@ -1,9 +1,4 @@
-import {
-  EntityManager,
-  EntityRepository,
-  FilterQuery,
-  QueryOrder
-} from 'mikro-orm';
+import { EntityRepository, QueryOrder } from 'mikro-orm';
 import { Alcohol } from '../microservices/alcohol-store/entities/alcohol.entity';
 
 export class AlcoholService {
@@ -13,8 +8,28 @@ export class AlcoholService {
     this.repo = repo;
   }
 
-  async findMany(query: FilterQuery<Alcohol>): Promise<Alcohol[]> {
-    return this.repo.find(query);
+  async findPopular(popularDrinks: { name: string, count: number }[]): Promise<Alcohol[]> {
+    const items = await Promise.all(
+      popularDrinks.map(
+        async (item): Promise<Alcohol[]> =>
+          this.findByName(item.name))
+    );
+
+    return items.reduce((total, current) => {
+      const items = current.sort((a, b) => {
+        if (a.name < b.name) {
+          return 1;
+        } else if (a.name > b.name) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+
+      total = [...total, ...items];
+      return total;
+    }, []);
+
   }
 
   async findByName(query: string): Promise<Alcohol[]> {
