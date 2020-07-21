@@ -14,8 +14,7 @@ import { Repository } from 'mongoize-orm';
 export class TimelineService {
   private digestiveSystem: DigestService;
 
-  private constructor() {
-  }
+  private constructor() {}
 
   static getInstance(drunkard: Drunkard) {
     return new TimelineService().withDrunkard(drunkard);
@@ -66,10 +65,7 @@ export class TimelineService {
         // extend the array if the bac may be 0, but there are more events to process within tolerance in the future
         const lastTimestampInSeries = timestamps[timestamps.length - 1];
 
-        timestamps = [
-          ...timestamps,
-          lastTimestampInSeries + ONE_MINUTE_IN_MS
-        ];
+        timestamps = [...timestamps, lastTimestampInSeries + ONE_MINUTE_IN_MS];
 
         index += 1;
       } else {
