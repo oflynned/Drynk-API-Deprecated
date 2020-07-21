@@ -19,7 +19,7 @@ export class UserController {
       return res.status(201).json(user.toJson());
     } catch (e) {
       throw new BadRequestError(
-        `${e.details.map((e: any) => e.message) || 'Payload is malformed'}`
+        `${e.details.map((e: Error) => e.message) || 'Payload is malformed'}`
       );
     }
   }
