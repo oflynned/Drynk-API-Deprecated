@@ -122,5 +122,19 @@ describe('user model', () => {
         ).toMatch(/must be one of/);
       });
     });
+
+    describe('.motivations', () => {
+      it('should fail on less than one motivation', async () => {
+        await expect(
+          factory.build().validateUpdate({ motivations: [] })
+        ).rejects.toThrow(/must contain at least 1 items/);
+      });
+
+      it('should require at least one motivation', async () => {
+        await expect(
+          factory.build().validateUpdate({ motivations: ['Something'] })
+        ).resolves.toBeDefined();
+      });
+    });
   });
 });

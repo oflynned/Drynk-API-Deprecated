@@ -21,6 +21,8 @@ export interface UserType extends BaseModelType {
   sex?: Sex;
   unit?: UnitPreference;
   lastActiveAt?: Date;
+  pushToken?: string;
+  motivations?: string[];
 }
 
 export class UserSchema extends Schema<UserType> {
@@ -43,9 +45,12 @@ export class UserSchema extends Schema<UserType> {
         .min(1)
         .max(999),
       sex: Joi.string().valid('male', 'female'),
-      unit: Joi.string().valid('metric', 'us_imperial', 'uk_imperial'),
+      unit: Joi.string().valid('metric', 'us_imperial'),
       lastActiveAt: Joi.date(),
-      pushToken: Joi.string()
+      pushToken: Joi.string(),
+      motivations: Joi.array()
+        .items(Joi.string())
+        .min(1)
     };
   }
 }
