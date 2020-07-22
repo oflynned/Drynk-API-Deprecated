@@ -4,40 +4,22 @@ import { SearchRequest } from './search.route';
 import { AlcoholService } from '../../services/alcohol.service';
 import { EntityRepository } from 'mikro-orm';
 import { Alcohol } from './entities/alcohol.entity';
-import { Drink } from '../../models/drink.model';
+import { DrinkService } from '../../services/drink.service';
 
 export class SearchController {
   private alcoholService: AlcoholService;
+  private drinkService: DrinkService;
 
   constructor(repo: EntityRepository<Alcohol>) {
     this.alcoholService = new AlcoholService(repo);
+    this.drinkService = new DrinkService();
   }
 
   async getPopular(req: Request, res: Response): Promise<Response> {
-    const drinks: Drink[] = await Drink.findMany({
-      drinkName: { $nin: ['Beer', 'Wine', 'Spirit'] },
-      drinkType: { $eq: 'beer' }
-    });
+    const popularBeers = await this.drinkService.getPopularBeers();
+    const items = await this.alcoholService.findPopular(popularBeers);
+    // TODO limit this in the future to 10-20 items if the list gets large, as there are a lot of expensive queries here
 
-    const drinkNames: string[] = drinks.map((drink: Drink) => drink.toJson().drinkName);
-    const drinkOccurrences = drinkNames.reduce(
-      (total: any, beerName) => {
-        if (!total[beerName]) {
-          total[beerName] = 1;
-        } else {
-          total[beerName] = total[beerName] + 1;
-        }
-
-        return total;
-      }, {});
-
-    const occurencesList: { name: string, count: number }[] = [];
-    for (const drink in drinkOccurrences) {
-      occurencesList.push({ name: drink, count: drinkOccurrences[drink] });
-    }
-    occurencesList.sort((a, b) => b.count - a.count);
-
-    const items = await this.alcoholService.findPopular(occurencesList);
     return res.status(200).json(items);
   }
 
