@@ -1,5 +1,6 @@
 import { EntityRepository, QueryOrder } from 'mikro-orm';
 import { Alcohol } from '../microservices/alcohol-store/entities/alcohol.entity';
+import { PopularDrink } from '../models/popular-drink';
 
 export class AlcoholService {
   private readonly repo: EntityRepository<Alcohol>;
@@ -8,11 +9,11 @@ export class AlcoholService {
     this.repo = repo;
   }
 
-  async findPopular(popularDrinks: { name: string, count: number }[]): Promise<Alcohol[]> {
+  async findPopular(popularDrinks: PopularDrink[]): Promise<Alcohol[]> {
+    // TODO could improve this further by caching the alcohol drink ids as well for indexing
     const items = await Promise.all(
-      popularDrinks.map(
-        async (item): Promise<Alcohol[]> =>
-          this.findByName(item.name))
+      popularDrinks.map(async (popularDrink: PopularDrink): Promise<Alcohol[]> =>
+        this.findByName(popularDrink.toJson().name))
     );
 
     return items.reduce((total, current) => {
