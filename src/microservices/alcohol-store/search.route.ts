@@ -15,5 +15,12 @@ export const searchRoute = (controller: SearchController): Router => {
     )
   );
 
+  router.get(
+    '/popular',
+    asyncHandler(async (req: Request, res: Response) =>
+      controller.getPopular(req, res)
+    )
+  );
+
   return router;
 };
