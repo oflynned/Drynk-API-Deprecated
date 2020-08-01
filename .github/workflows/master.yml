@@ -47,6 +47,18 @@ jobs:
           yml: codecov.yml
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Create new Sentry release
+        run: SENTRY_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:create
+
+      - name: Build project
+        run: yarn build
+
+      - name: Upload sourcemaps to Sentry
+        run: SENTRY_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:artifacts:upload
+
+      - name: Finalise Sentry release
+        run: SENTRY_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:finalise
+
   deploy:
     runs-on: ubuntu-latest
 
