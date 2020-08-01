@@ -59,16 +59,16 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Create new Sentry release
-        run: yarn sentry:release:create
+        run: sentry-cli releases new $(sentry-cli releases propose-version)
 
       - name: Build project
         run: yarn build
 
       - name: Upload sourcemaps to Sentry
-        run: yarn sentry:artifacts:upload
+        run: sentry-cli releases files $(sentry-cli releases propose-version) upload-sourcemaps ./dist
 
       - name: Finalise Sentry release
-        run: yarn sentry:release:finalise
+        run: sentry-cli releases finalize $(sentry-cli releases propose-version)
 
   deploy:
     runs-on: ubuntu-latest
