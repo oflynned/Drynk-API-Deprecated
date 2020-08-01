@@ -70,6 +70,7 @@ export class SessionController {
           return {
             ...session.toJson(),
             // TODO should a filter be done on only the _drunk_ time where bac > 0?
+            //      yes it should since a session can last within 3 hours even if sober at some points
             hoursDrunk: elapsedTimeFromMsToHours(
               session.toJson().soberAt.getTime() -
                 (await session.firstEvent()).toJson().createdAt.getTime()

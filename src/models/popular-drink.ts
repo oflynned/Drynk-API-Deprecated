@@ -8,8 +8,8 @@ import {
 
 export interface PopularDrinkType extends BaseModelType {
   name: string;
-  category: 'beer' | 'wine' | 'spirit' | 'cocktail',
-  popularity: number
+  category: 'beer' | 'wine' | 'spirit' | 'cocktail';
+  popularity: number;
 }
 
 export class PopularDrinkSchema extends Schema<PopularDrinkType> {
@@ -25,19 +25,29 @@ export class PopularDrinkSchema extends Schema<PopularDrinkType> {
   }
 }
 
-export class PopularDrink extends BaseDocument<PopularDrinkType, PopularDrinkSchema> {
+export class PopularDrink extends BaseDocument<
+  PopularDrinkType,
+  PopularDrinkSchema
+> {
   joiSchema(): PopularDrinkSchema {
     return new PopularDrinkSchema();
   }
 
   collection(): string {
-    return "popular_drinks"
+    return 'popular_drinks';
   }
 
-  static async cacheMany(beers: { name: string, count: number }[]): Promise<void> {
+  static async cacheMany(
+    beers: { name: string; count: number }[]
+  ): Promise<void> {
     await Promise.all(
-      beers.map((beer) =>
-        PopularDrink.cache({ name: beer.name, popularity: beer.count, category: 'beer' }))
+      beers.map(beer =>
+        PopularDrink.cache({
+          name: beer.name,
+          popularity: beer.count,
+          category: 'beer'
+        })
+      )
     );
   }
 

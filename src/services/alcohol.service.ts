@@ -12,8 +12,10 @@ export class AlcoholService {
   async findPopular(popularDrinks: PopularDrink[]): Promise<Alcohol[]> {
     // TODO could improve this further by caching the alcohol drink ids as well for indexing
     const items = await Promise.all(
-      popularDrinks.map(async (popularDrink: PopularDrink): Promise<Alcohol[]> =>
-        this.findByName(popularDrink.toJson().name))
+      popularDrinks.map(
+        async (popularDrink: PopularDrink): Promise<Alcohol[]> =>
+          this.findByName(popularDrink.toJson().name)
+      )
     );
 
     return items.reduce((total, current) => {
@@ -30,7 +32,6 @@ export class AlcoholService {
       total = [...total, ...items];
       return total;
     }, []);
-
   }
 
   async findByName(query: string): Promise<Alcohol[]> {
