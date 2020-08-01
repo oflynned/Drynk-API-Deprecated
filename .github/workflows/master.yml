@@ -29,16 +29,12 @@ jobs:
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
 
-      # todo move this back
       - name: Setup Sentry CLI
         uses: mathrix-education/setup-sentry-cli@0.1.0
         with:
           token: ${{ SECRETS.SENTRY_TOKEN }}
           organization: syzible-com
           project: drynk-api
-
-      - name: Sentry works?
-        run: sentry-cli info
 
       - name: Install dependencies
         run: yarn install
