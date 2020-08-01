@@ -39,6 +39,9 @@ jobs:
           organization: syzible-com
           project: drynk-api
 
+      - name: Sentry works?
+        run: sentry-cli info
+
       - name: Create new Sentry release
         run: yarn sentry:release:create
 
