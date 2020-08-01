@@ -13,10 +13,8 @@ jobs:
         node-version: [12.x]
 
     steps:
-      - name: Checkout repo history
+      - name: Checkout repo
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
@@ -32,13 +30,6 @@ jobs:
             ${{ runner.OS }}-build-${{ env.cache-name }}-
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
-
-      - name: Setup Sentry CLI
-        uses: mathrix-education/setup-sentry-cli@0.1.0
-        with:
-          token: ${{ SECRETS.SENTRY_TOKEN }}
-          organization: syzible-com
-          project: drynk-api
 
       - name: Install dependencies
         run: yarn install
@@ -58,6 +49,27 @@ jobs:
           yml: codecov.yml
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup Sentry CLI
+        uses: mathrix-education/setup-sentry-cli@0.1.0
+        with:
+          token: ${{ SECRETS.SENTRY_TOKEN }}
+          organization: syzible-com
+          project: drynk-api
+
       - name: Create new Sentry release
         run: sentry-cli releases new $(sentry-cli releases propose-version)
 
@@ -75,11 +87,11 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-
-    needs: test
-
+    needs: build
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
       - name: Deploy to Dokku
         uses: thadeu/easily-dokku-action@v1.0.8
         env:
