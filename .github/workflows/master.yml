@@ -29,6 +29,19 @@ jobs:
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
 
+      # todo move this back
+      - name: Setup Sentry CLI
+        uses: mathrix-education/setup-sentry-cli@0.1.0
+        with:
+          version: latest
+          url: https://drynk-api.syzible.com
+          token: ${{ SECRETS.SENTRY_TOKEN }}
+          organization: syzible-com
+          project: drynk-api
+
+      - name: Create new Sentry release
+        run: yarn sentry:release:create
+
       - name: Install dependencies
         run: yarn install
 
@@ -47,17 +60,14 @@ jobs:
           yml: codecov.yml
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Create new Sentry release
-        run: SENTRY_AUTH_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:create
-
       - name: Build project
         run: yarn build
 
       - name: Upload sourcemaps to Sentry
-        run: SENTRY_AUTH_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:artifacts:upload
+        run: yarn sentry:artifacts:upload
 
       - name: Finalise Sentry release
-        run: SENTRY_AUTH_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:finalise
+        run: yarn sentry:release:finalise
 
   deploy:
     runs-on: ubuntu-latest
