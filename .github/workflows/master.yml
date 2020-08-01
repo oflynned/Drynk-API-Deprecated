@@ -48,16 +48,16 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Create new Sentry release
-        run: SENTRY_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:create
+        run: SENTRY_AUTH_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:create
 
       - name: Build project
         run: yarn build
 
       - name: Upload sourcemaps to Sentry
-        run: SENTRY_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:artifacts:upload
+        run: SENTRY_AUTH_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:artifacts:upload
 
       - name: Finalise Sentry release
-        run: SENTRY_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:finalise
+        run: SENTRY_AUTH_TOKEN=${{secrets.SENTRY_TOKEN}} yarn sentry:release:finalise
 
   deploy:
     runs-on: ubuntu-latest
