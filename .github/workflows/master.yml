@@ -70,6 +70,19 @@ jobs:
           organization: syzible-com
           project: drynk-api
 
+      - name: Cache yarn dependencies
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+
+      - name: Install dependencies
+        run: yarn install --production=true
+
       - name: Create new Sentry release
         run: sentry-cli releases new $(sentry-cli releases propose-version)
 
