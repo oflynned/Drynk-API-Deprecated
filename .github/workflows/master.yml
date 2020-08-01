@@ -33,17 +33,12 @@ jobs:
       - name: Setup Sentry CLI
         uses: mathrix-education/setup-sentry-cli@0.1.0
         with:
-          version: latest
-          url: https://drynk-api.syzible.com
           token: ${{ SECRETS.SENTRY_TOKEN }}
           organization: syzible-com
           project: drynk-api
 
       - name: Sentry works?
         run: sentry-cli info
-
-      - name: Create new Sentry release
-        run: yarn sentry:release:create
 
       - name: Install dependencies
         run: yarn install
@@ -62,6 +57,9 @@ jobs:
         with:
           yml: codecov.yml
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Create new Sentry release
+        run: yarn sentry:release:create
 
       - name: Build project
         run: yarn build
