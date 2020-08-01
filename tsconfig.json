@@ -9,6 +9,9 @@
       "es6",
       "dom"
     ],
+    "sourceMap": true,
+    "inlineSources": false,
+    "sourceRoot": "/",
     "rootDir": "./src",
     "outDir": "./dist",
     "resolveJsonModule": true,
