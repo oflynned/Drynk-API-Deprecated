@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+          fetch-depth: 0
 
       - name: Cache yarn dependencies
         uses: actions/cache@v1
@@ -54,20 +55,25 @@ jobs:
           yml: codecov.yml
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Propose release version
+        run: |
+          export SENTRY_VERSION=$(sentry-cli releases propose-version)
+          source ~/.bashrc
+
       - name: Create new Sentry release
-        run: sentry-cli releases new $(sentry-cli releases propose-version)
+        run: sentry-cli releases new $SENTRY_VERSION
 
       - name: Build project
         run: yarn build
 
       - name: Upload sourcemaps to Sentry
-        run: sentry-cli releases files $(sentry-cli releases propose-version) upload-sourcemaps ./dist
+        run: sentry-cli releases files $SENTRY_VERSION upload-sourcemaps ./dist
 
       - name: Associate release commits
-        run: sentry-cli releases set-commits --auto $(sentry-cli releases propose-version)
+        run: sentry-cli releases set-commits $SENTRY_VERSION --auto
 
       - name: Finalise Sentry release
-        run: sentry-cli releases finalize $(sentry-cli releases propose-version)
+        run: sentry-cli releases finalize $SENTRY_VERSION
 
   deploy:
     runs-on: ubuntu-latest
