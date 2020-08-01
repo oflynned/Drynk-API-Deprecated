@@ -65,7 +65,7 @@ jobs:
         run: sentry-cli releases files $(sentry-cli releases propose-version) upload-sourcemaps ./dist
 
       - name: Associate release commits
-        run: sentry-cli releases set-commits $(sentry-cli releases propose-version) --auto
+        run: sentry-cli releases set-commits --auto $(sentry-cli releases propose-version)
 
       - name: Finalise Sentry release
         run: sentry-cli releases finalize $(sentry-cli releases propose-version)
