@@ -55,25 +55,20 @@ jobs:
           yml: codecov.yml
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Propose release version
-        run: |
-          export SENTRY_VERSION=$(sentry-cli releases propose-version)
-          source ~/.bashrc
-
       - name: Create new Sentry release
-        run: sentry-cli releases new $SENTRY_VERSION
+        run: sentry-cli releases new $(sentry-cli releases propose-version)
 
       - name: Build project
         run: yarn build
 
       - name: Upload sourcemaps to Sentry
-        run: sentry-cli releases files $SENTRY_VERSION upload-sourcemaps ./dist
+        run: sentry-cli releases files $(sentry-cli releases propose-version) upload-sourcemaps ./dist
 
       - name: Associate release commits
-        run: sentry-cli releases set-commits $SENTRY_VERSION --auto
+        run: sentry-cli releases set-commits $(sentry-cli releases propose-version) --auto
 
       - name: Finalise Sentry release
-        run: sentry-cli releases finalize $SENTRY_VERSION
+        run: sentry-cli releases finalize $(sentry-cli releases propose-version)
 
   deploy:
     runs-on: ubuntu-latest
