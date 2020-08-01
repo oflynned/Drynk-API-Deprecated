@@ -81,7 +81,7 @@ jobs:
             ${{ runner.OS }}-
 
       - name: Install dependencies
-        run: yarn install --production=true
+        run: yarn install
 
       - name: Create new Sentry release
         run: sentry-cli releases new $(sentry-cli releases propose-version)
