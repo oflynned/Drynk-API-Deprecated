@@ -49,6 +49,7 @@
     "get-caller-file": "^2.0.5",
     "graphql": "^15.0.0",
     "graphql-iso-date": "^3.6.1",
+    "graphql-type-json": "^0.3.2",
     "hbs": "~4.0.4",
     "helmet": "latest",
     "http-errors": "~1.6.3",
