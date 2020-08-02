@@ -9,34 +9,6 @@ import { ResourceNotFoundError } from '../infrastructure/errors';
 // https://digital.nhs.uk/data-and-information/publications/statistical/health-survey-for-england/2018/summary
 
 export class StatsController {
-  static async units(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<Response> {
-    return res.status(200).json({});
-  }
-
-  static async calories(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<Response> {
-    return res.status(200).json({});
-  }
-
-  static async timeDrunk(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<Response> {
-    return res.status(200).json({});
-  }
-
-  static async bloodAlcoholContent(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<Response> {
-    return res.status(200).json({});
-  }
-
   static async overview(
     req: AuthenticatedRequest,
     res: Response
