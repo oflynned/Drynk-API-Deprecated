@@ -40,6 +40,9 @@ jobs:
       - name: Lint package.json dependency versions
         run: yarn lint:dependencies:check
 
+      - name: Check types
+        run: yarn typecheck
+
       - name: Run tests
         run: yarn test
 
