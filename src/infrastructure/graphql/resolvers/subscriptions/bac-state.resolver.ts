@@ -7,6 +7,7 @@ export type BackgroundUpdateType = { events: TimelineEvents; session: Session };
 
 export const bacStateResolvers = {
   onStateUpdate: {
+    // TODO https://trello.com/c/KKwX0RG3/320-subscription-memory-leak
     subscribe: withFilter(
       () => pubsub.asyncIterator(SESSION_UPDATE_AVAILABLE),
       (
