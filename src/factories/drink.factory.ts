@@ -11,7 +11,7 @@ export class DrinkFactory {
     return {
       ...({
         drinkName: commerce.productName(),
-        drinkType: this.drinkType(),
+        drinkType: DrinkFactory.drinkType(),
         abv: random.number({ min: 1, max: 99 }),
         volume: random.number({ min: 35, max: 568 }),
         sessionId: random.uuid()

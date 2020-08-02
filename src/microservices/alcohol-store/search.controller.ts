@@ -24,7 +24,7 @@ export class SearchController {
   }
 
   async get(req: SearchRequest, res: Response): Promise<Response> {
-    const query = req.query.title;
+    const query = req.query.title || "";
     if (!query || query.trim().length === 0) {
       throw new BadRequestError(
         'Query needs to be at least one character long'

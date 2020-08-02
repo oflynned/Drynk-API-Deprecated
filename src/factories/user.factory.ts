@@ -23,7 +23,7 @@ export class UserFactory {
         providerId: random.uuid(),
         height: random.number({ min: 120, max: 200 }),
         weight: random.number({ min: 40, max: 150 }),
-        sex: this.sex(),
+        sex: UserFactory.sex(),
         unit: 'metric'
       } as UserType),
       ...overrides
