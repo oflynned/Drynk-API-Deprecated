@@ -7,4 +7,14 @@ export const projectionDefinition = gql`
     mostDrunkAt: ProjectionValue
     soberAt: ProjectionValue
   }
+
+  type ProjectionValue {
+      time: Float
+      bloodAlcoholContent: Float
+      alreadyPassed: Boolean
+  }
+  
+  extend type Subscription {
+    onStateUpdate(userId: ID!): Projection
+  }
 `;

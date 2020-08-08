@@ -60,6 +60,10 @@ export class User extends BaseDocument<UserType, UserSchema> {
     return Repository.with(User).findById(id);
   }
 
+  static async findByProviderId(providerId: string): Promise<User> {
+    return Repository.with(User).findOne({ providerId });
+  }
+
   static async findInactive(): Promise<User[]> {
     const date = dateAtTimeAgo({ unit: 'days', value: 7 });
     return Repository.with(User).findMany({

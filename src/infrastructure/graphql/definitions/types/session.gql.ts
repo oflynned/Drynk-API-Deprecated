@@ -5,4 +5,10 @@ export const sessionDefinition = gql`
     estimateEventTimes: Projection
     events: [Drink]
   }
+
+  extend type Query {
+    getSessionDrinks(sessionId: ID!): [Drink]
+    getCurrentSession(userId: ID!): Session
+    getSessions(userId: ID!): [Session]
+  }
 `;

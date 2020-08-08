@@ -4,13 +4,20 @@ import { Logger } from '../../common/logger';
 import { CleanInactiveUnonboardedUsersJob } from './jobs/clean-churned-users';
 import { Environment } from '../../config/environment';
 import { CachePopularDrinksJob } from './jobs/cache-popular-drinks';
+import { HealthCheckJob } from './jobs/health-check';
 
 const logger: Logger = Logger.getInstance('api.infrastructure.cron-jobs');
+const healthCheckJob = new HealthCheckJob();
 const bacUpdateJob = new BacUpdateJob();
 const cleanUsersJob = new CleanInactiveUnonboardedUsersJob();
 const cachePopularDrinksJob = new CachePopularDrinksJob();
 
 export const registerCronJobs = () => {
+  new CronJob(healthCheckJob.cronFrequency(), async () => {
+    logger.info('Running health check job');
+    await healthCheckJob.runJob();
+  }).start();
+
   new CronJob(bacUpdateJob.cronFrequency(), async () => {
     logger.info('Running bac update job');
     await bacUpdateJob.runJob();

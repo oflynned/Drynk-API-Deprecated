@@ -6,33 +6,35 @@ import { SessionService } from '../../services/session.service';
 import { Point } from '../../common/helpers';
 
 export type RiskGroup = {
-  goalPercentage: number,
-  max: number
-}
+  goalPercentage: number;
+  max: number;
+};
 
 export type Overview = {
   user: User;
   units: {
-    lowRisk: RiskGroup,
-    increasedRisk: RiskGroup,
-    count: number
-  },
+    lowRisk: RiskGroup;
+    increasedRisk: RiskGroup;
+    count: number;
+  };
   calories: {
-    count: number
-  },
+    count: number;
+  };
   timeDrunk: {
-    hours: number
-  },
+    hours: number;
+  };
   bloodAlcoholContentPeaks: {
-    count: number
-  }
-}
+    count: number;
+  };
+};
 
 export class OverviewHelper {
   static async overview(user: User, sessions: Session[]): Promise<Overview> {
     const drinks: Drink[] = StatisticsHelper.flattenSessionDrinks(sessions);
-    const dangerousPeaks: Point<number,
-      number>[] = await SessionService.getBloodAlcoholPeaks(sessions);
+    const dangerousPeaks: Point<
+      number,
+      number
+    >[] = await SessionService.getBloodAlcoholPeaks(sessions);
     return {
       user,
       units: await StatisticsHelper.intakeOverviewOverDays(user, drinks, 7),
