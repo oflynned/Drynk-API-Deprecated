@@ -57,12 +57,60 @@ export const requireUser = async (
   next();
 };
 
+export type GqlContext = {
+  user: User;
+};
+
+export const authGqlContext = async (req: Request): Promise<GqlContext> => {
+  // console.log(req)
+  const jwtToken = req.headers.authorization;
+  if (!jwtToken) {
+    throw new UnauthenticatedError('Authorization is a required header');
+  }
+
+  if (Array.isArray(jwtToken)) {
+    throw new UnauthenticatedError('Authorization header cannot be an array');
+  }
+
+  // TODO check for revocation
+  const [realm, token] = jwtToken.split(' ');
+  if (realm !== 'Bearer') {
+    throw new UnauthenticatedError('Authorisation must be a bearer token');
+  }
+
+  let providerId: DecodedIdToken;
+
+  try {
+    // TODO create a cache so that tokens aren't checked on every request since they have expiry timestamps
+    providerId = await auth().verifyIdToken(token, true);
+  } catch (e) {
+    if (String(e.message).indexOf('Firebase ID token has expired.') > -1) {
+      throw new UnauthorisedError('Firebase token has expired');
+    }
+
+    throw new ServiceDownError(
+      'Firebase token verification is experiencing downtime'
+    );
+  }
+
+  const user = await User.findByProviderId(providerId.uid);
+  if (!user || user.toJson().deleted) {
+    throw new ResourceNotFoundError();
+  }
+
+  await user.updateLastActiveAt();
+  await user.refresh();
+
+  return { user };
+};
+
 export const withFirebaseUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   const jwtToken = req.headers['authorization'];
+  console.log(jwtToken);
   if (!jwtToken) {
     throw new UnauthenticatedError('Authorization is a required header');
   }
