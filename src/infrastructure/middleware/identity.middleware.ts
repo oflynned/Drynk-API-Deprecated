@@ -15,6 +15,7 @@ import {
   UnauthenticatedError,
   UnauthorisedError
 } from '../errors';
+import { Environment } from '../../config/environment';
 
 export const withUser = async (
   req: SocialRequest,
@@ -42,9 +43,7 @@ export const requireUser = async (
   next: NextFunction
 ): Promise<void> => {
   const firebaseId = req.provider.providerId;
-  const user = await Repository.with(User).findOne({
-    providerId: firebaseId
-  } as object);
+  const user = await User.findByProviderId(firebaseId);
 
   if (!user || user.toJson().deleted) {
     throw new ResourceNotFoundError();
@@ -62,7 +61,12 @@ export type GqlContext = {
 };
 
 export const authGqlContext = async (req: Request): Promise<GqlContext> => {
-  // console.log(req)
+  if (Environment.isDevelopment()) {
+    // deepcode ignore NoHardcodedCredentials
+    const user = await Repository.with(User).findOne({ email: 'oflynned@gmail.com' });
+    return { user };
+  }
+
   const jwtToken = req.headers.authorization;
   if (!jwtToken) {
     throw new UnauthenticatedError('Authorization is a required header');
@@ -110,7 +114,6 @@ export const withFirebaseUser = async (
   next: NextFunction
 ): Promise<void> => {
   const jwtToken = req.headers['authorization'];
-  console.log(jwtToken);
   if (!jwtToken) {
     throw new UnauthenticatedError('Authorization is a required header');
   }

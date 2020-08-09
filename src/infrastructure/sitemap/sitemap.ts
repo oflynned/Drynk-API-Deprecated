@@ -5,7 +5,6 @@ import privacyRouter from '../routes/privacy.route';
 import drinksRouter from '../routes/drinks.route';
 import sessionRouter from '../routes/session.route';
 import userRouter from '../routes/user.route';
-import statsRouter from '../routes/stats.route';
 import { searchRoute } from '../../microservices/alcohol-store/search.route';
 import fallbackRouter from '../routes/fallback.route';
 
@@ -24,7 +23,6 @@ export const sitemap = (app: Application, di: Container): void => {
   app.use('/drinks', drinksRouter);
   app.use('/sessions', sessionRouter);
   app.use('/users', userRouter);
-  app.use('/stats', statsRouter);
 
   // microservices
   const controller = new SearchController(di.alcoholRepository);

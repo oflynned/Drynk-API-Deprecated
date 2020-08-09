@@ -2,10 +2,10 @@ import { gql } from 'apollo-server-express';
 
 export const projectionDefinition = gql`
   type Projection {
-    startedSessionAt: ProjectionValue
+    startState: ProjectionValue
     currentState: ProjectionValue
-    mostDrunkAt: ProjectionValue
-    soberAt: ProjectionValue
+    mostDrunkState: ProjectionValue
+    soberState: ProjectionValue
   }
 
   type ProjectionValue {
@@ -15,6 +15,6 @@ export const projectionDefinition = gql`
   }
   
   extend type Subscription {
-    onStateUpdate(userId: ID!): Projection
+    onStateUpdate: Projection
   }
 `;

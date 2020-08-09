@@ -7,7 +7,15 @@ export const insightsDefinition = gql`
   }
 
   type Overview {
+    user: User
     units: UnitInsights
+    calories: Int
+    bloodAlcohol: BloodAlcoholInsight
+    timeDrunk: Float
+  }
+  
+  type BloodAlcoholInsight {
+    peaks: Int
   }
 
   type UnitInsights {

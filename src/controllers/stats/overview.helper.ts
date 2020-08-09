@@ -1,7 +1,7 @@
 import { Session } from '../../models/session.model';
 import { Drink } from '../../models/drink.model';
 import { StatisticsHelper } from './helper';
-import { User } from '../../models/user.model';
+import { User, UserType } from '../../models/user.model';
 import { SessionService } from '../../services/session.service';
 import { Point } from '../../common/helpers';
 
@@ -11,41 +11,31 @@ export type RiskGroup = {
 };
 
 export type Overview = {
-  user: User;
+  user: UserType;
   units: {
     lowRisk: RiskGroup;
     increasedRisk: RiskGroup;
     count: number;
   };
-  calories: {
-    count: number;
-  };
-  timeDrunk: {
-    hours: number;
-  };
-  bloodAlcoholContentPeaks: {
-    count: number;
+  calories: number;
+  timeDrunk: number;
+  bloodAlcohol: {
+    peaks: number;
   };
 };
 
 export class OverviewHelper {
   static async overview(user: User, sessions: Session[]): Promise<Overview> {
     const drinks: Drink[] = StatisticsHelper.flattenSessionDrinks(sessions);
-    const dangerousPeaks: Point<
-      number,
-      number
-    >[] = await SessionService.getBloodAlcoholPeaks(sessions);
+    const dangerousPeaks: Point<number,
+      number>[] = await SessionService.getBloodAlcoholPeaks(sessions);
     return {
-      user,
+      user: user.toJson(),
       units: await StatisticsHelper.intakeOverviewOverDays(user, drinks, 7),
-      calories: {
-        count: await StatisticsHelper.drinkCalories(drinks)
-      },
-      timeDrunk: {
-        hours: await StatisticsHelper.totalHoursDrunk(sessions)
-      },
-      bloodAlcoholContentPeaks: {
-        count: dangerousPeaks.length
+      calories: await StatisticsHelper.drinkCalories(drinks),
+      timeDrunk: await StatisticsHelper.totalHoursDrunk(sessions),
+      bloodAlcohol: {
+        peaks: dangerousPeaks.length
       }
     };
   }

@@ -90,7 +90,7 @@ export class TimelineService {
     );
 
     return {
-      startedDrinkingAt: {
+      startState: {
         time: timeSeries[0].x,
         bloodAlcoholContent: 0,
         alreadyPassed: timeSeries[0].x < Date.now()
@@ -100,14 +100,15 @@ export class TimelineService {
         bloodAlcoholContent:
           soberPoint.x < Date.now()
             ? 0
-            : this.bloodAlcoholContent(timeSeries, soberPoint)
+            : this.bloodAlcoholContent(timeSeries, soberPoint),
+        alreadyPassed: false
       },
-      mostDrunkAt: {
+      mostDrunkState: {
         time: mostDrunkPoint.x,
         bloodAlcoholContent: mostDrunkPoint.y,
         alreadyPassed: mostDrunkPoint.x < Date.now()
       },
-      soberAt: {
+      soberState: {
         time: soberPoint.x,
         bloodAlcoholContent: 0,
         alreadyPassed: soberPoint.x < Date.now()
