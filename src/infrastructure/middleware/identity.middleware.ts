@@ -63,7 +63,9 @@ export type GqlContext = {
 export const authGqlContext = async (req: Request): Promise<GqlContext> => {
   if (Environment.isDevelopment()) {
     // deepcode ignore NoHardcodedCredentials
-    const user = await Repository.with(User).findOne({ email: 'oflynned@gmail.com' });
+    const user = await Repository.with(User).findOne({
+      email: 'oflynned@gmail.com'
+    });
     return { user };
   }
 
@@ -86,6 +88,7 @@ export const authGqlContext = async (req: Request): Promise<GqlContext> => {
 
   try {
     // TODO create a cache so that tokens aren't checked on every request since they have expiry timestamps
+    //      perhaps something with Redis?
     providerId = await auth().verifyIdToken(token, true);
   } catch (e) {
     if (String(e.message).indexOf('Firebase ID token has expired.') > -1) {
