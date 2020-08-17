@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@sentry/cli": "^1.55.1",
-    "@sentry/node": "5.20.1",
+    "@sentry/node": "5.21.1",
     "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.12.0",
     "connection-string-parser": "^1.0.3",
