@@ -13,10 +13,10 @@ export type Projection = {
 };
 
 export type TimelineEvents = {
-  startedDrinkingAt: Projection;
+  startState: Projection;
   currentState: Projection;
-  mostDrunkAt: Projection;
-  soberAt: Projection;
+  mostDrunkState: Projection;
+  soberState: Projection;
 };
 
 export class SessionService {
@@ -68,8 +68,8 @@ export class SessionService {
 
     await SessionService.updateSessionCache(
       session,
-      events.soberAt,
-      events.mostDrunkAt
+      events.soberState,
+      events.mostDrunkState
     );
   }
 

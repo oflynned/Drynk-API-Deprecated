@@ -4,14 +4,14 @@ export class Environment {
   }
 
   static isProduction() {
-    return this.getNodeEnv() === 'production';
+    return Environment.getNodeEnv() === 'production';
   }
 
   static isDevelopment() {
-    return this.getNodeEnv() === 'development';
+    return Environment.getNodeEnv() === 'development';
   }
 
   static isTest() {
-    return this.getNodeEnv() === 'test';
+    return Environment.getNodeEnv() === 'test';
   }
 }

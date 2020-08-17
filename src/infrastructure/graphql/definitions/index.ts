@@ -1,17 +1,20 @@
-import { drinkDefinition } from './types/drink.gql';
-import { pukeDefinition } from './types/puke.gql';
 import { projectionDefinition } from './types/projection.gql';
-import { projectionValueDefinition } from './types/projection-value.gql';
 import { sessionDefinition } from './types/session.gql';
-import { queryDefinition } from './base/query.gql';
-import { subscriptionDefinition } from './base/subscription.gql';
+import { insightsDefinition } from './types/insights.gql';
+import { userDefinition } from './types/user.gql';
+import { scalarDefinition } from './types/scalars.gql';
+import { baseDefinition } from './base.gql';
+import { drinkDefinition } from './types/event';
 
 export const typeDefs = [
+  // base
+  baseDefinition,
+  scalarDefinition,
+
+  // custom
+  insightsDefinition,
   drinkDefinition,
-  pukeDefinition,
+  userDefinition,
   projectionDefinition,
-  projectionValueDefinition,
-  sessionDefinition,
-  queryDefinition,
-  subscriptionDefinition
+  sessionDefinition
 ];

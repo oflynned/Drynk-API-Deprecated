@@ -23,6 +23,7 @@ export class DrinkController {
     if (!(await req.session.isEventWithinTolerance(req.body.createdAt))) {
       throw new BadRequestError('Drink start time is too far in the past');
     }
+
     // the time passed is more than 3 hours before the session started
     try {
       const drink: Drink = await new Drink()
@@ -37,7 +38,6 @@ export class DrinkController {
       await req.session.refresh();
       return res.status(201).json(drink.toJson());
     } catch (e) {
-      console.log(e);
       throw new BadRequestError();
     }
   }

@@ -64,6 +64,10 @@ export class Drink extends BaseDocument<DrinkType, DrinkSchema> {
     return Repository.with(Drink).findMany(query);
   }
 
+  static findById(id: string): Promise<Drink | undefined> {
+    return Repository.with(Drink).findById(id);
+  }
+
   static findBySessionIds(
     ids: string[],
     sinceStartTime?: Date

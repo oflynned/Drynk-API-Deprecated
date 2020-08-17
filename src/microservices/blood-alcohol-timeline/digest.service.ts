@@ -38,7 +38,7 @@ export class DigestService {
   }
 
   process(events?: Event[]): void {
-    events.map((event: Event) => {
+    events.forEach((event: Event) => {
       switch (event.constructor.name) {
         case 'Drink':
           this.addToStomach(event as Drink);

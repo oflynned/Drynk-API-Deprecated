@@ -1,7 +1,18 @@
 import { Drink } from '../../models/drink.model';
-import { Session } from '../../models/session.model';
+import { Session, SessionType } from '../../models/session.model';
 import { percentage, sum } from '../../common/helpers';
 import { User } from '../../models/user.model';
+import { RiskGroup } from './overview.helper';
+
+export type UnitInsights = {
+  lowRisk: RiskGroup;
+  increasedRisk: RiskGroup;
+  count: number;
+};
+
+export type CaloriesInsights = {
+  count: number;
+};
 
 export class StatisticsHelper {
   static async highestEthanolContent(drinks: Drink[]): Promise<object> {
@@ -33,7 +44,16 @@ export class StatisticsHelper {
     return sum(unitsPerSession) / sessions.length;
   }
 
-  static async mostUnitsPerSession(sessions: Session[]): Promise<object> {
+  static async mostUnitsPerSession(
+    sessions: Session[]
+  ): Promise<{ session: SessionType | null; value: number }> {
+    if (sessions.length === 0) {
+      return {
+        session: null,
+        value: 0
+      };
+    }
+
     const highestUnitIntake = await sessions.reduce(
       (a: Session, b: Session) => {
         return a.units() > b.units() ? a : b;
@@ -46,7 +66,16 @@ export class StatisticsHelper {
     };
   }
 
-  static async highestBac(sessions: Session[]): Promise<object> {
+  static async highestBac(
+    sessions: Session[]
+  ): Promise<{ session: SessionType | null; value: number }> {
+    if (sessions.length === 0) {
+      return {
+        session: null,
+        value: 0
+      };
+    }
+
     const mostIntoxicatedSession = sessions.reduce((a: Session, b: Session) => {
       return a.toJson().highestBac > b.toJson().highestBac ? a : b;
     });
@@ -57,7 +86,16 @@ export class StatisticsHelper {
     };
   }
 
-  static async longestSession(sessions: Session[]): Promise<object> {
+  static async longestSession(
+    sessions: Session[]
+  ): Promise<{ session: SessionType | null; value: number }> {
+    if (sessions.length === 0) {
+      return {
+        session: null,
+        value: 0
+      };
+    }
+
     const longestSession = sessions.reduce((a: Session, b: Session) => {
       return a.hoursDrunk() > b.hoursDrunk() ? a : b;
     });
@@ -72,16 +110,20 @@ export class StatisticsHelper {
     user: User,
     drinks: Drink[],
     days?: number
-  ): Promise<object> {
+  ): Promise<UnitInsights> {
     const lowRiskMax = 2 * days;
     const increasedRiskMax = user.isMale() ? 7 * days : 5 * days;
     const units = sum(drinks.map((drink: Drink) => drink.units()));
     return {
-      lowRiskGoalPercentage: percentage(units, lowRiskMax),
-      increasedRiskGoalPercentage: percentage(units, increasedRiskMax),
-      count: units,
-      lowRiskMax,
-      increasedRiskMax
+      lowRisk: {
+        goalPercentage: percentage(units, lowRiskMax),
+        max: lowRiskMax
+      },
+      increasedRisk: {
+        goalPercentage: percentage(units, increasedRiskMax),
+        max: increasedRiskMax
+      },
+      count: units
     };
   }
 
