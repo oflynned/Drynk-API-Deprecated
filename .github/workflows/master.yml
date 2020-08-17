@@ -107,6 +107,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Deploy to Dokku
         uses: thadeu/easily-dokku-action@v1.0.8
