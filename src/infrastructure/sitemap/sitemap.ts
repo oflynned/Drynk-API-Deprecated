@@ -1,6 +1,6 @@
 import { Application, NextFunction, Request, Response } from 'express';
 
-import indexRouter from '../routes';
+import healthRouter from '../routes/health.route';
 import privacyRouter from '../routes/privacy.route';
 import drinksRouter from '../routes/drinks.route';
 import sessionRouter from '../routes/session.route';
@@ -18,7 +18,7 @@ import { Container } from '../dependency-injector';
 const logger: Logger = Logger.getInstance('api.infrastructure.sitemap');
 
 export const sitemap = (app: Application, di: Container): void => {
-  app.use('/', indexRouter);
+  app.use('/health', healthRouter);
   app.use('/privacy', privacyRouter);
   app.use('/drinks', drinksRouter);
   app.use('/sessions', sessionRouter);
