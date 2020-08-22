@@ -17,7 +17,6 @@ export const graphql = (app: Application): HttpServer => {
         // subscription context
         return authGqlContext({ headers: { ...connection.context } } as any);
       }
-
       // request context
       return authGqlContext(req);
     }

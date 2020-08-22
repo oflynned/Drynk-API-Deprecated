@@ -149,28 +149,28 @@ export class Session extends RelationalDocument<
     return new SessionSchema();
   }
 
-  async isEventWithinTolerance(newEventCreationTime?: Date): Promise<boolean> {
-    if (!newEventCreationTime) {
+  async isEventWithinTolerance(
+    reportedEventCreationTime?: Date
+  ): Promise<boolean> {
+    if (!reportedEventCreationTime) {
       // adding an event without a pre-determined time defaults to the current time in the session
       return true;
     }
 
-    if (newEventCreationTime > new Date()) {
+    if (reportedEventCreationTime > new Date()) {
       // cannot be in the future
       return false;
     }
 
-    const sessionEvents = await this.events();
-    const hasAtLeastOneDrink = sessionEvents.length > 0;
-    const firstEventAddedAt = hasAtLeastOneDrink
-      ? (await this.firstEvent()).toJson().createdAt
-      : newEventCreationTime;
-
+    const firstEvent = await this.firstEvent();
+    const firstEventAddedAt = firstEvent?.toJson().createdAt ?? new Date();
     const limitNewDrinkTime = dateAtTimeAgo(
       { value: 3, unit: 'hours' },
       new Date(firstEventAddedAt)
     );
-    return new Date(newEventCreationTime) > limitNewDrinkTime;
+
+    // finally we need to check if the reported time is within 3 hours of the start of the session
+    return new Date(reportedEventCreationTime) > limitNewDrinkTime;
   }
 
   async firstEvent(): Promise<Event | undefined> {

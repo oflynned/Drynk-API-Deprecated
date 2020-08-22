@@ -4,6 +4,9 @@ import { Session } from '../../models/session.model';
 
 export type UserHeader = { user: User };
 
+// TODO tidy these up, it's super messy
+export type ClientAppRequest = Request & { clientAppVersion: string };
+
 export type SocialProviderHeader = {
   provider: {
     providerId: string;
