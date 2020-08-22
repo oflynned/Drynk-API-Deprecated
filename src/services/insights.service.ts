@@ -5,8 +5,7 @@ import { User } from '../models/user.model';
 import { InsightsController } from '../controllers/stats/in-depth.stats';
 
 export class InsightsService {
-  constructor() {
-  }
+  constructor() {}
 
   async getOverview(user: User): Promise<Overview> {
     const sessionsOverAllTime: Session[] = await Session.findByUserId(
