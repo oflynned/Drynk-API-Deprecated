@@ -25,7 +25,7 @@ export class Server {
 
   build(di: Container): Server {
     const app = express();
-    app.use(morgan('combined'));
+    app.use(morgan('dev'));
     app.use(bodyParser.json());
     app.use(cookieParser());
     app.use(helmet());
