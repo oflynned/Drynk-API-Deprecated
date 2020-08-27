@@ -17,7 +17,8 @@ export class DrinkController {
     res: Response
   ): Promise<Response> {
     if (new Date(req.body.createdAt) > new Date()) {
-      throw new BadRequestError('Drink start time cannot be in the future');
+      // makes more sense to modify it to be now instead of throwing an error
+      req.body.createdAt = new Date();
     }
 
     if (!(await req.session.isEventWithinTolerance(req.body.createdAt))) {

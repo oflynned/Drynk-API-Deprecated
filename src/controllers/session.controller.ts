@@ -105,9 +105,9 @@ export class SessionController {
     req: SessionRequest,
     res: Response
   ): Promise<Response> {
-    const sessions: Session[] = await Repository.with(Session).findMany({
-      userId: req.user.toJson()._id
-    });
+    const userId = req.user.toJson()._id;
+    const sessions: Session[] = await Session.findByUserId(userId);
+
     // TODO this is inefficient, offload this to the query
     const session = sessions.sort(sortTimeDescending)[0];
     const timeline = await TimelineService.fetchSessionTimeline(session);
