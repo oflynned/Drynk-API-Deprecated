@@ -20,6 +20,11 @@ export class SentryHelper {
   static captureException(e: Error) {
     if (Environment.isProduction()) {
       Sentry.captureException(e);
+    } else {
+      this.logger.debug(
+        'Captured Sentry exception, printing locally instead due to dev mode'
+      );
+      this.logger.error(e);
     }
   }
 }

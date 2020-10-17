@@ -1,4 +1,5 @@
 import ky from 'ky-universal';
+import { SentryHelper } from '../../common/sentry';
 
 type Endpoint = 'users' | 'drinks';
 
@@ -41,7 +42,7 @@ export class ApiProxy {
         body: JSON.stringify(options.body ?? {})
       });
     } catch (e) {
-      console.error(e);
+      SentryHelper.captureException(e);
       console.info(
         'Steamrolled an exception, API redundancy may be out of sync!!'
       );
