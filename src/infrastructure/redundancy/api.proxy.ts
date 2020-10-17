@@ -25,18 +25,25 @@ export class ApiProxy {
       body?: object;
     }
   ): Promise<void> {
+    const id = options.id ?? '';
+    const url = `${this.destination}/proxy/${this.endpoint}/${id}`;
+
+    console.log(`Forwarding ${method.toUpperCase()} req to ${url}`);
+
     try {
-      await ky(`${this.destination}/${this.endpoint}/${options.id ?? ''}`, {
+      await ky(url, {
         method,
         headers: {
           authorization: firebaseToken,
-          'x-proxy-secret': this.secret
+          'x-proxy-secret': this.secret,
+          'content-type': 'application/json'
         },
         body: JSON.stringify(options.body ?? {})
       });
     } catch (e) {
-      console.error(
-        'Steamrolled an exception, API redundancy may be out of sync'
+      console.error(e);
+      console.info(
+        'Steamrolled an exception, API redundancy may be out of sync!!'
       );
     }
   }
