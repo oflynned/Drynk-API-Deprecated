@@ -5,6 +5,9 @@ import { BadRequestError } from '../infrastructure/errors';
 import { SessionService } from '../services/session.service';
 import { Session } from '../models/session.model';
 import { FirebaseHelper } from '../common/firebase';
+import { ApiProxy } from '../infrastructure/redundancy/api.proxy';
+
+const proxy = new ApiProxy('users');
 
 export class UserController {
   static async createUser(
@@ -15,6 +18,8 @@ export class UserController {
       const user: User = await new User()
         .build({ ...req.body, ...req.provider })
         .save();
+
+      await proxy.create(req.headers.authorization, user.toJson());
 
       return res.status(201).json(user.toJson());
     } catch (e) {
@@ -48,6 +53,8 @@ export class UserController {
         )
       );
 
+      await proxy.update(req.headers.authorization, payload);
+
       return res.status(200).json(user.toJson());
     } catch (e) {
       throw new BadRequestError(
@@ -63,6 +70,7 @@ export class UserController {
   ): Promise<Response> {
     await FirebaseHelper.purgeFirebaseAccount(req.user.toJson().providerId);
     await req.user.softDeleteAndAnonymise();
+    await proxy.delete(req.headers.authorization);
     return res.status(204).send();
   }
 }
