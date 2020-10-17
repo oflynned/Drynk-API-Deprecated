@@ -17,41 +17,39 @@ export class ApiProxy {
     this.destination = process.env.PROXY_API_URL;
   }
 
-  async create(firebaseToken: string, payload: object): Promise<void> {
+  private async request(
+    method: 'post' | 'patch' | 'delete',
+    firebaseToken: string,
+    options: {
+      id?: string;
+      body?: object;
+    }
+  ): Promise<void> {
     try {
-      await ky.post(`${this.destination}/${this.endpoint}`, {
+      await ky(`${this.destination}/${this.endpoint}/${options.id ?? ''}`, {
+        method,
         headers: {
           authorization: firebaseToken,
           'x-proxy-secret': this.secret
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(options.body ?? {})
       });
     } catch (e) {
-      console.error(e);
+      console.error(
+        'Steamrolled an exception, API redundancy may be out of sync'
+      );
     }
   }
 
-  async update(firebaseToken: string, payload: object): Promise<void> {
-    try {
-      await ky.patch(`${this.destination}/${this.endpoint}`, {
-        headers: {
-          authorization: firebaseToken,
-          'x-proxy-secret': this.secret
-        },
-        body: JSON.stringify(payload)
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  async create(firebaseToken: string, body: object): Promise<void> {
+    await this.request('post', firebaseToken, { body });
+  }
+
+  async update(firebaseToken: string, body: object): Promise<void> {
+    await this.request('patch', firebaseToken, { body });
   }
 
   async delete(firebaseToken: string, id?: string): Promise<void> {
-    try {
-      await ky.delete(`${this.destination}/${this.endpoint}/${id ?? ''}`, {
-        headers: { authorization: firebaseToken, 'x-proxy-secret': this.secret }
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    await this.request('delete', firebaseToken, { id });
   }
 }
