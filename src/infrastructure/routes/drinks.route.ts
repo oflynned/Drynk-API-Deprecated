@@ -10,6 +10,9 @@ import {
   SessionRequest
 } from '../middleware/authenticated.request';
 import { createSessionIfSober } from '../middleware/session.middleware';
+import { ApiProxy } from '../redundancy/api.proxy';
+
+const proxy = new ApiProxy('drinks');
 
 const routes = (): Router => {
   const router = Router();
@@ -29,8 +32,11 @@ const routes = (): Router => {
         createSessionIfSober(req, res, next)
     ),
     asyncHandler(
-      async (req: SessionRequest, res: Response): Promise<Response> =>
-        DrinkController.createDrink(req, res)
+      async (req: SessionRequest, res: Response): Promise<Response> => {
+        const drink = await DrinkController.createDrink(req, res);
+        await proxy.create(req.headers.authorization, drink);
+        return drink;
+      }
     )
   );
 

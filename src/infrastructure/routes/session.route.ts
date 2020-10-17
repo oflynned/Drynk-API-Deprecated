@@ -18,6 +18,9 @@ import { SessionService } from '../../services/session.service';
 import { Session } from '../../models/session.model';
 import { ResourceNotFoundError } from '../errors';
 import { withDevEnvironment } from '../middleware/development.middleware';
+import { ApiProxy } from '../redundancy/api.proxy';
+
+const proxy = new ApiProxy('drinks');
 
 const routes = (): Router => {
   const router = Router();
@@ -160,8 +163,10 @@ const routes = (): Router => {
         withSession(req, res, next)
     ),
     asyncHandler(
-      async (req: SessionRequest, res: Response): Promise<Response> =>
-        DrinkController.destroyDrink(req, res)
+      async (req: SessionRequest, res: Response): Promise<Response> => {
+        await proxy.delete(req.headers.authorization, req.params.drinkId);
+        return DrinkController.destroyDrink(req, res);
+      }
     )
   );
 

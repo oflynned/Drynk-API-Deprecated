@@ -8,6 +8,9 @@ import {
 import { AuthenticatedRequest } from '../middleware/authenticated.request';
 
 import asyncHandler from 'express-async-handler';
+import { ApiProxy } from '../redundancy/api.proxy';
+
+const proxy = new ApiProxy('users');
 
 const routes = (): Router => {
   const router = Router();
@@ -26,7 +29,11 @@ const routes = (): Router => {
         return UserController.findUser(req, res);
       }
 
-      return UserController.createUser(req, res);
+      const user = await UserController.createUser(req, res);
+
+      await proxy.create(req.headers.authorization, user);
+
+      return user;
     })
   );
 
@@ -53,9 +60,11 @@ const routes = (): Router => {
       async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
         requireUser(req, res, next)
     ),
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
-      UserController.updateUser(req, res)
-    )
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+      await proxy.update(req.headers.authorization, req.body);
+
+      return UserController.updateUser(req, res);
+    })
   );
 
   router.delete(
@@ -67,9 +76,11 @@ const routes = (): Router => {
       async (req: AuthenticatedRequest, res: Response, next: NextFunction) =>
         requireUser(req, res, next)
     ),
-    asyncHandler(async (req: AuthenticatedRequest, res: Response) =>
-      UserController.deleteUser(req, res)
-    )
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+      await proxy.delete(req.headers.authorization);
+
+      return UserController.deleteUser(req, res);
+    })
   );
 
   return router;
