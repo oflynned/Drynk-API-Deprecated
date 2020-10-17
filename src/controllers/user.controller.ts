@@ -6,6 +6,7 @@ import { SessionService } from '../services/session.service';
 import { Session } from '../models/session.model';
 import { FirebaseHelper } from '../common/firebase';
 import { ApiProxy } from '../infrastructure/redundancy/api.proxy';
+import { Environment } from '../config/environment';
 
 const proxy = new ApiProxy('users');
 
@@ -19,7 +20,9 @@ export class UserController {
         .build({ ...req.body, ...req.provider })
         .save();
 
-      await proxy.create(req.headers.authorization, user.toJson());
+      if (Environment.isProduction()) {
+        await proxy.create(req.headers.authorization, user.toJson());
+      }
 
       return res.status(201).json(user.toJson());
     } catch (e) {
@@ -53,7 +56,9 @@ export class UserController {
         )
       );
 
-      await proxy.update(req.headers.authorization, payload);
+      if (Environment.isProduction()) {
+        await proxy.update(req.headers.authorization, payload);
+      }
 
       return res.status(200).json(user.toJson());
     } catch (e) {
@@ -70,7 +75,11 @@ export class UserController {
   ): Promise<Response> {
     await FirebaseHelper.purgeFirebaseAccount(req.user.toJson().providerId);
     await req.user.softDeleteAndAnonymise();
-    await proxy.delete(req.headers.authorization);
+
+    if (Environment.isProduction()) {
+      await proxy.delete(req.headers.authorization);
+    }
+
     return res.status(204).send();
   }
 }
