@@ -11,6 +11,11 @@ import {
 } from '../infrastructure/errors';
 import { SessionController } from './session.controller';
 import { sortTimeAscending } from '../models/event.type';
+import { ApiProxy } from '../infrastructure/redundancy/api.proxy';
+import { Environment } from '../config/environment';
+
+const proxy = new ApiProxy('drinks');
+
 export class DrinkController {
   static async createDrink(
     req: SessionRequest,
@@ -37,6 +42,11 @@ export class DrinkController {
         .save();
 
       await req.session.refresh();
+
+      if (Environment.isProduction()) {
+        await proxy.create(req.headers.authorization, drink.toJson());
+      }
+
       return res.status(201).json(drink.toJson());
     } catch (e) {
       throw new BadRequestError();
@@ -89,6 +99,10 @@ export class DrinkController {
 
     await drink.hardDelete();
     await req.session.refresh();
+
+    if (Environment.isProduction()) {
+      await proxy.delete(req.headers.authorization, req.params.drinkId);
+    }
 
     return SessionController.getSessionsDrinks(req, res);
   }
