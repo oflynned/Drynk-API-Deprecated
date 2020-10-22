@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/node';
 import { Environment } from '../config/environment';
-import { SentryOptions } from '../config/sentry.config';
 import { Logger } from './logger';
+import { NodeOptions } from '@sentry/node';
 
 export class SentryHelper {
   private static logger: Logger = Logger.getInstance('api.common.sentry');
 
-  static registerSentry(config: SentryOptions) {
+  static registerSentry(config: NodeOptions) {
     if (Environment.isProduction()) {
       Sentry.init(config);
       this.logger.info('Registered Sentry on production environment');
