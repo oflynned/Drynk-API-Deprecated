@@ -12,7 +12,7 @@ import { graphql } from './graphql';
 import { registerCronJobs } from './cron-jobs';
 import { Logger } from '../common/logger';
 import { RequestContext } from 'mikro-orm';
-import { Container, DependencyInjector } from './dependency-injector';
+import { Container } from './dependency-injector';
 import { SentryHelper } from '../common/sentry';
 import { sentryConfig } from '../config/sentry.config';
 import { Environment } from '../config/environment';
