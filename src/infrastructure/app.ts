@@ -23,7 +23,6 @@ export class App {
 
     // other services
     FirebaseHelper.registerFirebase(firebaseConfig());
-    SentryHelper.registerSentry(sentryConfig());
 
     const server = new Server().build(di.getContainer());
     return server.listen(serverConfig().port);

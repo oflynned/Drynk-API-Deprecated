@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import http from 'http';
+import * as Sentry from '@sentry/node';
 
 import { sitemap } from './sitemap';
 import { graphql } from './graphql';
@@ -12,6 +13,9 @@ import { registerCronJobs } from './cron-jobs';
 import { Logger } from '../common/logger';
 import { RequestContext } from 'mikro-orm';
 import { Container, DependencyInjector } from './dependency-injector';
+import { SentryHelper } from '../common/sentry';
+import { sentryConfig } from '../config/sentry.config';
+import { Environment } from '../config/environment';
 
 export class Server {
   private _httpServer: http.Server;
@@ -25,6 +29,14 @@ export class Server {
 
   build(di: Container): Server {
     const app = express();
+
+    SentryHelper.registerSentry(sentryConfig(app));
+
+    if (Environment.isProduction()) {
+      app.use(Sentry.Handlers.requestHandler());
+      app.use(Sentry.Handlers.tracingHandler());
+    }
+
     app.use(morgan('dev'));
     app.use(bodyParser.json());
     app.use(cookieParser());
