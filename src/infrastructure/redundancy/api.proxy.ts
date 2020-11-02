@@ -20,6 +20,7 @@ export class ApiProxy {
 
   private async request(
     method: 'post' | 'patch' | 'delete',
+    firebaseUid: string,
     firebaseToken: string,
     options: {
       id?: string;
@@ -36,6 +37,7 @@ export class ApiProxy {
         method,
         headers: {
           authorization: firebaseToken,
+          'x-firebase-uid': firebaseUid,
           'x-proxy-secret': this.secret,
           'content-type': 'application/json'
         },
@@ -49,15 +51,27 @@ export class ApiProxy {
     }
   }
 
-  async create(firebaseToken: string, body: object): Promise<void> {
-    await this.request('post', firebaseToken, { body });
+  async create(
+    firebaseUid: string,
+    firebaseToken: string,
+    body: object
+  ): Promise<void> {
+    await this.request('post', firebaseUid, firebaseToken, { body });
   }
 
-  async update(firebaseToken: string, body: object): Promise<void> {
-    await this.request('patch', firebaseToken, { body });
+  async update(
+    firebaseUid: string,
+    firebaseToken: string,
+    body: object
+  ): Promise<void> {
+    await this.request('patch', firebaseUid, firebaseToken, { body });
   }
 
-  async delete(firebaseToken: string, id?: string): Promise<void> {
-    await this.request('delete', firebaseToken, { id });
+  async delete(
+    firebaseUid: string,
+    firebaseToken: string,
+    id?: string
+  ): Promise<void> {
+    await this.request('delete', firebaseUid, firebaseToken, { id });
   }
 }

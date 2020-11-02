@@ -44,7 +44,11 @@ export class DrinkController {
       await req.session.refresh();
 
       if (Environment.isProduction()) {
-        await proxy.create(req.headers.authorization, drink.toJson());
+        await proxy.create(
+          req.user.toJson().providerId,
+          req.headers.authorization,
+          drink.toJson()
+        );
       }
 
       return res.status(201).json(drink.toJson());
@@ -101,7 +105,11 @@ export class DrinkController {
     await req.session.refresh();
 
     if (Environment.isProduction()) {
-      await proxy.delete(req.headers.authorization, req.params.drinkId);
+      await proxy.delete(
+        req.user.toJson().providerId,
+        req.headers.authorization,
+        req.params.drinkId
+      );
     }
 
     return SessionController.getSessionsDrinks(req, res);

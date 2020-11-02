@@ -21,7 +21,11 @@ export class UserController {
         .save();
 
       if (Environment.isProduction()) {
-        await proxy.create(req.headers.authorization, user.toJson());
+        await proxy.create(
+          user.toJson().providerId,
+          req.headers.authorization,
+          user.toJson()
+        );
       }
 
       return res.status(201).json(user.toJson());
@@ -57,7 +61,11 @@ export class UserController {
       );
 
       if (Environment.isProduction()) {
-        await proxy.update(req.headers.authorization, payload);
+        await proxy.update(
+          user.toJson().providerId,
+          req.headers.authorization,
+          payload
+        );
       }
 
       return res.status(200).json(user.toJson());
@@ -77,7 +85,10 @@ export class UserController {
     await req.user.softDeleteAndAnonymise();
 
     if (Environment.isProduction()) {
-      await proxy.delete(req.headers.authorization);
+      await proxy.delete(
+        req.user.toJson().providerId,
+        req.headers.authorization
+      );
     }
 
     return res.status(204).send();
