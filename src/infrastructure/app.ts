@@ -4,11 +4,9 @@ import * as http from 'http';
 import { Server } from './server';
 
 import { firebaseConfig } from '../config/firebase.config';
-import { sentryConfig } from '../config/sentry.config';
 import { dbConfig } from '../config/database.config';
 import { serverConfig } from '../config/server.config';
 
-import { SentryHelper } from '../common/sentry';
 import { FirebaseHelper } from '../common/firebase';
 import { DatabaseHelper } from '../common/database';
 import { DependencyInjector } from './dependency-injector';

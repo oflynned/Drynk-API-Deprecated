@@ -10,7 +10,6 @@ import fallbackRouter from '../routes/fallback.route';
 
 import { HttpError, HttpErrorType } from '../errors/http.error';
 import { Logger } from '../../common/logger';
-import { SentryHelper } from '../../common/sentry';
 import { Environment } from '../../config/environment';
 import { SearchController } from '../../microservices/alcohol-store/search.controller';
 import { Container } from '../dependency-injector';
@@ -37,20 +36,11 @@ export const sitemap = (app: Application, di: Container): void => {
       res: Response,
       next: NextFunction
     ) => {
-      if (Environment.isProduction()) {
-        logger.error(internalError.name);
-
-        if (internalError.status >= 500) {
-          SentryHelper.captureException(internalError);
-        }
-      } else {
-        logger.error('A stacktrace happened!');
-        console.error(internalError);
-      }
-
-      // INFO HttpErrorType is used as it needs to extend `Error` for tests to accept a throw
-      //      and here we need to infer some internal properties
+      // HttpErrorType is used as it needs to extend `Error` for tests to accept a throw
+      // and here we need to infer some internal properties
       const error = internalError as HttpErrorType & any;
+      logger.error(error);
+
       res.status(error._status);
       res.json({
         name: error._name,

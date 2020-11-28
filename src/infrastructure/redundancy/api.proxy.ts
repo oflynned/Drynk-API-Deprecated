@@ -1,12 +1,11 @@
 import ky from 'ky-universal';
-import { SentryHelper } from '../../common/sentry';
 
 type Endpoint = 'users' | 'drinks';
 
-// temp class to forward any writes to the new api
-// this can be removed in a few months when usage drops to 0
-// the app should probably have some killswitch put in to force an update
-// as this write-through solution isn't bad, but it needs to be deprecated relatively soon
+// TODO temp class to forward any writes to the new api
+//      this can be removed in a few months when usage drops to 0
+//      the app should probably have some killswitch put in to force an update
+//      as this write-through solution isn't bad, but it needs to be deprecated relatively soon
 export class ApiProxy {
   private readonly secret: string;
   private readonly destination: string;
@@ -44,7 +43,6 @@ export class ApiProxy {
         body: JSON.stringify(options.body ?? {})
       });
     } catch (e) {
-      SentryHelper.captureException(e);
       console.info(
         'Steamrolled an exception, API redundancy may be out of sync!!'
       );
